@@ -1010,24 +1010,50 @@ Provide a well-formatted, natural language answer with ALL the data:""")
             yield json_module.dumps({"type": "status", "message": f"Found {result_count} results. Generating response..."}) + "\n"
             print(f"🤖 Step 9: Streaming answer from LLM...")
             
+            # Check if user wants all data
+            wants_all_data = any(word in question.lower() for word in [
+                "all", "complete", "full", "entire", "sabhi", "sab", "poora", "pura", 
+                "sara", "sare", "total", "every", "detailed list"
+            ])
+            
+            # Limit results to 15 unless user asks for all
+            display_results = results
+            showing_sample = False
+            if result_count > 15 and not wants_all_data:
+                display_results = results[:15]
+                showing_sample = True
+            
             # Stream the answer generation
             language_instruction = "Respond in Hinglish (Hindi-English mix)." if detected_language == "hinglish" else "Respond in English"
+            
+            sample_note = f"""
+IMPORTANT: The query returned {result_count} total records but only showing first 15 as a sample.
+Mention this clearly: "Total {result_count} records found. Showing 15 sample records. Ask for 'complete data' or 'all records' to see everything."
+""" if showing_sample else ""
             
             answer_prompt = f"""You are a helpful database assistant. {language_instruction}
 
 User Question: {question}
-SQL Query: {sanitized_sql}
+SQL Query Used: {sanitized_sql}
 Total Results: {result_count}
-Query Results: {str(results[:100]) if result_count > 100 else str(results)}
+Query Results: {str(display_results)}
+{sample_note}
 
-FORMATTING RULES:
-1. Start with a brief summary
-2. Use markdown TABLE format for multiple columns
-3. Use numbered lists for simple lists
-4. Be concise but complete
-5. Do NOT say "showing sample" - present ALL data
+CRITICAL RESPONSE RULES:
+1. DIRECTLY ANSWER the user's question in natural language
+2. DO NOT describe what the SQL query does - answer what the USER asked
+3. Start with a brief, friendly summary answering their question
+4. Use markdown TABLE format for data with multiple columns
+5. Use numbered lists for simple lists
+6. Be conversational and helpful
 
-Provide a well-formatted answer:"""
+BAD EXAMPLE (don't do this):
+"Yeh query yeh dikhati hai ki..." or "The SQL query shows..."
+
+GOOD EXAMPLE (do this):
+"Here are the users who have overdue tasks:" or "Yeh rahi list of users jinke tasks pending hain:"
+
+Provide a well-formatted, natural language answer:"""
 
             # Use streaming LLM
             full_answer = ""
@@ -1073,6 +1099,16 @@ CRITICAL RULES:
 - checklist.status: 'yes' (completed), 'no' (not completed)
 - users.status: 'active', 'inactive', 'on_leave', 'terminated'
 
+⚠️ CASE-INSENSITIVE STRING MATCHING:
+ALWAYS use case-insensitive comparisons for text fields like names, usernames, email, etc.
+- Use ILIKE instead of LIKE: WHERE username ILIKE '%kavi%'
+- Use LOWER() for exact matches: WHERE LOWER(username) = LOWER('Kavi Singh')
+- For partial matches: WHERE LOWER(name) LIKE LOWER('%search%')
+
+Examples:
+- Finding user "Kavi Singh" or "kavi singh": WHERE LOWER(username) = LOWER('Kavi Singh')
+- Finding names containing "john": WHERE name ILIKE '%john%'
+
 ⚠️ CRITICAL DATE HANDLING:
 The column checklist.planned_date stores dates as TEXT in MIXED formats and may have invalid data.
 
@@ -1097,6 +1133,21 @@ This safely handles:
 - DD/MM/YYYY dates (28/11/2025)
 - ISO dates (2025-12-22T09:00:00)  
 - Ignores invalid data (numbers, nulls, etc.)
+
+⚠️ DELEGATION TABLE USAGE:
+The 'delegation' table tracks task handovers/coverage between users.
+Use this table when user asks about:
+- Who is covering for whom / Kaun kiska kaam cover kar raha hai
+- Task handovers / transfers
+- Temporary assignments
+- Backup work / substitute assignments
+- Who took over tasks
+
+Example - Show who is covering whose work:
+SELECT d.*, u1.username as delegator_name, u2.username as delegatee_name 
+FROM delegation d
+LEFT JOIN users u1 ON d.delegator_id = u1.id
+LEFT JOIN users u2 ON d.delegatee_id = u2.id
 
 Database Schema:
 {schema}

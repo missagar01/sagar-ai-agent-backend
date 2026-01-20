@@ -32,11 +32,60 @@ const clearCacheBtn = document.getElementById('clearCacheBtn');
 const cacheIndicator = document.getElementById('cacheIndicator');
 const sessionIndicator = document.getElementById('sessionIndicator');
 
+// Confirmation Modal Elements
+const confirmModal = document.getElementById('confirmModal');
+const confirmIcon = document.getElementById('confirmIcon');
+const confirmTitle = document.getElementById('confirmTitle');
+const confirmMessage = document.getElementById('confirmMessage');
+const confirmOkBtn = document.getElementById('confirmOkBtn');
+const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+
 // State
 let currentSessionId = null;
 let isGenerating = false;
 let currentRequestId = null;
 let abortController = null;
+let confirmResolve = null;
+
+// ============================================================================
+// CONFIRMATION MODAL
+// ============================================================================
+
+function showConfirmModal(options = {}) {
+    const {
+        title = 'Are you sure?',
+        message = 'This action cannot be undone.',
+        icon = 'warning', // 'warning', 'danger', 'info'
+        confirmText = 'Confirm',
+        cancelText = 'Cancel',
+        confirmClass = '' // 'primary' for non-destructive
+    } = options;
+    
+    return new Promise((resolve) => {
+        confirmResolve = resolve;
+        
+        confirmTitle.textContent = title;
+        confirmMessage.textContent = message;
+        confirmOkBtn.textContent = confirmText;
+        confirmCancelBtn.textContent = cancelText;
+        
+        // Set icon style
+        confirmIcon.className = `confirm-icon ${icon}`;
+        
+        // Set confirm button style
+        confirmOkBtn.className = `btn-confirm ${confirmClass}`;
+        
+        confirmModal.style.display = 'flex';
+    });
+}
+
+function closeConfirmModal(result) {
+    confirmModal.style.display = 'none';
+    if (confirmResolve) {
+        confirmResolve(result);
+        confirmResolve = null;
+    }
+}
 
 // ============================================================================
 // INITIALIZATION
@@ -68,6 +117,15 @@ function setupEventListeners() {
     cacheModal.addEventListener('click', (e) => {
         if (e.target === cacheModal) {
             cacheModal.style.display = 'none';
+        }
+    });
+    
+    // Confirmation modal handlers
+    confirmOkBtn.addEventListener('click', () => closeConfirmModal(true));
+    confirmCancelBtn.addEventListener('click', () => closeConfirmModal(false));
+    confirmModal.addEventListener('click', (e) => {
+        if (e.target === confirmModal) {
+            closeConfirmModal(false);
         }
     });
 }
@@ -217,7 +275,14 @@ async function createNewSession() {
 }
 
 async function deleteSession(sessionId) {
-    if (!confirm('Are you sure you want to delete this conversation?')) return;
+    const confirmed = await showConfirmModal({
+        title: 'Delete Conversation?',
+        message: 'This will permanently delete this conversation and all its messages.',
+        icon: 'danger',
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+    });
+    if (!confirmed) return;
     
     try {
         await fetch(`${API_BASE_URL}/chat/sessions/${sessionId}`, {
@@ -248,7 +313,14 @@ async function deleteCurrentSession() {
 async function clearCurrentChat() {
     if (!currentSessionId) return;
     
-    if (!confirm('Clear all messages in this conversation?')) return;
+    const confirmed = await showConfirmModal({
+        title: 'Clear Chat?',
+        message: 'This will remove all messages from this conversation. The conversation itself will remain.',
+        icon: 'warning',
+        confirmText: 'Clear',
+        cancelText: 'Cancel'
+    });
+    if (!confirmed) return;
     
     try {
         await fetch(`${API_BASE_URL}/chat/sessions/${currentSessionId}/clear`, {
@@ -532,7 +604,14 @@ async function showCacheStats() {
 }
 
 async function clearCache() {
-    if (!confirm('Clear all cached queries? This cannot be undone.')) return;
+    const confirmed = await showConfirmModal({
+        title: 'Clear Cache?',
+        message: 'This will remove all cached query results. This action cannot be undone.',
+        icon: 'warning',
+        confirmText: 'Clear Cache',
+        cancelText: 'Cancel'
+    });
+    if (!confirmed) return;
     
     try {
         await fetch(`${API_BASE_URL}/chat/cache/clear`, {

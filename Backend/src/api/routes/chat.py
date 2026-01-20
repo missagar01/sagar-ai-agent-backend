@@ -226,13 +226,13 @@ async def chat_stream_endpoint(request: ChatRequest):
     
     request_id = str(uuid.uuid4())
     
-    def generate():
-        for chunk in chat_service.process_query_streaming(
+    async def generate():
+        async for chunk in chat_service.process_query_streaming(
             question=request.question,
             session_id=request.session_id,
             request_id=request_id
         ):
-            yield f"data: {chunk}\n"
+            yield f"data: {chunk}\n\n"
     
     return StreamingResponse(
         generate(),

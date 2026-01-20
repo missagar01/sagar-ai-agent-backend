@@ -928,15 +928,18 @@ Provide a well-formatted, natural language answer with ALL the data:""")
                     role="user",
                     content=question
                 )
+                print(f"💬 Added user message to session {session_id[:8]}...")
             
             # Yield: Processing started
             yield json_module.dumps({"type": "status", "message": "Processing your query..."}) + "\n"
+            print("📝 Step 1: Processing query...")
             
             # Default language detection (done early for all paths)
             question_lower = question.lower()
             words = question_lower.split()
             hinglish_count = sum(1 for w in words if w in self.hinglish_words)
             detected_language = "hinglish" if hinglish_count >= 2 else "english"
+            print(f"🌐 Step 2: Detected language: {detected_language}")
             
             # Check cache first
             cached = query_cache.find_similar_query(question)
@@ -944,11 +947,14 @@ Provide a well-formatted, natural language answer with ALL the data:""")
                 yield json_module.dumps({"type": "status", "message": "Found similar query in cache!"}) + "\n"
                 yield json_module.dumps({"type": "cache_hit", "value": True}) + "\n"
                 generated_sql = cached['sql']
+                print(f"⚡ Step 3: CACHE HIT! Using cached SQL")
             else:
                 yield json_module.dumps({"type": "cache_hit", "value": False}) + "\n"
+                print("🔍 Step 3: Cache miss - generating new SQL...")
                 
                 # Fetch schema
                 yield json_module.dumps({"type": "status", "message": "Fetching database context..."}) + "\n"
+                print("📊 Step 4: Fetching database schema...")
                 schema_context = self._get_detailed_schema()
                 enum_context = self._get_enum_context()
                 sample_data = self._get_sample_data_context()
@@ -956,6 +962,7 @@ Provide a well-formatted, natural language answer with ALL the data:""")
                 
                 # Generate SQL
                 yield json_module.dumps({"type": "status", "message": "Generating SQL query..."}) + "\n"
+                print("🤖 Step 5: Calling LLM to generate SQL...")
                 
                 # Build SQL prompt (simplified for streaming)
                 sql_prompt = self._build_sql_prompt(
@@ -967,32 +974,41 @@ Provide a well-formatted, natural language answer with ALL the data:""")
                 generated_sql = resp.content.strip()
                 generated_sql = re.sub(r"```sql|```", "", generated_sql).strip()
                 generated_sql = re.sub(r"--.*$", "", generated_sql, flags=re.MULTILINE).strip()
+                print(f"✅ Step 6: SQL Generated:\n{generated_sql[:200]}...")
                 
                 # Cache the query
                 query_cache.cache_query(question, generated_sql, "", detected_language)
+                print("💾 Cached new query")
             
             # Security validation
             yield json_module.dumps({"type": "status", "message": "Validating query security..."}) + "\n"
+            print("🔒 Step 7: Validating SQL security...")
             is_valid, error_message, sanitized_sql = validate_sql_security(generated_sql)
             
             if not is_valid:
+                print(f"❌ Security validation FAILED: {error_message}")
                 yield json_module.dumps({"type": "error", "message": f"Query blocked: {error_message}"}) + "\n"
                 return
+            print("✅ Security validation passed")
             
             # Yield the SQL
             yield json_module.dumps({"type": "sql", "value": sanitized_sql}) + "\n"
             
             # Execute query
             yield json_module.dumps({"type": "status", "message": "Executing query..."}) + "\n"
+            print("🗄️ Step 8: Executing SQL query...")
             
             try:
                 results = self.db_service.execute_select(sanitized_sql)
                 result_count = len(results) if results else 0
+                print(f"✅ Query executed - {result_count} results")
             except Exception as e:
+                print(f"❌ Query execution FAILED: {str(e)}")
                 yield json_module.dumps({"type": "error", "message": f"Query failed: {str(e)}"}) + "\n"
                 return
             
             yield json_module.dumps({"type": "status", "message": f"Found {result_count} results. Generating response..."}) + "\n"
+            print(f"🤖 Step 9: Streaming answer from LLM...")
             
             # Stream the answer generation
             language_instruction = "Respond in Hinglish (Hindi-English mix)." if detected_language == "hinglish" else "Respond in English"
@@ -1056,8 +1072,31 @@ CRITICAL RULES:
 - ONLY SELECT queries allowed
 - checklist.status: 'yes' (completed), 'no' (not completed)
 - users.status: 'active', 'inactive', 'on_leave', 'terminated'
-- checklist.planned_date is TEXT in DD/MM/YYYY format
-- Use TO_TIMESTAMP(planned_date, 'DD/MM/YYYY') for date comparisons
+
+⚠️ CRITICAL DATE HANDLING:
+The column checklist.planned_date stores dates as TEXT in MIXED formats and may have invalid data.
+
+Create a helper function in your query using a CTE or just filter valid dates:
+
+For date comparisons, first filter only valid date formats, then compare:
+- Valid DD/MM/YYYY: planned_date ~ '^[0-9]{{2}}/[0-9]{{2}}/[0-9]{{4}}$'
+- Valid ISO: planned_date ~ '^[0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}}'
+
+Example - Find active users with overdue incomplete tasks (HANDLES ALL DATE FORMATS SAFELY):
+SELECT DISTINCT u.* FROM users u
+JOIN checklist c ON u.id = c.user_id
+WHERE u.status = 'active' 
+AND c.status = 'no' 
+AND (
+    (c.planned_date ~ '^[0-9]{{2}}/[0-9]{{2}}/[0-9]{{4}}$' AND TO_TIMESTAMP(c.planned_date, 'DD/MM/YYYY') < NOW())
+    OR 
+    (c.planned_date ~ '^[0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}}' AND c.planned_date::timestamp < NOW())
+)
+
+This safely handles:
+- DD/MM/YYYY dates (28/11/2025)
+- ISO dates (2025-12-22T09:00:00)  
+- Ignores invalid data (numbers, nulls, etc.)
 
 Database Schema:
 {schema}

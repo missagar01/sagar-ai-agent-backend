@@ -32,90 +32,20 @@ const clearCacheBtn = document.getElementById('clearCacheBtn');
 const cacheIndicator = document.getElementById('cacheIndicator');
 const sessionIndicator = document.getElementById('sessionIndicator');
 
-// Confirmation Modal Elements
-const confirmModal = document.getElementById('confirmModal');
-const confirmIcon = document.getElementById('confirmIcon');
-const confirmTitle = document.getElementById('confirmTitle');
-const confirmMessage = document.getElementById('confirmMessage');
-const confirmOkBtn = document.getElementById('confirmOkBtn');
-const confirmCancelBtn = document.getElementById('confirmCancelBtn');
-
 // State
 let currentSessionId = null;
 let isGenerating = false;
 let currentRequestId = null;
 let abortController = null;
-let confirmResolve = null;
-let currentSessionHasMessages = false; // Track if current session has any messages
-
-// ============================================================================
-// CONFIRMATION MODAL
-// ============================================================================
-
-function showConfirmModal(options = {}) {
-    const {
-        title = 'Are you sure?',
-        message = 'This action cannot be undone.',
-        icon = 'warning', // 'warning', 'danger', 'info'
-        confirmText = 'Confirm',
-        cancelText = 'Cancel',
-        confirmClass = '' // 'primary' for non-destructive
-    } = options;
-    
-    return new Promise((resolve) => {
-        confirmResolve = resolve;
-        
-        confirmTitle.textContent = title;
-        confirmMessage.textContent = message;
-        confirmOkBtn.textContent = confirmText;
-        confirmCancelBtn.textContent = cancelText;
-        
-        // Set icon style
-        confirmIcon.className = `confirm-icon ${icon}`;
-        
-        // Set confirm button style
-        confirmOkBtn.className = `btn-confirm ${confirmClass}`;
-        
-        confirmModal.style.display = 'flex';
-    });
-}
-
-function closeConfirmModal(result) {
-    confirmModal.style.display = 'none';
-    if (confirmResolve) {
-        confirmResolve(result);
-        confirmResolve = null;
-    }
-}
 
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     startTypingAnimation();
+    loadSessions();
     setupEventListeners();
-    
-    // Always create a new chat on site load
-    await createNewSession();
-    await loadSessions();
-});
-
-// Clean up empty sessions when user leaves the site
-window.addEventListener('beforeunload', () => {
-    // If current session has no messages, delete it silently
-    if (currentSessionId && !currentSessionHasMessages) {
-        // Use sendBeacon for reliable delivery even when page is closing
-        navigator.sendBeacon(`${API_BASE_URL}/chat/sessions/${currentSessionId}/delete-empty`);
-    }
-});
-
-// Also handle visibility change (when user switches tabs or minimizes)
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden' && currentSessionId && !currentSessionHasMessages) {
-        // Don't delete on tab switch, only track
-        // The actual deletion happens on beforeunload
-    }
 });
 
 function setupEventListeners() {
@@ -138,15 +68,6 @@ function setupEventListeners() {
     cacheModal.addEventListener('click', (e) => {
         if (e.target === cacheModal) {
             cacheModal.style.display = 'none';
-        }
-    });
-    
-    // Confirmation modal handlers
-    confirmOkBtn.addEventListener('click', () => closeConfirmModal(true));
-    confirmCancelBtn.addEventListener('click', () => closeConfirmModal(false));
-    confirmModal.addEventListener('click', (e) => {
-        if (e.target === confirmModal) {
-            closeConfirmModal(false);
         }
     });
 }
@@ -243,9 +164,6 @@ async function loadSessionMessages(sessionId) {
         const response = await fetch(`${API_BASE_URL}/chat/sessions/${sessionId}/messages`);
         const data = await response.json();
         
-        // Track if this session has messages
-        currentSessionHasMessages = data.messages.length > 0;
-        
         chatDisplay.innerHTML = '';
         
         if (data.messages.length === 0) {
@@ -272,17 +190,6 @@ async function loadSessionMessages(sessionId) {
 
 async function createNewSession() {
     try {
-        // Before creating new session, delete current if it has no messages
-        if (currentSessionId && !currentSessionHasMessages) {
-            try {
-                await fetch(`${API_BASE_URL}/chat/sessions/${currentSessionId}`, {
-                    method: 'DELETE'
-                });
-            } catch (e) {
-                // Silently ignore errors when deleting empty session
-            }
-        }
-        
         const response = await fetch(`${API_BASE_URL}/chat/sessions`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -291,7 +198,6 @@ async function createNewSession() {
         
         const session = await response.json();
         currentSessionId = session.session_id;
-        currentSessionHasMessages = false; // New session has no messages
         
         await loadSessions();
         selectSession(session.session_id);
@@ -311,14 +217,7 @@ async function createNewSession() {
 }
 
 async function deleteSession(sessionId) {
-    const confirmed = await showConfirmModal({
-        title: 'Delete Conversation?',
-        message: 'This will permanently delete this conversation and all its messages.',
-        icon: 'danger',
-        confirmText: 'Delete',
-        cancelText: 'Cancel'
-    });
-    if (!confirmed) return;
+    if (!confirm('Are you sure you want to delete this conversation?')) return;
     
     try {
         await fetch(`${API_BASE_URL}/chat/sessions/${sessionId}`, {
@@ -349,14 +248,7 @@ async function deleteCurrentSession() {
 async function clearCurrentChat() {
     if (!currentSessionId) return;
     
-    const confirmed = await showConfirmModal({
-        title: 'Clear Chat?',
-        message: 'This will remove all messages from this conversation. The conversation itself will remain.',
-        icon: 'warning',
-        confirmText: 'Clear',
-        cancelText: 'Cancel'
-    });
-    if (!confirmed) return;
+    if (!confirm('Clear all messages in this conversation?')) return;
     
     try {
         await fetch(`${API_BASE_URL}/chat/sessions/${currentSessionId}/clear`, {
@@ -408,9 +300,6 @@ async function sendMessage() {
             return;
         }
     }
-
-    // Mark session as having messages (prevents auto-deletion on close)
-    currentSessionHasMessages = true;
 
     // Set generating state
     isGenerating = true;
@@ -643,14 +532,7 @@ async function showCacheStats() {
 }
 
 async function clearCache() {
-    const confirmed = await showConfirmModal({
-        title: 'Clear Cache?',
-        message: 'This will remove all cached query results. This action cannot be undone.',
-        icon: 'warning',
-        confirmText: 'Clear Cache',
-        cancelText: 'Cancel'
-    });
-    if (!confirmed) return;
+    if (!confirm('Clear all cached queries? This cannot be undone.')) return;
     
     try {
         await fetch(`${API_BASE_URL}/chat/cache/clear`, {

@@ -175,22 +175,74 @@ Pre-Query Checklist:
 ☐ For name filtering: Using LOWER(name) = LOWER('person') ✅
 
 ═══════════════════════════════════════════════════════════════════════════════
-📚 FEW-SHOT LEARNING EXAMPLES
+📚 FEW-SHOT LEARNING EXAMPLES WITH BUSINESS LOGIC
 ═══════════════════════════════════════════════════════════════════════════════
 
-Example 1: Pending Tasks
-User: "pending tasks"
-Analysis: Sample shows submission_date=NULL in all rows → means pending
-         Sample shows status=NULL → unreliable field
-Correct Query: SELECT COUNT(*) FROM checklist WHERE submission_date IS NULL
-Why: submission_date NULL pattern observed in samples
+Example 1: "Users who have NOT completed tasks on time"
+────────────────────────────────────────────────────────────────────────────
+Analysis:
+- "Not on time" means EITHER:
+  1. Completed late (submission_date > scheduled date)
+  2. Still pending past due date (NULL submission + overdue)
+  
+Correct Query:
+```sql
+SELECT DISTINCT u.user_name
+FROM users u
+LEFT JOIN checklist c ON LOWER(c.name) = LOWER(u.user_name)
+  AND (
+    -- Completed late
+    (c.submission_date IS NOT NULL 
+     AND c.submission_date > c.task_start_date + INTERVAL '1 day')
+    OR
+    -- Overdue pending
+    (c.submission_date IS NULL 
+     AND c.task_start_date < CURRENT_DATE)
+  )
+WHERE u.status = 'active'
+  AND c.task_id IS NOT NULL
+```
 
-Example 2: Date Range
-User: "tasks in January 2025"
-Analysis: Sample shows created_at=2025-12-19, task_start_date=2026-05-29
-         Observation: created_at ≠ task_start_date (different timestamps)
-Correct Query: WHERE task_start_date >= '2025-01-01' AND task_start_date < '2025-02-01'
-Why: task_start_date is business date (observed from temporal comparison)
+Example 2: "Completed tasks this month"
+────────────────────────────────────────────────────────────────────────────
+Analysis:
+- "Completed" = submission_date IS NOT NULL
+- "This month" = January 1 to TODAY (not full month if mid-month)
+
+Correct Query:
+```sql
+SELECT COUNT(*) FROM checklist
+WHERE submission_date IS NOT NULL
+  AND submission_date >= '2026-01-01'
+  AND submission_date <= '2026-01-27'
+```
+
+Example 3: "Pending tasks"
+────────────────────────────────────────────────────────────────────────────
+Analysis:
+- "Pending" = submission_date IS NULL (not yet completed)
+
+Correct Query:
+```sql
+SELECT COUNT(*) FROM checklist 
+WHERE submission_date IS NULL
+```
+
+Example 4: "Tasks using TEXT date field"
+────────────────────────────────────────────────────────────────────────────
+⚠️ CRITICAL: planned_date is TEXT type, requires casting!
+
+Wrong Query (Will FAIL):
+```sql
+SELECT * FROM checklist 
+WHERE planned_date < CURRENT_DATE  -- ERROR: text < date
+```
+
+Correct Query:
+```sql
+SELECT * FROM checklist 
+WHERE planned_date::DATE < CURRENT_DATE  -- ✅ Cast to DATE first
+```
 
 {feedback_section}
 

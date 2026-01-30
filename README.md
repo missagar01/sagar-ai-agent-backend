@@ -21,30 +21,53 @@ The system features real-time answer streaming, query caching (semantic search v
 
 The system follows a modular architecture separating the Frontend UI from the Agentic Backend.
 
-```mermaid
-graph TD
-    User[User] -->|Natural Language| FE[Frontend (Vanilla JS)]
-    FE -->|Stream Request| API[FastAPI Backend]
-    
-    subgraph "Backend Services"
-        API -->|Check| Cache[(ChromaDB Cache)]
-        Cache -- Hit --> API
-        Cache -- Miss --> Agent[LangGraph Agent]
-        
-        subgraph "Agentic Workflow"
-            Agent -->|1. List Tables| Schema[Schema Manager]
-            Schema -->|2. Get Schema| GEN[Generative LLM (LLM 1)]
-            GEN -->|3. Generate SQL| VAL[Validator LLM (LLM 2)]
-            VAL -->|4. Critique| Decision{Approved?}
-            Decision -- No --> GEN
-            Decision -- Yes --> DB_Exec[DB Executor]
-        end
-        
-        DB_Exec -->|5. Run Query| PG[(PostgreSQL DB)]
-        PG -->|Results| Response[Answer Generator]
-    end
-    
-    Response -->|Stream Chunks| FE
+```text
+[ User Request ]
+       │
+       ▼
++---------------------+
+|    Frontend UI      |
+|   (Stream chunks)   |
++---------------------+
+       │
+       │ POST /stream
+       ▼
++---------------------------------------------------------------+
+|                    FastAPI Backend                            |
+|                                                               |
+|  +-------------+        Hit        +-----------------------+  |
+|  | Cache Check | ────────────────► | Return Cached Result  |  |
+|  +-------------+                   +-----------------------+  |
+|         │                                                     |
+|        Miss                                                   |
+|         │                                                     |
+|         ▼                                                     |
+|  +---------------------------------------------------------+  |
+|  |                 LangGraph SQL Agent                     |  |
+|  |                                                         |  |
+|  |  [Schema] ──► [Prompt with Context]                     |  |
+|  |                      │                                  |  |
+|  |                      ▼                                  |  |
+|  |              [ Generator LLM ] ── Propose SQL ──┐       |  |
+|  |                                                 │       |  |
+|  |    ┌────────── REJECT (Feedback) ◄──────────────│       |  |
+|  |    │                                            │       |  |
+|  |    ▼                                            ▼       |  |
+|  |  [ Retry ]       [ Validator LLM ] ◄── Critique Query   |  |
+|  |                      │                                  |  |
+|  |                  APPROVED                               |  |
+|  |                      │                                  |  |
+|  |                      ▼                                  |  |
+|  |               [ Execute SQL ] ──► [PostgreSQL DB]       |  |
+|  |                      │                                  |  |
+|  |                      ▼                                  |  |
+|  |              [ Answer Generator ]                       |  |
+|  +---------------------------------------------------------+  |
+|         │                                                     |
++---------│-----------------------------------------------------+
+          │
+          ▼
+   [ Stream Response ]
 ```
 
 ---

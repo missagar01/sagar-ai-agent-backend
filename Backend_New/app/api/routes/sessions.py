@@ -9,6 +9,7 @@ from typing import Optional
 import uuid
 
 from app.services.session_manager import session_manager
+from app.services.cache_service import query_cache
 
 router = APIRouter()
 
@@ -38,8 +39,19 @@ async def get_session_messages(session_id: str):
 async def delete_session(session_id: str):
     """Delete a session"""
     try:
+        # Invalidate cached queries before deletion
+        messages = session_manager.get_session_messages(session_id)
+        invalidated = 0
+        for msg in messages:
+            if msg['role'] == 'user':
+                if query_cache.invalidate(msg['content']):
+                    invalidated += 1
+        
         session_manager.delete_session(session_id)
-        return {"status": "success", "message": f"Session {session_id} deleted"}
+        return {
+            "status": "success",
+            "message": f"Session deleted, {invalidated} cache entries invalidated"
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -47,7 +59,18 @@ async def delete_session(session_id: str):
 async def clear_session(session_id: str):
     """Clear all messages from a session"""
     try:
+        # Invalidate cached queries before clearing
+        messages = session_manager.get_session_messages(session_id)
+        invalidated = 0
+        for msg in messages:
+            if msg['role'] == 'user':
+                if query_cache.invalidate(msg['content']):
+                    invalidated += 1
+        
         session_manager.clear_session(session_id)
-        return {"status": "success", "message": f"Session {session_id} cleared"}
+        return {
+            "status": "success",
+            "message": f"Session cleared, {invalidated} cache entries invalidated"
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

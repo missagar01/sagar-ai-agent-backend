@@ -1,114 +1,190 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Botivate v1.0 - AI Chat Bot Dashboard</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  </head>
-  <body>
-    <div class="app-container">
-      <!-- Sidebar for Chat History -->
-      <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-          <h2><i class="fas fa-comments"></i> Chats</h2>
-          <button class="new-chat-btn" id="newChatBtn" title="New Chat">
-            <i class="fas fa-plus"></i>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Botivate v1.0 - AI Chat Bot Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Sidebar for Chat History -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-comments"></i> Chats</h2>
+        <button class="new-chat-btn" id="newChatBtn" title="New Chat">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+      <div class="session-list" id="sessionList">
+        <!-- Sessions will be populated here -->
+      </div>
+      <div class="sidebar-footer">
+        <button class="cache-info-btn" id="cacheInfoBtn" title="Cache Info">
+          <i class="fas fa-database"></i> Cache Stats
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="chat-header">
+        <button class="toggle-sidebar-btn" id="toggleSidebarBtn" title="Toggle Sidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="model-selector">
+          <span>Botivate v1.0</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="header-actions">
+          <button class="btn-secondary" id="clearChatBtn" title="Clear Chat">
+            <i class="fas fa-eraser"></i> Clear
+          </button>
+          <button class="btn-secondary" id="deleteChatBtn" title="Delete Chat">
+            <i class="fas fa-trash"></i>
           </button>
         </div>
-        <div class="session-list" id="sessionList">
-          <!-- Sessions will be populated here -->
-        </div>
-        <div class="sidebar-footer">
-          <button class="cache-info-btn" id="cacheInfoBtn" title="Cache Info">
-            <i class="fas fa-database"></i> Cache Stats
-          </button>
-        </div>
-      </aside>
+      </header>
 
-      <!-- Main Content -->
-      <main class="main-content">
-        <header class="chat-header">
-          <button class="toggle-sidebar-btn" id="toggleSidebarBtn" title="Toggle Sidebar">
-            <i class="fas fa-bars"></i>
-          </button>
-          <div class="model-selector">
-            <span>Botivate v1.0</span>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div class="header-actions">
-            <button class="btn-secondary" id="clearChatBtn" title="Clear Chat">
-              <i class="fas fa-eraser"></i> Clear
-            </button>
-            <button class="btn-secondary" id="deleteChatBtn" title="Delete Chat">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </header>
-
-        <div class="chat-display" id="chatDisplay">
-          <div class="welcome-screen" id="welcomeScreen">
-            <div class="welcome-orb"></div>
-            <h1 id="typingText"></h1>
-            <p class="welcome-subtitle">Your intelligent database assistant</p>
-          </div>
-          <!-- Messages will appear here -->
+      <div class="chat-display" id="chatDisplay">
+        <div class="welcome-screen" id="welcomeScreen">
+          <div class="welcome-orb"></div>
+          <h1 id="typingText"></h1>
+          <p class="welcome-subtitle">Your intelligent database assistant</p>
         </div>
+        <!-- Messages will appear here -->
+      </div>
 
-        <footer class="chat-input-container">
-          <div class="input-wrapper">
-            <div class="input-top">
-              <input
-                type="text"
-                id="userInput"
-                placeholder="Ask Anything..."
-                autocomplete="off"
-              />
-              <div class="input-actions">
-                <button class="icon-btn" id="voiceBtn" title="Voice input (coming soon)">
-                  <i class="fas fa-microphone"></i>
-                </button>
-                <button class="send-btn" id="sendBtn" title="Send message">
-                  <i class="fas fa-arrow-up" id="sendIcon"></i>
-                </button>
-              </div>
-            </div>
-            <div class="input-footer">
-              <span class="cache-indicator" id="cacheIndicator" style="display: none;">
-                <i class="fas fa-bolt"></i> Cached
-              </span>
-              <span class="session-indicator" id="sessionIndicator">
-                <i class="fas fa-circle"></i> New Session
-              </span>
+      <footer class="chat-input-container">
+        <div class="input-wrapper">
+          <div class="input-top">
+            <input type="text" id="userInput" placeholder="Ask Anything..." autocomplete="off" />
+            <div class="input-actions">
+              <button class="icon-btn" id="voiceBtn" title="Voice input (coming soon)">
+                <i class="fas fa-microphone"></i>
+              </button>
+              <button class="send-btn" id="sendBtn" title="Send message">
+                <i class="fas fa-arrow-up" id="sendIcon"></i>
+              </button>
             </div>
           </div>
-        </footer>
-      </main>
+          <div class="input-footer">
+            <span class="cache-indicator" id="cacheIndicator" style="display: none;">
+              <i class="fas fa-bolt"></i> Cached
+            </span>
+            <span class="session-indicator" id="sessionIndicator">
+              <i class="fas fa-circle"></i> New Session
+            </span>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Cache Info Modal -->
+  <div class="modal" id="cacheModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-database"></i> Cache Statistics</h3>
+        <button class="modal-close" id="closeCacheModal">&times;</button>
+      </div>
+      <div class="modal-body" id="cacheModalBody">
+        Loading...
+      </div>
+      <div class="modal-footer">
+        <button class="btn-danger" id="clearCacheBtn">
+          <i class="fas fa-trash"></i> Clear Cache
+        </button>
+      </div>
     </div>
+  </div>
 
-    <!-- Cache Info Modal -->
-    <div class="modal" id="cacheModal" style="display: none;">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3><i class="fas fa-database"></i> Cache Statistics</h3>
-          <button class="modal-close" id="closeCacheModal">&times;</button>
-        </div>
-        <div class="modal-body" id="cacheModalBody">
-          Loading...
-        </div>
-        <div class="modal-footer">
-          <button class="btn-danger" id="clearCacheBtn">
-            <i class="fas fa-trash"></i> Clear Cache
+  <style>
+    /* Modal Button Styles */
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .modal-btn {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+      width: 100%;
+      text-align: left;
+    }
+
+    .modal-btn:hover {
+      background: #f8f9fa;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .modal-btn i {
+      margin-right: 12px;
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .modal-btn.delete-btn {
+      color: #dc3545;
+      border-color: #dc3545;
+    }
+
+    .modal-btn.delete-btn:hover {
+      background: #fff5f5;
+    }
+
+    .modal-btn.cache-btn {
+      color: #f59f00;
+      border-color: #f59f00;
+    }
+
+    .modal-btn.cache-btn:hover {
+      background: #fff9db;
+    }
+  </style>
+
+  <!-- Clear Options Modal -->
+  <div class="modal" id="clearOptionsModal" style="display: none;">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-eraser"></i> Clear Options</h3>
+        <button class="modal-close" id="closeClearModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 10px; color: #666;">Select an action to perform:</p>
+        <div class="modal-actions">
+          <button type="button" class="modal-btn" id="confirmClearChat">
+            <i class="fas fa-comment-slash" style="color: #666;"></i> Clear Chat View
+          </button>
+
+          <button type="button" class="modal-btn delete-btn" id="confirmDeleteSession">
+            <i class="fas fa-trash"></i> Delete Current Session
+          </button>
+
+          <button type="button" class="modal-btn cache-btn" id="confirmClearCacheFromModal">
+            <i class="fas fa-database"></i> Clear System Cache
           </button>
         </div>
       </div>
     </div>
+  </div>
 
-    <script src="app.js"></script>
-  </body>
+  <script src="app.js"></script>
+</body>
+
 </html>

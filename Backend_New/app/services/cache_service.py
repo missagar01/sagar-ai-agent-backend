@@ -24,10 +24,12 @@ class QueryCacheService:
         self,
         persist_directory: str = "./chroma_cache",
         collection_name: str = "query_cache",
-        similarity_threshold: float = 0.90
+        similarity_threshold: float = 0.92  # High threshold to prevent false matches (completed vs all)
     ):
         self.similarity_threshold = similarity_threshold
         self.enabled = CHROMADB_AVAILABLE
+        self.cache_hits = 0
+        self.cache_misses = 0
         
         if not self.enabled:
             return
@@ -71,6 +73,7 @@ class QueryCacheService:
                 metadata = results['metadatas'][0][0]
                 cached_question = results['documents'][0][0]
                 
+                self.cache_hits += 1
                 print(f"🎯 CACHE HIT! Similarity: {similarity:.2%}")
                 print(f"   Cached: '{cached_question[:50]}...'")
                 print(f"   Current: '{question[:50]}...'")
@@ -83,6 +86,7 @@ class QueryCacheService:
                     "hit_count": int(metadata.get("hit_count", 0)) + 1
                 }
             else:
+                self.cache_misses += 1
                 print(f"📭 Cache miss. Similarity: {similarity:.2%}")
                 return None
                 
@@ -145,10 +149,16 @@ class QueryCacheService:
         if not self.enabled:
             return {"total_queries": 0, "enabled": False}
         
+        total_requests = self.cache_hits + self.cache_misses
+        hit_rate = (self.cache_hits / total_requests * 100) if total_requests > 0 else 0.0
+        
         return {
             "total_queries": self.collection.count(),
             "enabled": True,
-            "threshold": self.similarity_threshold
+            "threshold": self.similarity_threshold,
+            "cache_hits": self.cache_hits,
+            "cache_misses": self.cache_misses,
+            "hit_rate": hit_rate
         }
     
     def clear(self) -> bool:

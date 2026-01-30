@@ -1,0 +1,764 @@
+{
+  "database": {
+    "name": "checklist-delegation",
+    "host": "database-2-mumbai.c1wm8i46kcmm.ap-south-1.rds.amazonaws.com",
+    "generated_at": "2026-01-28T11:59:44.492745",
+    "purpose": "Task Management & Employee Tracking System for Manufacturing Plant",
+    "column_restrictions": {
+      "checklist": "task_id, department, given_by, name, task_description, frequency, admin_done, task_start_date, submission_date",
+      "delegation": "task_id, department, name, task_description, frequency, task_start_date, given_by, planned_date, submission_date",
+      "users": "user_name, password, given_by, role, department",
+      "forbidden_global": "status, created_at, remark, image",
+      "important_note": "Use submission_date IS NULL for pending tasks, IS NOT NULL for completed tasks"
+    }
+  },
+  "tables": {
+    "checklist": {
+      "description": "The checklist table stores individual checklist task instances assigned to departments/users, including scheduling (task_start_date), assignment context (given_by), and completion evidence (submission_date). Each row represents a task occurrence that may be pending or completed.",
+      "business_context": "Used for operational task tracking across many departments (e.g., production, maintenance, security). Tasks are created with a start date and expected recurrence (frequency). Completion is inferred from submission_date (NULL = pending, NOT NULL = completed). admin_done can represent an administrative confirmation step, often independent from actual completion timing.",
+      "common_queries": [
+        "Find pending tasks by department and date range (submission_date IS NULL, filter by task_start_date).",
+        "Daily dashboard: tasks due today per department/user (task_start_date::date = current_date; pending vs completed via submission_date).",
+        "Overdue-like views: tasks with task_start_date older than a cutoff and submission_date IS NULL.",
+        "Completion metrics: count completed tasks per department/user over a date range (submission_date between ...).",
+        "Audit/admin confirmation: list completed tasks not yet admin confirmed (submission_date IS NOT NULL AND admin_done IS NULL).",
+        "Frequency breakdown: counts by frequency per department, using case-insensitive normalization."
+      ],
+      "column_restrictions": {
+        "allowed_columns": [
+          "task_id",
+          "department",
+          "given_by",
+          "name",
+          "task_description",
+          "frequency",
+          "admin_done",
+          "task_start_date",
+          "submission_date"
+        ],
+        "forbidden_columns": [
+          "status",
+          "created_at",
+          "remark",
+          "image"
+        ],
+        "important_notes": "Do NOT reference forbidden columns in SQL. Determine task completion strictly using submission_date: submission_date IS NULL means pending; submission_date IS NOT NULL means completed. Avoid using any status column even if it exists or is indexed."
+      },
+      "columns": {
+        "task_id": {
+          "description": "Unique identifier for each checklist row (task instance).",
+          "business_meaning": "Primary key for referencing a specific task occurrence in reporting, drill-down, and joins.",
+          "valid_values": "Positive BIGINT; auto-incrementing identity starting at 1.",
+          "data_quality_notes": "Never NULL; unique by design.",
+          "query_tips": "Use for stable ordering (ORDER BY task_id DESC) and point lookups. Prefer filtering by dates/department for large scans rather than task_id ranges unless you specifically want recent inserts.",
+          "null_interpretation": "Not applicable (non-null)."
+        },
+        "department": {
+          "description": "Department responsible for the task instance.",
+          "business_meaning": "Primary organizational dimension for task ownership and aggregation (dashboards, KPIs).",
+          "valid_values": "Free-text department name; common values include PIPE MILL PRODUCTION, SMS MAINTENANCE, STRIP MILL PRODUCTION, CCM, WORKSHOP, etc.",
+          "data_quality_notes": "Mostly populated (~0.01% NULL). Values are text and may vary by case/format. An index exists on lower(department), indicating case-insensitive lookups are expected.",
+          "query_tips": "For case-insensitive filtering, use LOWER(department) = LOWER(:dept) to match the functional index. When grouping, consider grouping by LOWER(department) to avoid splitting by case variants.",
+          "null_interpretation": "NULL means department not recorded/unknown; handle with COALESCE(department,'UNKNOWN') in reporting if needed."
+        },
+        "given_by": {
+          "description": "Identifier/name of the user or role that assigned/created the task.",
+          "business_meaning": "Attribution for who issued the checklist task (supervisor/admin). Useful for accountability and workload tracking by issuer.",
+          "valid_values": "Free-text; typically aligns to a user identifier (often matches users.user_name in practice).",
+          "data_quality_notes": "Nullable (~1.53% NULL). May have inconsistent formatting/case/spacing since it is TEXT.",
+          "query_tips": "Use case-insensitive comparisons if needed (LOWER(given_by) = LOWER(:user)). When joining to USERS, join on normalized values (e.g., LOWER(given_by) = LOWER(users.user_name)) if your SQL dialect/requirements allow.",
+          "null_interpretation": "NULL means issuer not captured or task was system-generated/legacy."
+        },
+        "name": {
+          "description": "Assignee name or responsible person for the task instance.",
+          "business_meaning": "Who is expected to perform/submit the checklist task; used for personal task lists and per-person performance metrics.",
+          "valid_values": "Free-text person/user name; expected to correspond to an application user in many cases.",
+          "data_quality_notes": "Mostly populated (~0.01% NULL). A functional index exists on lower(name) for case-insensitive search; indicates potential case inconsistencies.",
+          "query_tips": "For efficient lookups, filter using LOWER(name) = LOWER(:name) to leverage the lower(name) index. Combine with department and task_start_date to use the composite index (department, name, task_start_date).",
+          "null_interpretation": "NULL means assignee not recorded/unknown."
+        },
+        "task_description": {
+          "description": "Human-readable description of the task to be performed.",
+          "business_meaning": "Defines what work is required (e.g., inspection steps, safety checks). Often used for search, reporting, and task categorization (informal).",
+          "valid_values": "Free-text; may include operational instructions.",
+          "data_quality_notes": "Mostly populated (~0.01% NULL). Text may contain duplicates, spelling variations, or inconsistent punctuation. Not indexed per provided schema, so full scans may be expensive at this scale.",
+          "query_tips": "Avoid leading-wildcard searches (e.g., LIKE '%text%') on large datasets unless necessary. Prefer filtering by department/date and then applying text filters. If exact matching is used, normalize spacing/case in the application layer when possible.",
+          "null_interpretation": "NULL means description missing (likely data entry/legacy)."
+        },
+        "frequency": {
+          "description": "Planned recurrence frequency for the task template/instance (e.g., daily, weekly).",
+          "business_meaning": "Used to schedule and categorize tasks; supports planning and KPI breakdown by recurrence.",
+          "valid_values": [
+            "daily",
+            "weekly",
+            "monthly",
+            "fortnightly",
+            "quarterly",
+            "yearly",
+            "one-time",
+            "Also observed variants/codes: 'Daily', 'Weekly', 'Monthly', 'W', 'F', 'Y'"
+          ],
+          "data_quality_notes": "Mostly populated (~0.01% NULL). Strong skew to 'daily'. Contains case variants and shorthand codes, which can fragment grouping results.",
+          "query_tips": "Normalize in queries for grouping, e.g., CASE/LOWER(frequency) to consolidate variants. If treating codes: map 'W'->'weekly', 'Y'->'yearly', etc., consistently.",
+          "null_interpretation": "NULL means recurrence not specified."
+        },
+        "admin_done": {
+          "description": "Administrative confirmation flag/value indicating an admin has verified/confirmed the task record.",
+          "business_meaning": "Represents a secondary workflow step (verification/approval). Not equivalent to completion; completion should be inferred from submission_date.",
+          "valid_values": [
+            "confirmed",
+            "Confirmed",
+            "Done"
+          ],
+          "data_quality_notes": "Highly nullable (~80.31% NULL). Values show case inconsistency; overwhelmingly 'confirmed'. Presence does not guarantee submission_date is set (treat independently unless business rules state otherwise).",
+          "query_tips": "For 'confirmed' checks, use case-insensitive comparison (LOWER(admin_done) = 'confirmed'). To find tasks completed but not admin-confirmed: submission_date IS NOT NULL AND admin_done IS NULL (or admin_done not confirmed).",
+          "null_interpretation": "NULL means not yet admin-confirmed or admin confirmation not tracked for that task."
+        },
+        "task_start_date": {
+          "description": "Timestamp when the task becomes active/due (start of the task instance window).",
+          "business_meaning": "Primary scheduling date used to generate daily/weekly task lists and to define due/overdue windows.",
+          "valid_values": "TIMESTAMP (no timezone info specified in schema).",
+          "data_quality_notes": "Mostly populated (~0.01% NULL). Time component may exist; many business queries are date-based and may need DATE(task_start_date) comparisons.",
+          "query_tips": "For date-range queries, prefer sargable predicates: task_start_date >= :start_ts AND task_start_date < :end_ts. There is an index on task_start_date and a composite index (department, name, task_start_date) that benefits filters starting with department and/or name plus date.",
+          "null_interpretation": "NULL means scheduling date missing (likely invalid/incomplete record)."
+        },
+        "submission_date": {
+          "description": "Timestamp when the task was submitted/completed.",
+          "business_meaning": "Authoritative indicator of task completion for analytics and operational tracking.",
+          "valid_values": "TIMESTAMP; NULL indicates not submitted yet.",
+          "data_quality_notes": "Highly nullable (~79.66% NULL), consistent with many pending/unsubmitted tasks or historical backlog. Time component may be important for same-day SLAs.",
+          "query_tips": "Completion status: submission_date IS NULL (pending) vs submission_date IS NOT NULL (completed). For completion-rate metrics within a window, filter by submission_date range. For pending workload, filter by task_start_date range plus submission_date IS NULL. There is a composite index on (task_start_date, submission_date) useful for 'pending as of date' style queries.",
+          "null_interpretation": "NULL means pending/not completed/not submitted."
+        }
+      },
+      "relationships": {
+        "users": "Informal relationship: checklist.name (assignee) and checklist.given_by (issuer) often correspond to users.user_name. Joins should be done carefully due to TEXT case/format inconsistencies; prefer case-insensitive matching (e.g., LOWER(checklist.name) = LOWER(users.user_name)) when necessary.",
+        "delegation": "Potential cross-table linkage by task_id when tasks are delegated/replicated; however, confirm semantics because both tables may use task_id as an identity key in their own table rather than a shared identifier. If analyzing delegation vs checklist, join on business keys like department/name/task_description/task_start_date where appropriate (all allowed columns)."
+      },
+      "performance_hints": [
+        "Row count is very large (~3.1M). Always filter by task_start_date and/or department/name for analytical queries to avoid full scans.",
+        "Use case-insensitive filters that match functional indexes: LOWER(department) and LOWER(name).",
+        "Leverage composite index (department, name, task_start_date) for per-person/per-department time-window queries.",
+        "Use sargable timestamp ranges (>= start AND < end) rather than casting task_start_date to date in WHERE when possible; if you must do date-based filtering, consider bounding timestamps.",
+        "For pending/completed splits, use submission_date IS NULL / IS NOT NULL; do not use any status column even if indexed.",
+        "Text search on task_description can be expensive; first restrict by department and date range, then apply text predicates."
+      ],
+      "_raw_schema": {
+        "table_name": "checklist",
+        "columns": [
+          {
+            "name": "task_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "default": null,
+            "autoincrement": true,
+            "comment": null,
+            "identity": {
+              "always": false,
+              "start": 1,
+              "increment": 1,
+              "minvalue": 1,
+              "maxvalue": 9223372036854775807,
+              "cache": 1,
+              "cycle": false
+            }
+          },
+          {
+            "name": "department",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "given_by",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "name",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "task_description",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "frequency",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "admin_done",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "task_start_date",
+            "type": "TIMESTAMP",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "submission_date",
+            "type": "TIMESTAMP",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          }
+        ],
+        "primary_key": [
+          "task_id"
+        ],
+        "foreign_keys": [],
+        "indexes": [
+          {
+            "name": "idx_checklist_department",
+            "unique": false,
+            "column_names": [
+              null
+            ],
+            "expressions": [
+              "lower(department)"
+            ],
+            "include_columns": [],
+            "dialect_options": {
+              "postgresql_include": []
+            }
+          },
+          {
+            "name": "idx_checklist_dept_name_date",
+            "unique": false,
+            "column_names": [
+              "department",
+              "name",
+              "task_start_date"
+            ],
+            "include_columns": [],
+            "dialect_options": {
+              "postgresql_include": []
+            }
+          },
+          {
+            "name": "idx_checklist_name",
+            "unique": false,
+            "column_names": [
+              null
+            ],
+            "expressions": [
+              "lower(name)"
+            ],
+            "include_columns": [],
+            "dialect_options": {
+              "postgresql_include": []
+            }
+          },
+          {
+            "name": "idx_checklist_overdue",
+            "unique": false,
+            "column_names": [
+              "task_start_date",
+              "submission_date"
+            ],
+            "include_columns": [],
+            "dialect_options": {
+              "postgresql_include": []
+            }
+          },
+          {
+            "name": "idx_checklist_status",
+            "unique": false,
+            "column_names": [
+              "status"
+            ],
+            "include_columns": [],
+            "dialect_options": {
+              "postgresql_include": []
+            }
+          },
+          {
+            "name": "idx_checklist_task_start_date",
+            "unique": false,
+            "column_names": [
+              "task_start_date"
+            ],
+            "include_columns": [],
+            "dialect_options": {
+              "postgresql_include": []
+            }
+          },
+          {
+            "name": "idx_checklist_today_pending",
+            "unique": false,
+            "column_names": [
+              "task_start_date",
+              "submission_date",
+              "status"
+            ],
+            "include_columns": [],
+            "dialect_options": {
+              "postgresql_include": []
+            }
+          }
+        ]
+      },
+      "_statistics": {
+        "row_count": 3093580,
+        "total_size": "1224 MB",
+        "table_size": "855 MB",
+        "indexes_size": "370 MB"
+      }
+    },
+    "delegation": {
+      "description": "Stores delegated (assigned) tasks, typically one-time assignments, including who assigned them, who they are assigned to, target/planned dates, and the completion marker (submission_date).",
+      "business_context": "Used to track delegation of work items across departments. Each row represents a single delegated task instance. Operational reporting commonly includes: pending vs completed tasks, tasks by department/assignee/assigner, overdue items (planned_date in past with no submission_date), and workload summaries.",
+      "common_queries": [
+        "List pending delegated tasks by department (submission_date IS NULL)",
+        "List completed delegated tasks within a date range (submission_date between ... and ...)",
+        "Find overdue tasks (planned_date < NOW() AND submission_date IS NULL)",
+        "Count tasks by department and completion state (submission_date NULL vs NOT NULL)",
+        "Show tasks assigned to a specific person (name) optionally filtered by department",
+        "Show tasks given by a specific user/manager (given_by) and their completion rates",
+        "Tasks created/started in a time window (task_start_date between ... and ...)"
+      ],
+      "column_restrictions": {
+        "allowed_columns": [
+          "task_id",
+          "department",
+          "name",
+          "task_description",
+          "frequency",
+          "task_start_date",
+          "given_by",
+          "planned_date",
+          "submission_date"
+        ],
+        "forbidden_columns": [
+          "status",
+          "created_at",
+          "remark",
+          "image"
+        ],
+        "important_notes": "Do not use any forbidden columns. Determine task status using submission_date: pending when submission_date IS NULL; completed when submission_date IS NOT NULL."
+      },
+      "columns": {
+        "task_id": {
+          "description": "Unique identifier for each delegated task record.",
+          "business_meaning": "Primary key used to reference a specific delegated task instance in reporting and updates.",
+          "valid_values": "Positive BIGINT (auto-increment starting at 1).",
+          "data_quality_notes": "Non-null and unique by design; safe for exact-match filters and ordering.",
+          "query_tips": "Use for stable ordering (ORDER BY task_id DESC) and to target a single task (WHERE task_id = ...). Avoid relying on task_id for time ordering unless confirmed that inserts are chronological.",
+          "null_interpretation": "Never NULL."
+        },
+        "department": {
+          "description": "Department associated with the delegated task.",
+          "business_meaning": "Used to route and report tasks by organizational unit (e.g., AUTOMATION, PROJECT, PC).",
+          "valid_values": [
+            "AUTOMATION",
+            "PROJECT",
+            "PC",
+            "STRIP MILL MAINTENANCE",
+            "PIPE MILL MAINTENANCE",
+            "ADMIN",
+            "SMS ELECTRICAL",
+            "STRIP MILL ELECTRICAL",
+            "SMS MAINTENANCE",
+            "CCM ELECTRICAL",
+            "HR",
+            "STRIP MILL PRODUCTION",
+            "SECURITY",
+            "CCM",
+            "STORE",
+            "EA",
+            "PIPE MILL ELECTRICAL",
+            "TRANSPORT",
+            "LAB AND QUALITY CONTROL",
+            "PURCHASE"
+          ],
+          "data_quality_notes": "Although schema allows NULL, current data shows 100% non-null. Values appear uppercase with spaces; treat comparisons as case-sensitive depending on DB collation. Prefer exact matches using the observed casing.",
+          "query_tips": "Filter using exact department strings (WHERE department = 'AUTOMATION'). For multi-department dashboards use IN (...). Consider normalizing/UPPER() in queries only if needed and supported; otherwise standardize input values.",
+          "null_interpretation": "If NULL occurs in future, it means department was not captured/unknown; handle with COALESCE(department, 'UNKNOWN') for grouping."
+        },
+        "name": {
+          "description": "Name of the person the task is delegated to (assignee).",
+          "business_meaning": "Primary attribute for assignee workload and accountability reporting.",
+          "valid_values": "Free-text person name; expected to match a user identifier used operationally.",
+          "data_quality_notes": "Currently 100% non-null, but stored as TEXT so may contain inconsistent casing, spacing, or alternate spellings. Might or might not align exactly with USERS.user_name.",
+          "query_tips": "Use exact match when possible (WHERE name = '...'). For searching, use ILIKE/LIKE (depending on DB) carefully. For grouping, consider trimming whitespace if necessary (e.g., TRIM(name)).",
+          "null_interpretation": "If NULL occurs, assignee is unknown/unrecorded; treat as unassigned for reporting."
+        },
+        "task_description": {
+          "description": "Free-text description of the delegated task.",
+          "business_meaning": "Human-readable task content used in task lists and audits.",
+          "valid_values": "Free text; may contain punctuation and varying length.",
+          "data_quality_notes": "Currently 100% non-null. As TEXT, may include duplicates, formatting differences, or trailing spaces; not ideal as a join key.",
+          "query_tips": "Use for display and keyword search (LIKE/ILIKE). Avoid grouping solely by task_description unless you accept duplicates/variants. Prefer task_id for uniqueness.",
+          "null_interpretation": "If NULL occurs, task details were not entered."
+        },
+        "frequency": {
+          "description": "Task frequency classification for the delegated task.",
+          "business_meaning": "Indicates whether the task is recurring or one-off; used to segment reporting.",
+          "valid_values": [
+            "one-time"
+          ],
+          "data_quality_notes": "All observed values are 'one-time' (274/274). This column may be future-proofed for additional frequencies but currently not discriminating.",
+          "query_tips": "Generally optional in filters given uniform values; include only if future data introduces more categories.",
+          "null_interpretation": "If NULL occurs, frequency was not specified; treat as unknown."
+        },
+        "task_start_date": {
+          "description": "Timestamp when the delegated task record was started/created/activated.",
+          "business_meaning": "Used to analyze task creation volume over time and to scope task lists to a timeframe.",
+          "valid_values": "Valid TIMESTAMP; non-null.",
+          "data_quality_notes": "Non-null. Time zone semantics are not specified; use consistent time zone handling in analytics (e.g., interpret as server/local time).",
+          "query_tips": "Use for time-window filtering (WHERE task_start_date >= ... AND task_start_date < ...). For daily rollups use DATE(task_start_date) if supported.",
+          "null_interpretation": "Never NULL."
+        },
+        "given_by": {
+          "description": "Name/identifier of the person who delegated (assigned) the task.",
+          "business_meaning": "Supports managerial tracking: tasks assigned by a supervisor or requester.",
+          "valid_values": "Free-text person name/username; expected to align with an internal user identity.",
+          "data_quality_notes": "Currently 100% non-null. As TEXT, may have inconsistent formatting and may or may not exactly match USERS.user_name.",
+          "query_tips": "Filter by assigner (WHERE given_by = '...'). For rollups, group by given_by. If joining to USERS, join on USERS.user_name = delegation.given_by only when naming conventions are consistent.",
+          "null_interpretation": "If NULL occurs, assigner information is missing."
+        },
+        "planned_date": {
+          "description": "Planned/target completion date for the delegated task.",
+          "business_meaning": "Primary deadline used to determine due/overdue tasks and SLA-like reporting.",
+          "valid_values": "Valid TIMESTAMP; current data shows 100% non-null though schema allows NULL.",
+          "data_quality_notes": "Schema allows NULL but none observed. Ensure planned_date is compared with current time consistently (NOW()/CURRENT_TIMESTAMP) and be mindful of time zones.",
+          "query_tips": "Overdue logic: planned_date < CURRENT_TIMESTAMP AND submission_date IS NULL. Upcoming tasks: planned_date between CURRENT_TIMESTAMP and CURRENT_TIMESTAMP + interval. Use date-range filters for planned workload.",
+          "null_interpretation": "If NULL occurs, task has no defined deadline; exclude from overdue calculations or treat separately."
+        },
+        "submission_date": {
+          "description": "Timestamp when the delegated task was submitted/completed.",
+          "business_meaning": "Acts as the completion marker for the task. Completion status is derived from whether this value is NULL.",
+          "valid_values": "NULL (pending) or TIMESTAMP (completed).",
+          "data_quality_notes": "Approximately 5.11% NULL (14/274), representing pending tasks. Non-NULL values indicate completed tasks, but late submissions should be evaluated using planned_date vs submission_date.",
+          "query_tips": "Status derivation: pending WHERE submission_date IS NULL; completed WHERE submission_date IS NOT NULL. Completion within timeframe: submission_date between ... and .... Late completion: submission_date > planned_date (ensure planned_date not NULL).",
+          "null_interpretation": "NULL means the task is not yet submitted/completed (pending)."
+        }
+      },
+      "relationships": {
+        "users": "Likely logical relationship: delegation.name (assignee) and/or delegation.given_by (assigner) may correspond to USERS.user_name. No enforced foreign keys; joins should be done carefully due to potential formatting/casing differences."
+      },
+      "performance_hints": [
+        "If query volume grows, add indexes based on access patterns: (submission_date), (planned_date), (department), (name), (given_by), and composite indexes like (department, submission_date) or (name, submission_date) for common dashboards.",
+        "For overdue/pending queries, filtering on submission_date IS NULL plus planned_date < CURRENT_TIMESTAMP benefits from an index on (submission_date, planned_date) or partial index on pending rows if supported.",
+        "Use sargable date predicates (e.g., planned_date >= :start AND planned_date < :end) instead of applying functions to the column in WHERE clauses when possible.",
+        "Avoid wildcard-leading LIKE searches on task_description in large datasets; consider full-text search capabilities if needed."
+      ],
+      "_raw_schema": {
+        "table_name": "delegation",
+        "columns": [
+          {
+            "name": "task_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "default": null,
+            "autoincrement": true,
+            "comment": null,
+            "identity": {
+              "always": false,
+              "start": 1,
+              "increment": 1,
+              "minvalue": 1,
+              "maxvalue": 9223372036854775807,
+              "cache": 1,
+              "cycle": false
+            }
+          },
+          {
+            "name": "department",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "name",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "task_description",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "frequency",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "task_start_date",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "given_by",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "planned_date",
+            "type": "TIMESTAMP",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "submission_date",
+            "type": "TIMESTAMP",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          }
+        ],
+        "primary_key": [
+          "task_id"
+        ],
+        "foreign_keys": [],
+        "indexes": []
+      },
+      "_statistics": {
+        "row_count": 274,
+        "total_size": "136 kB",
+        "table_size": "88 kB",
+        "indexes_size": "48 kB"
+      }
+    },
+    "users": {
+      "description": "Stores application user accounts used for authentication and authorization, including each user's department affiliation and role (e.g., admin vs user).",
+      "business_context": "The users table represents people who can log into the system and interact with operational task workflows (e.g., checklist/delegation tasks). It is typically used to (1) authenticate a user by user_name/password, (2) determine permissions via role, and (3) scope data access and reporting by department. The given_by field appears to capture who created/registered the user or the supervisor/issuer associated with that user, but it is sparsely populated.",
+      "common_queries": [
+        "Authenticate a user by user_name (and compare password in application logic)",
+        "List users by department for routing tasks or reporting",
+        "List admins (role = 'admin') for escalation/oversight",
+        "Find users missing department or role for data cleanup",
+        "Count users per department and/or role"
+      ],
+      "column_restrictions": {
+        "allowed_columns": [
+          "user_name",
+          "password",
+          "given_by",
+          "role",
+          "department"
+        ],
+        "forbidden_columns": [
+          "status",
+          "created_at",
+          "remark",
+          "image"
+        ],
+        "important_notes": "Only the allowed columns above may be referenced in queries. Although other tables may use submission_date for completion status, the users table has no task status semantics."
+      },
+      "columns": {
+        "user_name": {
+          "description": "Login identifier / username for a system account.",
+          "business_meaning": "Primary human-facing identifier used to sign in and to associate actions/tasks with a person in other tables (often via name/user_name conventions).",
+          "valid_values": "Free-text. An index indicates user_name is intended to be unique. Expect non-empty strings; may contain spaces depending on naming convention.",
+          "data_quality_notes": "609/616 non-null (1.14% NULL). Uniqueness is enforced by an index (idx_users_user_name) but NULLs may exist. Case sensitivity depends on database collation; treat comparisons as case-sensitive unless you explicitly normalize. Potential mismatch risk if other tables store person names differently (e.g., 'NAME' vs 'user_name').",
+          "query_tips": "Use equality filtering for lookup (fast due to unique index). Prefer exact match predicates: WHERE user_name = ? . For case-insensitive search, use LOWER(user_name) = LOWER(?) but note it may reduce index usage unless functional indexes exist.",
+          "null_interpretation": "NULL indicates the account record lacks a username and is likely invalid/incomplete; exclude from authentication and most user lists."
+        },
+        "password": {
+          "description": "Stored password representation for the account.",
+          "business_meaning": "Used to verify identity during login. Ideally stored as a salted hash rather than plaintext (not verifiable from schema).",
+          "valid_values": "Free-text. Could be plaintext or hash; format is not specified.",
+          "data_quality_notes": "605/616 non-null (1.79% NULL). Presence of NULL suggests incomplete accounts. Security note: avoid selecting or returning this column in analytics queries; minimize exposure.",
+          "query_tips": "Do not use in reporting queries. For authentication lookups, fetch by user_name and compare in application logic; avoid filtering directly by password. If you must check existence of a password: WHERE password IS NOT NULL.",
+          "null_interpretation": "NULL suggests the user has not been provisioned a password or record is incomplete; treat as inactive/unusable for login."
+        },
+        "department": {
+          "description": "Department/functional area the user belongs to.",
+          "business_meaning": "Used to scope responsibilities, filter dashboards, and align users with operational units (e.g., PIPE MILL PRODUCTION, SMS MAINTENANCE).",
+          "valid_values": [
+            "PIPE MILL PRODUCTION",
+            "SMS MAINTENANCE",
+            "STRIP MILL PRODUCTION",
+            "CCM",
+            "CONTRACTORS CHANDU TIWARI RECOILER",
+            "SECURITY",
+            "SMS PRODUCTION",
+            "STRIP MILL MAINTENANCE",
+            "SMS ELECTRICAL",
+            "WORKSHOP",
+            "TRANSPORT",
+            "CONTRACTORS NAWIK LAB",
+            "PIPE MILL MAINTENANCE",
+            "ADMIN",
+            "CONTRACTORS MUMTAZ RECOILER AND SALATING",
+            "STRIP MILL ELECTRICAL",
+            "PIPE MILL ELECTRICAL",
+            "CONTRACTORS CHANDU TIWARI PIPE MILL",
+            "CONTRACTORS SHIVAM TIWARI PIPE MILL",
+            "CONTRACTORS BIRENDRA SALATING"
+          ],
+          "data_quality_notes": "611/616 non-null (0.81% NULL). Values appear uppercase and include both internal departments and contractor groups; expect inconsistencies/variants (spelling, spacing) over time. Consider normalizing in application logic when grouping (e.g., TRIM, consistent casing).",
+          "query_tips": "Use department for grouping and filtering: WHERE department = 'SMS MAINTENANCE' or GROUP BY department. To handle data inconsistencies, consider WHERE UPPER(TRIM(department)) = '...' in analytic queries (may reduce index usage if no index exists on department).",
+          "null_interpretation": "NULL means department not assigned; treat as 'Unassigned' in reporting and flag for cleanup."
+        },
+        "given_by": {
+          "description": "Identifier/name of the person who created the user or is responsible for assigning the account.",
+          "business_meaning": "Represents an assigning authority (e.g., an admin/supervisor) who registered the user, or a hierarchical link for accountability.",
+          "valid_values": "Free-text; likely corresponds to another user's user_name or a supervisor name, but not enforced by constraints.",
+          "data_quality_notes": "Only 94/616 non-null (84.74% NULL). This field is largely missing and therefore unreliable for mandatory joins or governance reporting. Potential referential ambiguity (may not match user_name exactly).",
+          "query_tips": "Use only when explicitly needed (e.g., list users created by a particular admin). Prefer NULL-safe filtering: WHERE given_by = ? and also consider TRIM/UPPER normalization if names vary. Avoid assuming it always maps to users.user_name.",
+          "null_interpretation": "NULL indicates the creator/assigner is unknown, not recorded, or not applicable."
+        },
+        "role": {
+          "description": "Authorization role for the user account.",
+          "business_meaning": "Determines permissions in the application (e.g., admin can manage users/tasks; user has standard access).",
+          "valid_values": [
+            "user",
+            "admin"
+          ],
+          "data_quality_notes": "608/616 non-null (1.3% NULL). Strongly skewed towards 'user' (601) with few 'admin' (7). Stored as VARCHAR(8); values fit within length. Potential casing variation risk; observed values are lowercase.",
+          "query_tips": "Filter by role for admin lists and access checks: WHERE role = 'admin'. When handling unknowns, treat NULL as 'user' only if business rules state so; otherwise report as missing.",
+          "null_interpretation": "NULL indicates role not assigned; treat as misconfigured account and exclude from permission-dependent outputs unless a default role is defined."
+        }
+      },
+      "relationships": {
+        "checklist": "Likely logical relationship via USERS.user_name matching CHECKLIST.name or USERS.department matching CHECKLIST.department (no enforced foreign keys). Use careful string matching; do not assume perfect alignment.",
+        "delegation": "Likely logical relationship via USERS.user_name matching DELEGATION.name or USERS.department matching DELEGATION.department (no enforced foreign keys). given_by may also conceptually relate to DELEGATION.given_by, but is sparsely populated in USERS."
+      },
+      "performance_hints": [
+        "Use user_name for point lookups; it has a unique index and will be efficient with equality predicates.",
+        "Avoid functions on user_name (e.g., LOWER(user_name)) in WHERE clauses when possible, as it can prevent index usage unless a functional index exists.",
+        "Department and role are not indicated as indexed; large scans are still manageable at 616 rows, but for growth consider indexing (department), (role), or composite (department, role) if frequently filtered.",
+        "Minimize selecting the password column; only retrieve it when strictly needed for authentication workflows."
+      ],
+      "_raw_schema": {
+        "table_name": "users",
+        "columns": [
+          {
+            "name": "user_name",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "password",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "department",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "given_by",
+            "type": "TEXT",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          },
+          {
+            "name": "role",
+            "type": "VARCHAR(8)",
+            "nullable": true,
+            "default": null,
+            "autoincrement": false,
+            "comment": null
+          }
+        ],
+        "primary_key": [
+          "id"
+        ],
+        "foreign_keys": [],
+        "indexes": [
+          {
+            "name": "idx_users_employee_id",
+            "unique": true,
+            "column_names": [
+              "employee_id"
+            ],
+            "include_columns": [],
+            "dialect_options": {
+              "postgresql_include": []
+            }
+          },
+          {
+            "name": "idx_users_user_name",
+            "unique": true,
+            "column_names": [
+              "user_name"
+            ],
+            "include_columns": [],
+            "dialect_options": {
+              "postgresql_include": []
+            }
+          },
+          {
+            "name": "users_employee_id_key",
+            "unique": true,
+            "column_names": [
+              "employee_id"
+            ],
+            "duplicates_constraint": "users_employee_id_key",
+            "include_columns": [],
+            "dialect_options": {
+              "postgresql_include": []
+            }
+          }
+        ]
+      },
+      "_statistics": {
+        "row_count": 616,
+        "total_size": "544 kB",
+        "table_size": "312 kB",
+        "indexes_size": "232 kB"
+      }
+    }
+  }
+}

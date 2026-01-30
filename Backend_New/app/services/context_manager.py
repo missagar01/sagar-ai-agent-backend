@@ -77,10 +77,14 @@ class ContextManager:
             r'\b(show|display)\b.*\b(that|those|their)\b',
             r'\b(completed|pending|done)\b',
             r'\b(also|and)\b',
-            r'\b(what about)\b'
+            r'\b(what about)\b',
+            r'\b(versus|vs)\b'
         ]
         
-        is_follow_up = any(re.search(pattern, question_lower) for pattern in follow_up_patterns)
+        # Check if starts with preposition (implicit continuation)
+        starts_with_prep = re.match(r'^\s*(of|for|from|in|with|to)\b', question_lower)
+        
+        is_follow_up = any(re.search(pattern, question_lower) for pattern in follow_up_patterns) or bool(starts_with_prep)
         
         # Check if question lacks explicit filters
         lacks_filters = not any([

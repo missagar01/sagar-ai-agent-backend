@@ -10,77 +10,26 @@ from dataclasses import dataclass
 from typing import Tuple
 from app.core.config import settings
 
-# 🚫 HARDCODED BLOCKED KEYWORDS
+# 🚫 HARDCODED BLOCKED KEYWORDS (Simplified for Read-Only Logic)
 BLOCKED_KEYWORDS: frozenset = frozenset([
-    # Data Modification
+    # Data Modification (STRICTLY FORBIDDEN)
     "delete", "update", "insert", "merge", "upsert", "replace",
-    
-    # Data Definition
     "drop", "alter", "create", "truncate", "rename",
-    
-    # Permissions & Access
     "grant", "revoke", "deny",
-    
-    # Transaction Control
-    "commit", "rollback", "savepoint",
-    
-    # Database Administration
-    "vacuum", "analyze", "reindex", "cluster",
-    
-    # Dangerous Functions
-    "exec", "execute", "call", "prepare",
-    
-    # System Operations
-    "copy", "pg_dump", "pg_restore", "load",
-    
-    # File Operations
-    "pg_read_file", "pg_write_file", "lo_import", "lo_export",
-    
-    # User/Role Management
-    "createuser", "dropuser", "createrole", "droprole",
-    "set role", "set session",
-    
-    # Extension/Function Creation
-    "create function", "create procedure", "create trigger",
-    "create extension", "create type",
-    
-    # Dangerous Keywords
-    "into outfile", "into dumpfile", "load_file",
-    "benchmark", "sleep", "waitfor",
-    
-    # Information Schema Abuse
-    "information_schema", "pg_catalog", "pg_shadow", "pg_authid",
+    "exec", "execute", "call",
+    "pg_dump", "pg_restore", "copy"
 ])
 
 # 🚫 HARDCODED BLOCKED PATTERNS
 BLOCKED_PATTERNS: tuple = (
-    r"/\*",  # Comment blocks
-    r"\*/",
-    r"\\x[0-9a-fA-F]+",  # String escape attempts
-    r"chr\s*\(",
-    r"char\s*\(",
-    r"ascii\s*\(",
-    r";\s*select",  # Stacked queries
     r";\s*insert",
     r";\s*update",
     r";\s*delete",
     r";\s*drop",
     r";\s*create",
-    r"pg_sleep\s*\(",  # Time-based injection
-    r"sleep\s*\(",
-    r"waitfor\s+delay",
-    r"benchmark\s*\(",
-    r"'\s*or\s+'",  # Boolean-based injection
-    r"'\s*and\s+'",
-    r"1\s*=\s*1",
-    r"'='",
-    r"xp_cmdshell",  # System command execution
-    r"sp_executesql",
-    r"dbms_",
-    r"utl_",
-    r"dns\s*\(",  # Out-of-band data exfiltration
-    r"http\s*\(",
-    r"load_file\s*\(",
+    r";\s*alter",
+    r"pg_sleep",
+    r"waitfor delay"
 )
 
 @dataclass

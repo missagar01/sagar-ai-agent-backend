@@ -17,10 +17,10 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     
-    # OpenAI Settings
+    # LLM Settings (Using OpenAI GPT)
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
-    OPENAI_MODEL: str = "gpt-4o"
-    OPENAI_TEMPERATURE: float = 0.0
+    LLM_MODEL: str = os.getenv("MODEL_NAME", "gpt-4o-mini")  # OpenAI GPT-4o-mini
+    LLM_TEMPERATURE: float = 0.0
     
     # Database Settings
     DB_HOST: str = os.getenv("DB_HOST", "localhost")
@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     
     # Validation Settings
     MAX_VALIDATION_ATTEMPTS: int = 3
+    CONFIDENCE_THRESHOLD: int = 70  # Auto-execute queries with confidence >= 70%
+    
+    # Metadata Settings
+    METADATA_FILE: str = "metadata.json"
     
     # Session Settings
     SESSION_DB_PATH: str = "chat_sessions.db"

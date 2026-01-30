@@ -32,28 +32,35 @@ async def stream_natural_answer(question: str, raw_result: str, sql_query: str, 
     if is_sample and total_count > 0:
         sample_note = f"\n\n⚠️ IMPORTANT: The results show a SAMPLE of 15 rows out of {total_count:,} total records. Mention this prominently in your answer."
     
-    answer_prompt = f"""You are a helpful database assistant. Convert the query results into a natural language answer.
+    answer_prompt = f"""You are a Database Analyst. Your job is to fill out the Report Template below based on the query results.
 
-User Question: {question}
+Basic Information:
+- User Question: "{question}"
+- SQL Query: {sql_query}
+- Results: {raw_result}{sample_note}
 
-SQL Query: {sql_query}
+────────────────────────────────────────────────────────────
+REQUIRED RESPONSE TEMPLATE (Fill this out):
+────────────────────────────────────────────────────────────
 
-Query Results: {raw_result}{sample_note}
+### 1. 📊 Executive Summary
+[Write a natural language summary of the answer here. Use bold numbers. Explain "Pending" (submission_date is NULL) vs "Completed".]
 
-IMPORTANT FORMATTING RULES:
-1. Start with a clear, direct answer to the user's question
-2. If showing counts, format clearly: "**155,013 completed tasks** were found in January 2026"
-3. If showing sample data with total count, say: "Here are 15 sample records out of {total_count:,} total results:"
-4. If showing multiple tables, explain the breakdown: "Total of 188,038 tasks: 188,029 from checklist and 9 from delegation"
-5. Add context about what the numbers mean
-6. Be conversational and helpful
-7. Do NOT include raw SQL results like [(188029,)]
-8. Do NOT say "undefined" or show technical errors
+### 2. 📝 Technical Note
+(Note: To derive this answer, I queried the `[insert table names]` table(s). I filtered `[insert column]` to match the date range, used `[insert column]` to determine status, and filtered `[insert column]` to match the user.)
 
-Generate a natural, human-readable answer:"""
+────────────────────────────────────────────────────────────
+RULES:
+1. You MUST explicitly name the SQL columns used in the Technical Note.
+2. Do NOT leave the Technical Note empty.
+3. Do NOT output the identifiers "### 1." or "### 2." - just the content.
+4. Put the Note in a new paragraph at the very end.
+
+Generate the response now:"""
 
     try:
-        answer_llm = ChatOpenAI(model=settings.OPENAI_MODEL, temperature=0, streaming=True)
+        from langchain_openai import ChatOpenAI
+        answer_llm = ChatOpenAI(model=settings.LLM_MODEL, temperature=0, openai_api_key=settings.OPENAI_API_KEY, streaming=True)
         
         # Stream response word by word
         async for chunk in answer_llm.astream(answer_prompt):
@@ -132,8 +139,14 @@ async def stream_agent_response(question: str, session_id: str) -> AsyncGenerato
         
         # Stream through the graph
         node_count = 0
+        
+        # Inject context into the conversation
+        agent_input_message = question
+        if context_hint:
+             agent_input_message = f"{context_hint}\n\nUser Question: {question}"
+
         for event in sql_agent.stream(
-            {"messages": [HumanMessage(content=question)]},
+            {"messages": [HumanMessage(content=agent_input_message)]},
             config,
             stream_mode="updates"
         ):
@@ -314,10 +327,11 @@ async def get_cache_stats():
     """Get cache statistics"""
     stats = query_cache.get_stats()
     return {
-        "total_queries": stats.get("total_queries", 0),
-        "cache_hits": 0,  # Would need tracking
-        "cache_misses": 0,  # Would need tracking
-        "hit_rate": 0.0,
+        "total_entries": stats.get("total_queries", 0),
+        "cache_hits": stats.get("cache_hits", 0),
+        "cache_misses": stats.get("cache_misses", 0),
+        "hit_rate": stats.get("hit_rate", 0.0),
+        "similarity_threshold": stats.get("threshold", 0.85),
         "enabled": stats.get("enabled", False)
     }
 
@@ -329,3 +343,25 @@ async def clear_cache():
         "status": "success" if success else "failed",
         "message": "Cache cleared" if success else "Cache clear failed"
     }
+
+@router.post("/cache/invalidate/{session_id}")
+async def invalidate_session_cache(session_id: str):
+    """Clear cache entries related to a session"""
+    try:
+        from app.services.session_manager import session_manager
+        messages = session_manager.get_session_messages(session_id)
+        invalidated = 0
+        for msg in messages:
+            if msg['role'] == 'user':
+                if query_cache.invalidate(msg['content']):
+                    invalidated += 1
+        return {
+            "status": "success",
+            "invalidated_count": invalidated,
+            "message": f"Invalidated {invalidated} cache entries"
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }

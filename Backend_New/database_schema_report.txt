@@ -1,0 +1,371 @@
+================================================================================
+DATABASE SCHEMA INSPECTION REPORT
+Generated: 2026-01-27 15:31:29
+Database: checklist-delegation
+Host: database-2-mumbai.c1wm8i46kcmm.ap-south-1.rds.amazonaws.com
+================================================================================
+
+================================================================================
+📊 TABLE: CHECKLIST
+================================================================================
+
+📈 STATISTICS:
+   Total Rows: 3,093,580
+   Total Size: 1224 MB
+   Table Size: 855 MB
+   Indexes Size: 361 MB
+
+📋 COLUMNS (18 total):
+   Column Name                   Data Type                Nullable  Default             
+   -----------------------------------------------------------------------------------------------
+   task_id                       bigint(64,0)             NO        -                   
+   department                    text                     YES       -                   
+   given_by                      text                     YES       -                   
+   name                          text                     YES       -                   
+   task_description              text                     YES       -                   
+   enable_reminder               USER-DEFINED             YES       -                   
+   require_attachment            USER-DEFINED             YES       -                   
+   frequency                     text                     YES       -                   
+   remark                        text                     YES       -                   
+   status                        text                     YES       -                   
+   image                         text                     YES       -                   
+   admin_done                    text                     YES       -                   
+   delay                         interval                 YES       -                   
+   planned_date                  text                     YES       -                   
+   created_at                    timestamp without time zoneYES       now()               
+   task_start_date               timestamp without time zoneYES       -                   
+   submission_date               timestamp without time zoneYES       -                   
+   user_status_checklist         text                     YES       -                   
+
+🔑 PRIMARY KEYS:
+   - task_id (constraint: checklist_pkey)
+
+🔗 FOREIGN KEYS:
+   No foreign keys found
+
+✨ UNIQUE CONSTRAINTS:
+   No unique constraints found
+
+✓ CHECK CONSTRAINTS:
+   No check constraints found
+
+📇 INDEXES:
+   - checklist_pkey
+     CREATE UNIQUE INDEX checklist_pkey ON public.checklist USING btree (task_id)
+   - idx_checklist_task_start_date
+     CREATE INDEX idx_checklist_task_start_date ON public.checklist USING btree (task_start_date)
+   - idx_checklist_name
+     CREATE INDEX idx_checklist_name ON public.checklist USING btree (lower(name))
+   - idx_checklist_department
+     CREATE INDEX idx_checklist_department ON public.checklist USING btree (lower(department))
+   - idx_checklist_overdue
+     CREATE INDEX idx_checklist_overdue ON public.checklist USING btree (task_start_date, submission_date)
+   - idx_checklist_dept_name_date
+     CREATE INDEX idx_checklist_dept_name_date ON public.checklist USING btree (department, name, task_start_date)
+   - idx_checklist_status
+     CREATE INDEX idx_checklist_status ON public.checklist USING btree (status)
+   - idx_checklist_today_pending
+     CREATE INDEX idx_checklist_today_pending ON public.checklist USING btree (task_start_date, submission_date, status)
+
+🔍 NULL VALUE ANALYSIS:
+   Column                        Total Rows     Non-NULL       NULL Count     NULL %    
+   -------------------------------------------------------------------------------------
+   task_id                       3093580        3093580        0              0.00      %
+   department                    3093580        3093118        462            0.01      %
+   given_by                      3093580        3046234        47346          1.53      %
+   name                          3093580        3093118        462            0.01      %
+   task_description              3093580        3093118        462            0.01      %
+   enable_reminder               3093580        3093118        462            0.01      %
+   require_attachment            3093580        3092830        750            0.02      %
+   frequency                     3093580        3093118        462            0.01      %
+   remark                        3093580        579811         2513769        81.26     %
+   status                        3093580        619905         2473675        79.96     %
+   image                         3093580        3111           3090469        99.90     %
+   admin_done                    3093580        604906         2488674        80.45     %
+   delay                         3093580        618817         2474763        80.00     %
+   planned_date                  3093580        1123236        1970344        63.69     %
+   created_at                    3093580        3093580        0              0.00      %
+   task_start_date               3093580        3093118        462            0.01      %
+   submission_date               3093580        618802         2474778        80.00     %
+   user_status_checklist         3093580        597231         2496349        80.69     %
+
+📝 SAMPLE DATA (First 5 rows):
+
+   Row 1:
+      task_id: 3009301
+      department: PC
+      given_by: AK GUPTA
+
+   Row 2:
+      task_id: 3009302
+      department: PC
+      given_by: AK GUPTA
+
+   Row 3:
+      task_id: 3009303
+      department: PC
+      given_by: AK GUPTA
+
+   Row 4:
+      task_id: 3009304
+      department: PC
+      given_by: AK GUPTA
+
+   Row 5:
+      task_id: 3009305
+      department: PC
+      given_by: AK GUPTA
+
+🎯 DISTINCT VALUES FOR KEY COLUMNS:
+
+   Column: status
+      - yes: 534,312 rows
+      - no: 74,961 rows
+      - Yes: 10,362 rows
+      - No: 270 rows
+
+================================================================================
+📊 TABLE: DELEGATION
+================================================================================
+
+📈 STATISTICS:
+   Total Rows: 271
+   Total Size: 136 kB
+   Table Size: 88 kB
+   Indexes Size: 16 kB
+
+📋 COLUMNS (18 total):
+   Column Name                   Data Type                Nullable  Default             
+   -----------------------------------------------------------------------------------------------
+   task_id                       bigint(64,0)             NO        -                   
+   created_at                    timestamp without time zoneNO        now()               
+   department                    text                     YES       -                   
+   name                          text                     YES       -                   
+   task_description              text                     YES       -                   
+   frequency                     text                     YES       -                   
+   remarks                       text                     YES       -                   
+   task_start_date               timestamp without time zoneNO        -                   
+   given_by                      text                     YES       -                   
+   image                         text                     YES       -                   
+   enable_reminder               USER-DEFINED             YES       -                   
+   require_attachment            text                     YES       -                   
+   status                        text                     YES       -                   
+   updated_at                    timestamp without time zoneYES       -                   
+   planned_date                  timestamp without time zoneYES       -                   
+   submission_date               timestamp without time zoneYES       -                   
+   color_code_for                bigint(64,0)             YES       -                   
+   delay                         interval                 YES       -                   
+
+🔑 PRIMARY KEYS:
+   - task_id (constraint: delegation_pkey)
+
+🔗 FOREIGN KEYS:
+   No foreign keys found
+
+✨ UNIQUE CONSTRAINTS:
+   No unique constraints found
+
+✓ CHECK CONSTRAINTS:
+   No check constraints found
+
+📇 INDEXES:
+   - delegation_pkey
+     CREATE UNIQUE INDEX delegation_pkey ON public.delegation USING btree (task_id)
+
+🔍 NULL VALUE ANALYSIS:
+   Column                        Total Rows     Non-NULL       NULL Count     NULL %    
+   -------------------------------------------------------------------------------------
+   task_id                       271            271            0              0.00      %
+   created_at                    271            271            0              0.00      %
+   department                    271            271            0              0.00      %
+   name                          271            271            0              0.00      %
+   task_description              271            271            0              0.00      %
+   frequency                     271            271            0              0.00      %
+   remarks                       271            180            91             33.58     %
+   task_start_date               271            271            0              0.00      %
+   given_by                      271            271            0              0.00      %
+   image                         271            26             245            90.41     %
+   enable_reminder               271            271            0              0.00      %
+   require_attachment            271            271            0              0.00      %
+   status                        271            260            11             4.06      %
+   updated_at                    271            246            25             9.23      %
+   planned_date                  271            271            0              0.00      %
+   submission_date               271            260            11             4.06      %
+   color_code_for                271            260            11             4.06      %
+   delay                         271            260            11             4.06      %
+
+📝 SAMPLE DATA (First 5 rows):
+
+   Row 1:
+      task_id: 19
+      created_at: 2025-08-19 11:37:00
+      department: ADMIN
+
+   Row 2:
+      task_id: 20
+      created_at: 2025-08-19 11:42:00
+      department: ADMIN
+
+   Row 3:
+      task_id: 21
+      created_at: 2025-08-19 11:45:00
+      department: ADMIN
+
+   Row 4:
+      task_id: 22
+      created_at: 2025-08-19 11:48:00
+      department: ADMIN
+
+   Row 5:
+      task_id: 23
+      created_at: 2025-08-19 11:53:00
+      department: ADMIN
+
+🎯 DISTINCT VALUES FOR KEY COLUMNS:
+
+   Column: status
+      - done: 200 rows
+      - extend: 52 rows
+      - Done: 8 rows
+
+================================================================================
+📊 TABLE: USERS
+================================================================================
+
+📈 STATISTICS:
+   Total Rows: 616
+   Total Size: 544 kB
+   Table Size: 312 kB
+   Indexes Size: 192 kB
+
+📋 COLUMNS (25 total):
+   Column Name                   Data Type                Nullable  Default             
+   -----------------------------------------------------------------------------------------------
+   id                            bigint(64,0)             NO        -                   
+   created_at                    timestamp with time zone NO        now()               
+   user_name                     text                     YES       -                   
+   password                      text                     YES       -                   
+   email_id                      text                     YES       -                   
+   number                        bigint(64,0)             YES       -                   
+   department                    text                     YES       -                   
+   given_by                      text                     YES       -                   
+   role                          USER-DEFINED             YES       -                   
+   status                        USER-DEFINED             YES       -                   
+   user_access                   text                     YES       -                   
+   leave_date                    timestamp without time zoneYES       -                   
+   remark                        text                     YES       -                   
+   leave_end_date                timestamp without time zoneYES       -                   
+   employee_id                   text                     YES       -                   
+   last_punch_time               timestamp without time zoneYES       -                   
+   last_punch_device             text                     YES       -                   
+   page_access                   text                     YES       -                   
+   system_access                 text                     YES       -                   
+   subscription_access_system    text                     YES       -                   
+   user_access1                  text                     YES       -                   
+   store_access                  text                     YES       -                   
+   emp_image                     text                     YES       -                   
+   verify_access                 character varying(20)    YES       -                   
+   verify_access_dept            text                     YES       -                   
+
+🔑 PRIMARY KEYS:
+   - id (constraint: users_pkey)
+
+🔗 FOREIGN KEYS:
+   No foreign keys found
+
+✨ UNIQUE CONSTRAINTS:
+   - employee_id (constraint: users_employee_id_key)
+
+✓ CHECK CONSTRAINTS:
+   No check constraints found
+
+📇 INDEXES:
+   - users_pkey
+     CREATE UNIQUE INDEX users_pkey ON public.users USING btree (id)
+   - users_employee_id_key
+     CREATE UNIQUE INDEX users_employee_id_key ON public.users USING btree (employee_id)
+   - idx_users_user_name
+     CREATE UNIQUE INDEX idx_users_user_name ON public.users USING btree (user_name)
+   - idx_users_employee_id
+     CREATE UNIQUE INDEX idx_users_employee_id ON public.users USING btree (employee_id)
+
+🔍 NULL VALUE ANALYSIS:
+   Column                        Total Rows     Non-NULL       NULL Count     NULL %    
+   -------------------------------------------------------------------------------------
+   id                            616            616            0              0.00      %
+   created_at                    616            616            0              0.00      %
+   user_name                     616            609            7              1.14      %
+   password                      616            605            11             1.79      %
+   email_id                      616            454            162            26.30     %
+   number                        616            595            21             3.41      %
+   department                    616            611            5              0.81      %
+   given_by                      616            94             522            84.74     %
+   role                          616            608            8              1.30      %
+   status                        616            616            0              0.00      %
+   user_access                   616            609            7              1.14      %
+   leave_date                    616            0              616            100.00    %
+   remark                        616            36             580            94.16     %
+   leave_end_date                616            0              616            100.00    %
+   employee_id                   616            544            72             11.69     %
+   last_punch_time               616            380            236            38.31     %
+   last_punch_device             616            380            236            38.31     %
+   page_access                   616            595            21             3.41      %
+   system_access                 616            600            16             2.60      %
+   subscription_access_system    616            5              611            99.19     %
+   user_access1                  616            123            493            80.03     %
+   store_access                  616            6              610            99.03     %
+   emp_image                     616            54             562            91.23     %
+   verify_access                 616            27             589            95.62     %
+   verify_access_dept            616            27             589            95.62     %
+
+📝 SAMPLE DATA (First 5 rows):
+
+   Row 1:
+      id: 767
+      created_at: 2026-01-18 05:39:28.544410+00:00
+      user_name: Shrikant Yadav
+
+   Row 2:
+      id: 814
+      created_at: 2026-01-25 05:03:57.943824+00:00
+      user_name: Anand Kumar Kushwaha
+
+   Row 3:
+      id: 768
+      created_at: 2026-01-18 06:51:58.841718+00:00
+      user_name: Ravi Patle
+
+   Row 4:
+      id: 770
+      created_at: 2026-01-19 05:05:45.337581+00:00
+      user_name: VIBHUTI MOHAN GUPTA
+
+   Row 5:
+      id: 775
+      created_at: 2026-01-19 06:28:58.066706+00:00
+      user_name: Siddharth Singh
+
+🎯 DISTINCT VALUES FOR KEY COLUMNS:
+
+   Column: status
+      - active: 616 rows
+
+   Column: department
+      - PIPE MILL PRODUCTION: 111 rows
+      - SMS MAINTENANCE: 54 rows
+      - STRIP MILL PRODUCTION: 42 rows
+      - CCM: 32 rows
+      - CONTRACTORS CHANDU TIWARI RECOILER: 27 rows
+      - SECURITY: 26 rows
+      - SMS PRODUCTION: 22 rows
+      - STRIP MILL MAINTENANCE: 20 rows
+      - SMS ELECTRICAL: 18 rows
+      - WORKSHOP: 18 rows
+
+   Column: role
+      - user: 601 rows
+      - admin: 7 rows
+
+================================================================================
+END OF REPORT
+================================================================================

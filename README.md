@@ -21,65 +21,64 @@ The system features real-time answer streaming, query caching (semantic search v
 
 The system follows a modular architecture separating the Frontend UI from the Agentic Backend.
 
+## 🏗️ Architecture
+
+The system uses a highly modular Agentic Architecture.
+
 ```text
-[ User Request ]
-       │
-       ▼
-+---------------------+
-|    Frontend UI      |
-|   (Stream chunks)   |
-+---------------------+
-       │
-       │ POST /stream
-       ▼
-+---------------------------------------------------------------+
-|                    FastAPI Backend                            |
+🟢 [USER] 
+    │
+    │ (Question)
+    ▼
+.-----------------.
+| 🖥️ FRONTEND UI | 
+'-----------------'
+    │
+    │ (Stream)
+    ▼
+.-----------------------.      Hit       .------------------------.
+| ⚙️ FASTAPI BACKEND  | ───────────▶ | 🧠 CHROMADB CACHE    |
+'-----------------------'              '------------------------'
+    │
+    │ Miss
+    ▼
+.---------------------------------------------------------------.
+| 🤖 AGENTIC WORKFLOW                                           |
 |                                                               |
-|  +-------------+        Hit        +-----------------------+  |
-|  | Cache Check | ────────────────► | Return Cached Result  |  |
-|  +-------------+                   +-----------------------+  |
-|         │                                                     |
-|        Miss                                                   |
-|         │                                                     |
-|         ▼                                                     |
-|  +---------------------------------------------------------+  |
-|  |                 LangGraph SQL Agent                     |  |
-|  |                                                         |  |
-|  |  [Schema] ──► [Prompt with Context]                     |  |
-|  |                      │                                  |  |
-|  |                      ▼                                  |  |
-|  |              [ Generator LLM ] ── Propose SQL ──┐       |  |
-|  |                                                 │       |  |
-|  |    ┌────────── REJECT (Feedback) ◄──────────────│       |  |
-|  |    │                                            │       |  |
-|  |    ▼                                            ▼       |  |
-|  |  [ Retry ]       [ Validator LLM ] ◄── Critique Query   |  |
-|  |                      │                                  |  |
-|  |                  APPROVED                               |  |
-|  |                      │                                  |  |
-|  |                      ▼                                  |  |
-|  |               [ Execute SQL ] ──► [PostgreSQL DB]       |  |
-|  |                      │                                  |  |
-|  |                      ▼                                  |  |
-|  |              [ Answer Generator ]                       |  |
-|  +---------------------------------------------------------+  |
-|         │                                                     |
-+---------│-----------------------------------------------------+
-          │
-          ▼
-   [ Stream Response ]
+|  [1. 🔍 SCHEMA] ──▶ [2. 🧠 GENERATOR AGENT] (Writer)          |
+|                                    │                          |
+|                                  (SQL)                        |
+|                                    ▼                          |
+|  [4. ⚡ EXECUTOR] ◀── [3. 🛡️ VALIDATOR AGENT] (Critic)        |
+'---------------------------------------------------------------'
+    │
+    │ (Run Query)
+    ▼
+.-----------------.
+| 🗄️ POSTGRES DB  |
+'-----------------'
+    │
+    │ (Results)
+    ▼
+.-----------------------.
+| 💬 ANSWER GENERATOR |
+'-----------------------'
+    │
+    │ (Natural Language)
+    ▼
+[ 🟢 FINAL RESPONSE ]
 ```
 
 ---
 
 ## ✨ Key Features
 
-- **🧠 Dual-LLM Validation:** Ensures high accuracy by having a second "Critic" LLM review every query before execution.
-- **⚡ Real-Time Streaming:** Responses are streamed token-by-token using Server-Sent Events (SSE).
-- **💾 Intelligent Caching:** Validated queries are cached in a vector database (`ChromaDB`) for instant retrieval of similar questions.
-- **🗣️ Context Awareness:** Remembers previous filters (e.g., "Show me Hem's tasks" -> "Now show pending") and maintains "Sticky Context".
-- **🔒 Security First:** Read-only database permissions, restricted column access, and hardcoded `DELETE/UPDATE` prevention.
-- **📱 Responsive UI:** Modern, clean interface with Dark/Light mode support (system default) and mobile responsiveness.
+- **🎓 Dual Persona:** Acts as both a **Task Management Expert** and an **Analytics Manager** with high-level access.
+- **🛡️ Secure & Smart:** Access to sensitive data (like user passwords) is restricted to Manager personas, while standard queries remain safe.
+- **🧠 Dual-LLM Validation:** Generator creates queries; Validator critiques them (Read-Only checks, Intent verification).
+- **⚡ Real-Time Streaming:** Zero-latency streaming responses via SSE.
+- **💾 Semantic Caching:** Vector search remembers previous answers.
+- **🔗 Sticky Context:** "Show me his tasks" works by remembering the last user discussed.
 
 ---
 

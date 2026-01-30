@@ -10,16 +10,13 @@
 ## 📖 Overview
 
 **DB Assistant** is a full-stack application designed to interact with PostgreSQL databases using natural language. Unlike standard text-to-SQL tools, it employs a sophisticated **Agentic Workflow** with two distinct LLMs:
-1.  **Generator Agent:** Crafts the SQL query based on schema and user intent.
-2.  **Validator Agent:** Critiques the query for safety, accuracy, and intent matching before execution.
+
+1. **Generator Agent:** Crafts the SQL query based on schema and user intent.
+2. **Validator Agent:** Critiques the query for safety, accuracy, and intent matching before execution.
 
 The system features real-time answer streaming, query caching (semantic search via ChromaDB), and sticky context management for follow-up questions.
 
 ---
-
-## 🏗️ Architecture
-
-The system follows a modular architecture separating the Frontend UI from the Agentic Backend.
 
 ## 🏗️ Architecture
 
@@ -85,6 +82,7 @@ The system uses a highly modular Agentic Architecture.
 ## 🛠️ Technology Stack
 
 ### Backend
+
 - **Framework:** Python (FastAPI)
 - **Agent Orchestration:** LangGraph (Stateful Multi-Actor Applications)
 - **Database:** PostgreSQL (Core Data), ChromaDB (Vector Cache)
@@ -92,6 +90,7 @@ The system uses a highly modular Agentic Architecture.
 - **Server:** Uvicorn (ASGI)
 
 ### Frontend
+
 - **Core:** HTML5, CSS3, Vanilla JavaScript (ES6+)
 - **Icons:** FontAwesome
 - **Formatting:** Marked.js (Markdown rendering)
@@ -103,17 +102,20 @@ The system uses a highly modular Agentic Architecture.
 Follow these steps to get the project running locally.
 
 ### Prerequisites
+
 - Python 3.10+
 - PostgreSQL Database
 - OpenAI API Key
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/Prabhat9801/DB_Assistant.git
 cd DB_Assistant
 ```
 
 ### 2. Backend Setup
+
 Navigate to the backend directory and set up the environment.
 
 ```bash
@@ -133,6 +135,7 @@ pip install -r requirements.txt
 ```
 
 ### 3. Environment Configuration
+
 Create a `.env` file in `Backend_New/` with your credentials:
 
 ```env
@@ -145,15 +148,18 @@ DB_PASSWORD=your-db-password
 ```
 
 ### 4. Run the Backend
+
 Start the FastAPI server.
 
 ```bash
 # Make sure you are in Backend_New/ and .venv is active
 uvicorn main:app --reload
 ```
+
 *Server will start at `http://127.0.0.1:8000`*
 
 ### 5. Frontend Setup
+
 The frontend is a static web application. You can simply open `Frontend/index.html` in your browser, or serve it using a lightweight server (recommended).
 
 ```bash
@@ -161,6 +167,7 @@ The frontend is a static web application. You can simply open `Frontend/index.ht
 cd Frontend
 python -m http.server 5500
 ```
+
 *Access the app at `http://127.0.0.1:5500`*
 
 ---
@@ -170,12 +177,15 @@ python -m http.server 5500
 The **Agentic Workflow** is defined in `app/services/agent_nodes.py`. Here is the detailed lifecycle of a user request:
 
 ### 1. Schema Loading
+
 The agent connects to the database to fetch the list of tables (`checklist`, `delegation`) and their schemas.
 
 ### 2. Context Injection
+
 If the user asks a follow-up question (e.g., "pending ones?"), the `ContextManager` injects details from the previous query (User Filters, Date Ranges) into the prompt.
 
 ### 3. Query Generation (Loop)
+
 - **Generator (LLM 1):** Proposes a SQL query.
 - **Validator (LLM 2):** Reviews the query against a strict checklist:
   - Is it read-only?
@@ -184,6 +194,7 @@ If the user asks a follow-up question (e.g., "pending ones?"), the `ContextManag
 - **Feedback:** If rejected, the Validator provides specific feedback, and the Generator retries (up to 3 times).
 
 ### 4. Execution & Response
+
 - Once approved, the query is executed securely.
 - Results are passed to the **Answer Generator**, which crafts a natural language summary.
 - The summary is **Streamed** to the frontend efficiently.

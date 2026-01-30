@@ -117,9 +117,9 @@ This database tracks employee tasks across two main tables (`checklist`, `delega
      * `department` (TEXT): User's department.
      * `role` (TEXT): 'user' or 'admin'.
      * `given_by` (TEXT): Reporting manager/Assigner.
-     * `email_id` (TEXT): User email address.
-     * `number` (TEXT): Contact number.
-     * `Status` (TEXT): User active status.
+     * `email_id` (TEXT): User email address (Nullable).
+     * `number` (BIGINT): Contact number (Nullable).
+     * `status` (USER-DEFINED/ENUM): User status (e.g. 'active').
    - **Forbidden:** `password` (Security risk).
 
 ------------------------------------------------------------------------------------------------

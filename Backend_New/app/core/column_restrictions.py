@@ -36,7 +36,7 @@ ALLOWED_COLUMNS = {
         "department",
         "email_id",
         "number",
-        "Status"
+        "status"
     ]
 }
 

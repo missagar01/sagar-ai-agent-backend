@@ -50,7 +50,7 @@ class QueryCacheService:
         """Generate unique ID from question"""
         return hashlib.md5(question.lower().strip().encode()).hexdigest()
     
-    def find_similar_query(self, question: str) -> Optional[Dict[str, Any]]:
+    def find_similar_query(self, question: str, db_name: str = "checklist") -> Optional[Dict[str, Any]]:
         """Find cached query with semantic similarity"""
         if not self.enabled:
             return None
@@ -59,7 +59,8 @@ class QueryCacheService:
             results = self.collection.query(
                 query_texts=[question.lower().strip()],
                 n_results=1,
-                include=["documents", "metadatas", "distances"]
+                include=["documents", "metadatas", "distances"],
+                where={"database": db_name}
             )
             
             if not results or not results['documents'] or not results['documents'][0]:
@@ -94,18 +95,20 @@ class QueryCacheService:
             print(f"❌ Cache lookup error: {e}")
             return None
     
-    def cache_query(self, question: str, sql: str, language: str = "english") -> bool:
+    def cache_query(self, question: str, sql: str, db_name: str = "checklist", language: str = "english") -> bool:
         """Cache question-SQL mapping"""
         if not self.enabled:
             return False
         
         try:
-            doc_id = self._generate_id(question)
+            # Generate ID specific to this database context
+            doc_id = self._generate_id(f"{db_name}:{question}")
             existing = self.collection.get(ids=[doc_id])
             
             metadata = {
                 "sql": sql,
                 "language": language,
+                "database": db_name,
                 "cached_at": datetime.now().isoformat(),
                 "hit_count": "0"
             }
@@ -130,13 +133,13 @@ class QueryCacheService:
             print(f"❌ Cache write error: {e}")
             return False
     
-    def invalidate(self, question: str) -> bool:
+    def invalidate(self, question: str, db_name: str = "checklist") -> bool:
         """Remove cached query"""
         if not self.enabled:
             return False
         
         try:
-            doc_id = self._generate_id(question)
+            doc_id = self._generate_id(f"{db_name}:{question}")
             self.collection.delete(ids=[doc_id])
             print(f"🗑️ Cache invalidated: '{question[:50]}...'")
             return True

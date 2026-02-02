@@ -29,9 +29,23 @@ class Settings(BaseSettings):
     DB_NAME: str = os.getenv("DB_NAME", "")
     DB_PORT: str = os.getenv("DB_PORT", "5432")
     
+    # ────────────────────────────────────────────────────────
+    # MULTI-DATABASE URLS
+    # ────────────────────────────────────────────────────────
+    
+    # 1. Checklist System
+    DB_CHECKLIST_URL: str = os.getenv(
+        "DB_CHECKLIST_URL", 
+        f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+    )
+
+    # 2. Lead-To-Order System (New)
+    DB_LEAD_TO_ORDER_URL: str = os.getenv("DB_LEAD_TO_ORDER_URL", "")
+    
     @property
     def DATABASE_URL(self) -> str:
-        return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        """Default Connection (Legacy Support)"""
+        return self.DB_CHECKLIST_URL
     
     # Security Settings
     MAX_QUERY_LENGTH: int = 50000

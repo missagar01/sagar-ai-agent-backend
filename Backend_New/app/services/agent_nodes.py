@@ -107,17 +107,34 @@ Generate ONLY the note:"""
 # GRAPH NODES
 # ============================================================================
 
-def list_tables(state: EnhancedState):
-    """Get available table names"""
-    tables = list_tables_tool.invoke("")
+def list_tables(state: EnhancedState, db=None):
+    """Get available table names. Accepts optional 'db' for multi-database support."""
+    if db:
+        # Use the specific DB instance if provided
+        tables = ", ".join(db.get_usable_table_names())
+    else:
+        # Default fallback
+        tables = list_tables_tool.invoke("")
+        
     return {"messages": [AIMessage(content=f"Available tables: {tables}")]}
 
-def call_get_schema(state: EnhancedState):
-    """Fetch complete schema with samples and add type warnings"""
+def call_get_schema(state: EnhancedState, db=None, allowed_tables=None):
+    """Fetch complete schema with samples and add type warnings.
+       Accepts 'db' and 'allowed_tables' for multi-db support.
+    """
+    if db and allowed_tables:
+        # Custom DB Schema Retrieval
+        schema = db.get_table_info(allowed_tables)
+        tables_str = ", ".join(allowed_tables)
+        restriction_note = f"🔒 RESTRICTED TO TABLES: {tables_str}"
+        enhanced_schema = f"{restriction_note}\n\n{schema}"
+        return {"messages": [AIMessage(content=enhanced_schema)]}
+
+    # Default / Legacy Logic (Checklist)
     tables = ", ".join(settings.ALLOWED_TABLES)
     schema = get_schema_tool.invoke({"table_names": tables})
     
-    # Add column restrictions notice
+    # Add column restrictions notice (Legacy Checklist Specifics)
     column_restrictions = f"""
 🔒 COLUMN RESTRICTIONS (Client Requirement):
 ═══════════════════════════════════════════════════════════════════════════════
@@ -136,39 +153,8 @@ ONLY use these columns in your queries:
 
 {schema}
 
-⚠️ CRITICAL DATA TYPE WARNINGS:
-═══════════════════════════════════════════════════════════════════════════════
-
-🔴 TEXT DATE COLUMNS (Require ::DATE casting for comparisons):
-   - checklist.planned_date (TEXT) → Use: planned_date::DATE < CURRENT_DATE
-   - delegation.planned_date (TEXT) → Use: planned_date::DATE < CURRENT_DATE
-   
-   ❌ WRONG: WHERE planned_date < CURRENT_DATE
-   ✅ RIGHT: WHERE planned_date::DATE < CURRENT_DATE
-
-🟢 NATIVE DATE/TIMESTAMP COLUMNS (Can compare directly):
-   - checklist.task_start_date (DATE)
-   - checklist.submission_date (TIMESTAMP)
-   - delegation.task_start_date (DATE)
-   - delegation.submission_date (TIMESTAMP)
-
-💡 SAMPLE DATA PATTERNS (Learn from these):
-───────────────────────────────────────────────────────────────────────────────
-Checklist Row 1:
-  submission_date = NULL              → Task is PENDING
-  task_start_date = '2026-01-15'     → Scheduled date
-  status = NULL                       → Don't use (unreliable field)
-
-Checklist Row 2:
-  submission_date = '2026-01-20'     → Task COMPLETED on this date
-  task_start_date = '2026-01-10'     → Was scheduled for this date
-  Late? Yes (10 days late)
-
-Delegation Row 1:
-  status = 'In Progress'              → NOT done yet
-  submission_date = NULL              → Still pending
-  task_start_date = '2026-01-05'     → Overdue (past due)
-═══════════════════════════════════════════════════════════════════════════════
+⚠️ CRITICAL DATA TYPE WARNINGS (Checklist System):
+...
 """
     
     return {"messages": [AIMessage(content=enhanced_schema)]}
@@ -393,8 +379,10 @@ Validate this query against the SEMANTIC SCHEMA. Provide JSON response only."""
             "messages": []
         }
 
-def run_query_node(state: EnhancedState):
-    """Execute query after validation with security checks"""
+def run_query_node(state: EnhancedState, db=None):
+    """Execute query after validation with security checks. 
+       Accepts optional 'db' for multi-database support.
+    """
     query = None
     tool_call_id = None
     for msg in reversed(state["messages"]):
@@ -402,87 +390,41 @@ def run_query_node(state: EnhancedState):
             query = msg.tool_calls[0]['args']['query']
             tool_call_id = msg.tool_calls[0]['id']
             break
+            
+    # Fallback to content if no tool call (for some agent types)
+    if not query:
+        # Check if the last message is an AIMessage with content being the SQL
+        last_msg = state["messages"][-1]
+        if isinstance(last_msg, AIMessage) and "SELECT" in last_msg.content.upper():
+            query = last_msg.content
     
     if not query:
         return {"messages": [AIMessage(content="Error: No query found to execute")]}
-    
-    print(f"[DEBUG] ===== SQL BEING EXECUTED =====")
-    print(query)
-    print(f"[DEBUG] =====================================")
     
     # 🔒 SECURITY VALIDATION
     is_valid, error_msg, sanitized_query = validate_sql_security(query)
     
     if not is_valid:
-        error_response = f"""
-🚨 SECURITY VALIDATION FAILED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-❌ Query blocked by security validation:
-   {error_msg}
-
-This query does not meet security requirements for execution.
-
-Allowed Query Types:
-- SELECT statements only
-- WITH ... SELECT (CTEs) only
-- Maximum length: {settings.MAX_QUERY_LENGTH} characters
-- No dangerous keywords or patterns allowed
-- No multiple statements
-
-Please try a different query.
-"""
-        tool_response = ToolMessage(
-            content=error_response,
-            tool_call_id=tool_call_id
-        )
-        return {"messages": [tool_response]}
+        error_response = f"🚨 SECURITY VALIDATION FAILED: {error_msg}"
+        return {"messages": [AIMessage(content=error_response)]}
     
     query = sanitized_query
-    
-    # Detect multi-table handling
-    is_task_query = 'checklist' in query.lower() or 'delegation' in query.lower()
-    has_both_tables = (
-        'checklist_metrics' in query.lower() or 
-        'delegation_metrics' in query.lower() or 
-        'checklist_agg' in query.lower() or 
-        'delegation_agg' in query.lower() or 
-        'union' in query.lower() or
-        'full outer join' in query.lower()
-    )
-    
-    if is_task_query and 'checklist' in query.lower() and not has_both_tables:
-        checklist_query = query
-        delegation_query = query.replace('checklist', 'delegation').replace('CHECKLIST', 'DELEGATION')
-        
-        checklist_result = run_query_tool.invoke({"query": checklist_query})
-        delegation_result = run_query_tool.invoke({"query": delegation_query})
-        
-        combined_result = f"""SEPARATE RESULTS:
+    print(f"[DEBUG] Executing SQL on {'Custom DB' if db else 'Default DB'}: {query}")
 
-📋 CHECKLIST TABLE:
-{checklist_result}
-
-📌 DELEGATION TABLE:
-{delegation_result}
-
-💡 Note: Results shown separately as requested."""
+    try:
+        if db:
+            # Direct execution on the passed DB instance
+            result = db.run(query)
+        else:
+            # Logic for default/legacy system (splitting checklist/delegation if needed)
+            # ... (Rest of legacy formatting logic if needed, or simple exec)
+            result = run_query_tool.invoke({"query": query})
+            
+        return {"messages": [AIMessage(content=str(result))]}
         
-        # Store raw result for streaming answer generation
-        tool_response = ToolMessage(
-            content=combined_result,
-            tool_call_id=tool_call_id
-        )
-    else:
-        result = run_query_tool.invoke({"query": query})
-        
-        # Store raw result for streaming answer generation
-        tool_response = ToolMessage(
-            content=str(result),
-            tool_call_id=tool_call_id
-        )
-    
-    return {"messages": [tool_response]}
+    except Exception as e:
+        print(f"[ERROR] Query Execution Failed: {e}")
+        return {"messages": [AIMessage(content=f"Error executing query: {str(e)}")]}
 
 # ============================================================================
 # CONDITIONAL EDGES

@@ -1,0 +1,916 @@
+{
+  "business_summary": "This database supports two intertwined business domains for a steel/manufacturing organization:\n1) A Sales CRM / Lead-to-Order pipeline used to capture leads (source, company/contact details), track enquiry progress and follow-ups, generate quotations, and record whether an order was received along with commercial terms (payment/transport/hold reasons).\n2) An Operations/Production \u201cbatchcode/O2D\u201d style shop-floor data capture system that logs production and quality checkpoints (SMS register/heat identifiers, QC lab chemical results, hot coil, pipe mill, re-coiler, and safety/maintenance checklists for laddle and tundish). \n\nThe common pattern across operational tables is a sampled timestamp/date, process-specific measurements/checks, personnel names, and a unique_code used as a cross-form correlation key. The sales side contains redundant tracking tables (fms_leads, leads_tracker, enquiry_tracker, enquiry_to_order) that represent different stages or UI modules of the same pipeline, plus a large dropdown table that functions as a configurable picklist/master-data source for many CRM fields. Users/login tables provide authentication/authorization and page/system access for modules like lead-to-order, o2d, and batchcode.",
+  "table_insights": {
+    "laddle_checklist": {
+      "description": "Checklist form capturing readiness/condition checks for a laddle (ladle) before/after use in steelmaking/continuous casting, including cleaning checks, nozzle/gate checks, plate life, and responsible personnel. Used for operational compliance and traceability per laddle per date.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Potential logical link to sms_register / qc_lab_samples via laddle_number (not enforced)",
+        "Potential logical link to other batch/process tables via unique_code (not enforced)"
+      ],
+      "important_columns": [
+        "sample_date",
+        "sample_timestamp",
+        "laddle_number",
+        "plate_life",
+        "unique_code",
+        "created_at"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for the checklist entry (likely auto-increment).",
+        "sample_timestamp": "When the checklist was captured (date-time).",
+        "sample_date": "Business date of the checklist (required).",
+        "laddle_number": "Physical laddle/ladle identifier number.",
+        "slag_cleaning_top": "Result/notes for slag cleaning at the top portion of the laddle.",
+        "slag_cleaning_bottom": "Result/notes for slag cleaning at the bottom portion of the laddle.",
+        "nozzle_proper_lancing": "Whether nozzle lancing was performed properly (often Yes/No/Remarks stored as text).",
+        "pursing_plug_cleaning": "Status of purging plug cleaning.",
+        "sly_gate_check": "Check status for slide gate condition.",
+        "nozzle_check_cleaning": "Status of nozzle check/cleaning.",
+        "sly_gate_operate": "Whether slide gate operated correctly.",
+        "nfc_proper_heat": "NFC (likely nozzle/flow control) proper heat check status.",
+        "nfc_filling_nozzle": "NFC nozzle filling/check status.",
+        "plate_life": "Life/usage count of a plate (likely refractory/slide gate plate).",
+        "timber_man_name": "Name of timber man involved/checked.",
+        "laddle_man_name": "Name of laddle/ladle operator.",
+        "laddle_foreman_name": "Name of laddle foreman.",
+        "supervisor_name": "Shift/area supervisor name who supervised checklist.",
+        "unique_code": "Cross-form unique identifier used to correlate related process records.",
+        "created_at": "Record creation timestamp."
+      }
+    },
+    "hot_coil": {
+      "description": "Production/quality log for hot coil/hot coiler process capturing temperatures by strand, shift roles, size, remarks and evidence photo. Likely a batch/heat related form in the operations module.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Potential link to sms_register via sms_short_code (not enforced)",
+        "Potential link to re_coiler via hot_coiler_short_code (not enforced)",
+        "Potential link to other operations data via unique_code (not enforced)"
+      ],
+      "important_columns": [
+        "sample_timestamp",
+        "sms_short_code",
+        "submission_type",
+        "size",
+        "strand1_temperature",
+        "strand2_temperature",
+        "unique_code",
+        "created_at",
+        "updated_at"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for hot coil log entry.",
+        "sample_timestamp": "When the hot coil data was sampled/recorded.",
+        "sms_short_code": "Short code referencing SMS/heat/batch identifier for traceability.",
+        "submission_type": "Type of submission (e.g., initial/final/rework) stored as free text.",
+        "size": "Produced size specification (text).",
+        "mill_incharge": "Name of mill in-charge responsible during the run.",
+        "quality_supervisor": "Name of quality supervisor.",
+        "picture": "URL/path of an attached picture for evidence.",
+        "electrical_dc_operator": "Name of electrical/DC operator (role-based accountability).",
+        "remarks": "Additional notes about run/quality issues.",
+        "strand1_temperature": "Recorded temperature for strand 1 (stored as text).",
+        "strand2_temperature": "Recorded temperature for strand 2 (stored as text).",
+        "shift_supervisor": "Shift supervisor name.",
+        "unique_code": "Cross-form unique identifier to join with other batchcode forms.",
+        "created_at": "Record creation time.",
+        "updated_at": "Last update time.",
+        "update_link": "Link used by UI to update/edit this record."
+      }
+    },
+    "pipe_mill": {
+      "description": "Pipe mill production log capturing machine condition checks (turbine/blower), production metrics, time window, product specs (section/item_type/size/thickness), and responsible personnel plus photo evidence.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Potential link to size_master via (item_type, size, thickness) (not enforced)",
+        "Potential link to re_coiler/hot_coil via recoiler_short_code (not enforced)",
+        "Potential link across operations via unique_code (not enforced)"
+      ],
+      "important_columns": [
+        "sample_timestamp",
+        "shift",
+        "pipe_mill",
+        "production",
+        "time_start",
+        "time_end",
+        "section",
+        "item_type",
+        "size",
+        "thickness",
+        "unique_code",
+        "created_at"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for pipe mill log entry.",
+        "sample_timestamp": "When the log was captured (required).",
+        "size": "Pipe size/dimension (text).",
+        "shift": "Shift identifier (e.g., A/B/C).",
+        "pipe_mill": "Pipe mill line name/identifier.",
+        "turbuse_name": "Name/identifier of turbine (likely 'turbine' misspelled).",
+        "turbine_is_ok": "Turbine condition status (e.g., OK/Not OK).",
+        "gas_flow_reading": "Gas flow meter reading.",
+        "blower_name": "Name/identifier of blower.",
+        "blower_is_ok": "Blower condition status (e.g., OK/Not OK).",
+        "helper": "Helper/operator name.",
+        "unique_code": "Cross-form unique identifier for correlation.",
+        "created_at": "Record creation time.",
+        "jobtime": "Job time or duration (text).",
+        "production": "Produced quantity in the logged interval (integer units not specified).",
+        "time_start": "Start time of the logged production slot (stored as text).",
+        "time_end": "End time of the logged production slot (stored as text).",
+        "section": "Mill/production section or product section specification.",
+        "item_type": "Product type/category (e.g., round/square/rectangular).",
+        "thickness": "Material thickness (text; could be numeric but stored as varchar).",
+        "picture": "Photo URL/path for evidence/inspection.",
+        "recoiler_short_code": "Short code referencing recoiler or upstream coil identifier.",
+        "mill_number": "Mill run or order/heat/mill number (free text).",
+        "quality_supervisor": "Quality supervisor name for this run.",
+        "mill_incharge": "Mill in-charge name.",
+        "forman_name": "Foreman name (spelled 'forman').",
+        "fitter_name": "Fitter/maintenance staff name.",
+        "remarks": "Free-text remarks."
+      }
+    },
+    "qc_lab_samples": {
+      "description": "Quality Control lab sample results tied to an SMS batch/heat: includes furnace/sequence/ladle identifiers and final chemical analysis values (C, Mn, S, P) plus tester and evidence.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Potential link to sms_register via (laddle_number, furnace_number, sequence_code) and/or sms_batch_code (not enforced)",
+        "Potential link to laddle_checklist via laddle_number (not enforced)",
+        "Potential link across operations via unique_code (not enforced)"
+      ],
+      "important_columns": [
+        "sample_timestamp",
+        "sms_batch_code",
+        "furnace_number",
+        "sequence_code",
+        "laddle_number",
+        "shift_type",
+        "final_c",
+        "final_mn",
+        "final_s",
+        "final_p",
+        "tested_by",
+        "created_at"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for QC lab sample record.",
+        "sample_timestamp": "When the sample was tested/recorded (required).",
+        "sms_batch_code": "Batch/heat code used by SMS/register for traceability.",
+        "furnace_number": "Furnace identifier where heat was produced.",
+        "sequence_code": "Sequence identifier within casting/production.",
+        "laddle_number": "Laddle/ladle number associated with the sample.",
+        "shift_type": "Shift classification (day/night or A/B/C) for analytics.",
+        "final_c": "Final Carbon percentage (or similar fraction) measured.",
+        "final_mn": "Final Manganese measured.",
+        "final_s": "Final Sulfur measured.",
+        "final_p": "Final Phosphorus measured.",
+        "tested_by": "Lab technician/analyst name.",
+        "remarks": "Additional lab remarks/notes.",
+        "report_picture": "Photo/scan URL of the lab report.",
+        "unique_code": "Cross-form unique identifier for correlation.",
+        "created_at": "Record creation time."
+      }
+    },
+    "fms_leads": {
+      "description": "Primary CRM lead/enquiry record capturing lead source, company/contact details, scheduling (planned/actual/delay), enquiry and follow-up statuses, next actions, and order receipt details (acceptance/payment/transport), plus a resulting order number when won.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Logical join to leads_tracker via lead_no (not enforced)",
+        "Logical join to enquiry_tracker via enquiry_no = lead_no in some cases (not enforced)",
+        "Logical join to dropdown for picklist values (not enforced)",
+        "Potential join to users via salesperson_name/sc_name text match (not enforced)"
+      ],
+      "important_columns": [
+        "created_at",
+        "updated_at",
+        "lead_no",
+        "lead_source",
+        "company_name",
+        "phone_number",
+        "state",
+        "planned",
+        "actual",
+        "delay",
+        "status",
+        "enquiry_received_status",
+        "enquiry_received_date",
+        "enquiry_approach",
+        "project_approx_value",
+        "item_qty",
+        "total_qty",
+        "next_call_date",
+        "next_call_time",
+        "enquiry_status",
+        "current_stage",
+        "followup_next_call_date",
+        "followup_next_call_time",
+        "is_order_received",
+        "payment_mode",
+        "payment_terms_days",
+        "transport_mode",
+        "orderno"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for lead record.",
+        "created_at": "When the lead was created in the system.",
+        "updated_at": "When the lead was last updated.",
+        "lead_no": "Business lead identifier (e.g., LD-003).",
+        "lead_receiver_name": "Person/team who received the lead.",
+        "lead_source": "Acquisition channel (e.g., Indiamart, WhatsApp).",
+        "company_name": "Prospect company name.",
+        "phone_number": "Primary phone contact.",
+        "salesperson_name": "Salesperson assigned (free-text name).",
+        "location": "Prospect location/city.",
+        "email_address": "Primary email contact.",
+        "state": "State/region of prospect.",
+        "address": "Address of prospect.",
+        "nob": "Nature of business of the prospect.",
+        "additional_notes": "Extra notes captured at lead time.",
+        "planned": "Planned date for an activity/visit/follow-up milestone.",
+        "actual": "Actual completion date of that milestone.",
+        "delay": "Delay in days for that milestone.",
+        "status": "Overall lead temperature/status (e.g., Hot).",
+        "customer_feedback": "Customer feedback summary.",
+        "enquiry_received_status": "Whether enquiry is received (yes/expected/etc.).",
+        "enquiry_received_date": "Date enquiry was received.",
+        "enquiry_approach": "How enquiry was received/approached.",
+        "project_approx_value": "Estimated project/enquiry value.",
+        "item_qty": "Requested items and quantities; stored as JSON string.",
+        "total_qty": "Total quantity across items (integer).",
+        "next_action": "Next planned action text.",
+        "next_call_date": "Next call/follow-up date.",
+        "next_call_time": "Next call/follow-up time (stored as text).",
+        "planned1": "Second planned date for another milestone/step.",
+        "actual1": "Second actual date for that milestone/step.",
+        "delay1": "Second delay metric.",
+        "enquiry_status": "Status of enquiry (open/hot/etc.).",
+        "customer_say": "What customer said (free text).",
+        "current_stage": "Pipeline stage (e.g., order-status).",
+        "followup_status": "Follow-up status indicator.",
+        "followup_next_call_date": "Next call date in follow-up phase.",
+        "followup_next_call_time": "Next call time in follow-up phase.",
+        "is_order_received": "Whether order was received (stored as text yes/no).",
+        "acceptance_via": "How customer accepted (email/whatsapp/etc.).",
+        "payment_mode": "Preferred payment mode.",
+        "payment_terms_days": "Payment terms in days (stored as text).",
+        "transport_mode": "Transport mode for delivery.",
+        "remark": "General remark field.",
+        "not_received_reason_status": "Reason category when order not received.",
+        "not_received_reason_remark": "Remarks/details for not received reason.",
+        "customer_order_hold_category": "Hold category if customer put order on hold.",
+        "hold_date": "Date of placing on hold.",
+        "hold_remark": "Remark for hold.",
+        "sc_name": "Sales coordinator name.",
+        "planned_days": "Configured/expected days for lead process steps.",
+        "leadscallingdays": "Calling days metric for lead stage (stored as text).",
+        "enquirycallingdays": "Calling days metric for enquiry stage (stored as text).",
+        "orderno": "Sales order / delivery order number when converted."
+      }
+    },
+    "size_master": {
+      "description": "Reference/master table defining valid combinations of item_type, size, and thickness for products (likely pipes/sections). Used for validation, dropdowns, and analytics normalization.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "item_type",
+        "size",
+        "thickness"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for a size master row.",
+        "item_type": "Product shape/category (round/square/rectangular).",
+        "size": "Size/dimension specification (e.g., 25 OD, 19X19).",
+        "thickness": "Thickness for the given size and type."
+      }
+    },
+    "re_coiler": {
+      "description": "Operations log for the re-coiler process capturing supervisor/incharge/contractor, machine number, welder, and linking back to hot coiler via short code; used for traceability and staffing accountability.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Potential link to hot_coil via hot_coiler_short_code (not enforced)",
+        "Potential link across operations via unique_code (not enforced)"
+      ],
+      "important_columns": [
+        "sample_timestamp",
+        "hot_coiler_short_code",
+        "size",
+        "machine_number",
+        "unique_code",
+        "created_at"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for re-coiler entry.",
+        "sample_timestamp": "When the re-coiler record was captured (required).",
+        "hot_coiler_short_code": "Short code referencing upstream hot coiler run.",
+        "size": "Material size processed at re-coiler.",
+        "supervisor": "Supervisor name.",
+        "incharge": "In-charge name.",
+        "contractor": "Contractor name (if outsourced labor).",
+        "machine_number": "Re-coiler machine identifier/number.",
+        "welder_name": "Welder/operator name.",
+        "unique_code": "Cross-form unique identifier for correlation.",
+        "created_at": "Record creation time."
+      }
+    },
+    "tundish_checklist": {
+      "description": "Checklist form for tundish readiness and handover checks in continuous casting (nozzle plate, well block, board setting, sand filling, slag cleaning, handover confirmations), plus operator names. Supports compliance and traceability by tundish.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Potential link to sms_register / qc_lab_samples via tundish_number or sequence context (not present; not enforced)",
+        "Potential link across operations via unique_code (not enforced)"
+      ],
+      "important_columns": [
+        "sample_timestamp",
+        "tundish_number",
+        "unique_code"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for tundish checklist entry.",
+        "sample_timestamp": "When the checklist was captured.",
+        "tundish_number": "Physical tundish identifier number.",
+        "nozzle_plate_check": "Status/notes for nozzle plate condition check.",
+        "well_block_check": "Status/notes for well block condition check.",
+        "board_proper_set": "Whether the board was set properly.",
+        "board_sand_filling": "Whether sand filling was done properly.",
+        "refractory_slag_cleaning": "Status/notes for refractory and slag cleaning.",
+        "tundish_mession_name": "Name of tundish mason/mission staff (spelling suggests 'mason').",
+        "handover_proper_check": "Whether handover checks were done properly.",
+        "handover_nozzle_installed": "Whether nozzle was installed at handover.",
+        "handover_masala_inserted": "Whether 'masala' (refractory mix) inserted at handover.",
+        "stand1_mould_operator": "Mould operator for strand 1.",
+        "stand2_mould_operator": "Mould operator for strand 2.",
+        "timber_man_name": "Timber man name.",
+        "laddle_operator_name": "Laddle/ladle operator name.",
+        "shift_incharge_name": "Shift in-charge name.",
+        "forman_name": "Foreman name.",
+        "unique_code": "Cross-form unique identifier for correlation."
+      }
+    },
+    "leads_tracker": {
+      "description": "Event/history-style table for tracking lead/enquiry snapshots over time (customer statement, status, enquiry received details, item quantities, next action). Acts like an activity log separate from the main lead record.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Logical join to fms_leads via lead_no (not enforced)"
+      ],
+      "important_columns": [
+        "created_at",
+        "lead_no",
+        "lead_status",
+        "enquiry_received_status",
+        "enquiry_received_date",
+        "enquiry_approach",
+        "item_qty",
+        "total_qty",
+        "next_call_date",
+        "next_call_time",
+        "calling_days"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for lead tracker entry.",
+        "created_at": "When this tracker snapshot/event was created.",
+        "lead_no": "Business lead identifier being tracked.",
+        "customer_say": "Customer statement at the time of this entry.",
+        "lead_status": "Lead status/temperature (Hot/Warm/etc.).",
+        "enquiry_received_status": "Whether enquiry received at that time (yes/expected).",
+        "enquiry_received_date": "Date of enquiry receipt for this snapshot.",
+        "enquiry_approach": "Approach/channel for enquiry.",
+        "item_qty": "JSONB payload of requested items and quantities.",
+        "total_qty": "Total quantity requested in this entry.",
+        "next_action": "Next action text.",
+        "next_call_date": "Next follow-up date (snapshot).",
+        "next_call_time": "Next follow-up time (snapshot).",
+        "company_name": "Company name (may be redundant with fms_leads).",
+        "sales_coordinator": "Sales coordinator name (snapshot).",
+        "calling_days": "Calling days metric for cadence/SLAs."
+      }
+    },
+    "dropdown": {
+      "description": "Picklist/master-data staging table used by the CRM UI to populate dropdowns for many fields (lead sources, statuses, payment modes, reasons, consignee/consignor details, item catalog, rates, scripts like 'what did customer say'). This is not normalized; it stores many independent lists in columns.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "created_at",
+        "lead_source",
+        "enquiry_status",
+        "acceptance_via",
+        "payment_mode",
+        "payment_terms_days",
+        "transport_mode",
+        "freight_type",
+        "item_code",
+        "item_category",
+        "item_name",
+        "rate",
+        "description",
+        "followup_status",
+        "what_did_customer_say"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for a dropdown configuration row.",
+        "created_at": "When this dropdown row was added.",
+        "lead_receiver_name": "Allowed value for lead receiver name.",
+        "lead_source": "Allowed value for lead source/channel.",
+        "state": "Allowed state value.",
+        "quotation_shared_by": "Allowed value for who shared quotation.",
+        "enquiry_status": "Allowed enquiry status value.",
+        "acceptance_via": "Allowed acceptance channel value.",
+        "payment_mode": "Allowed payment mode value.",
+        "not_received_reason_status": "Allowed reason category when order not received.",
+        "hold_reason_category": "Allowed hold reason category.",
+        "consignee_company_name": "Consignee company name master value.",
+        "consignee_client_name": "Consignee contact name master value.",
+        "consignee_client_contact_no": "Consignee contact phone master value.",
+        "consignee_billing_address": "Consignee billing address master value.",
+        "consignee_state": "Consignee state master value.",
+        "consignee_gstin_uin": "Consignee GSTIN/UIN master value.",
+        "consignee_state_code": "Consignee state code master value.",
+        "sp_name": "Sales person/reference person master value (context-specific).",
+        "reference_contact_no1": "Reference contact phone #1 master value.",
+        "sp_state": "Sales person/reference state master value.",
+        "sp_state_code": "Sales person/reference state code master value.",
+        "sp_pan": "Sales person/reference PAN master value.",
+        "consignor_bank_details": "Consignor bank details master string.",
+        "consignor_state_code": "Consignor state code.",
+        "consignor_gstin": "Consignor GSTIN.",
+        "consignor_msme_no": "Consignor MSME registration number.",
+        "lead_assign_to": "Allowed assignee for lead.",
+        "requirement_product_category": "Allowed product category requirement.",
+        "sales_coordinator_name": "Allowed sales coordinator name.",
+        "nob": "Allowed nature-of-business value.",
+        "enquiry_approach": "Allowed enquiry approach values.",
+        "requirement_product_category_codes": "Codes for requirement categories/items.",
+        "live_company_name": "Master values for live lead capture company name.",
+        "live_person_name": "Master values for live lead capture person name.",
+        "live_mobile": "Master values for live mobile.",
+        "live_email_address": "Master values for live email.",
+        "live_address": "Master values for live address.",
+        "live_sc_name": "Master values for live sales coordinator name.",
+        "live_source": "Master values for live source/channel.",
+        "direct_company_name": "Master values for direct visit company name.",
+        "direct_client_name": "Master values for direct client name.",
+        "direct_client_contact_no": "Master values for direct client contact.",
+        "direct_state": "Master values for direct state.",
+        "direct_billing_address": "Master values for direct billing address.",
+        "item_code": "Product/item code master value.",
+        "item_category": "Product category master value.",
+        "item_name": "Product name master value.",
+        "payment_terms_days": "Payment terms in days master value (string).",
+        "transport_mode": "Transport mode master value.",
+        "freight_type": "Freight type master value (FOR/Paid/etc.).",
+        "payment_terms": "Payment terms text master value.",
+        "enquiry_receiver_name": "Allowed enquiry receiver name.",
+        "enquiry_assign_to": "Allowed enquiry assignee value.",
+        "item_list": "Example item list string for UI selection.",
+        "rate": "Default/standard rate for the item.",
+        "description": "Item description master text.",
+        "prepared_by": "Allowed prepared-by value.",
+        "followup_status": "Allowed follow-up status value.",
+        "reference_phone_no_2": "Reference phone #2 master value.",
+        "what_did_customer_say": "Allowed/scripted customer statement."
+      }
+    },
+    "make_quotation": {
+      "description": "Quotation header record including consignee/consignor details, commercial terms, banking details, items (JSON), generated PDF URL, and grand total. Used for generating and storing formal quotation documents.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Logical join to fms_leads or enquiry_to_order via company_name/contact fields (not enforced)",
+        "Logical join to dropdown for prepared_by/payment terms etc. (not enforced)"
+      ],
+      "important_columns": [
+        "timestamp",
+        "quotation_no",
+        "quotation_date",
+        "prepared_by",
+        "company_name",
+        "contact_name",
+        "contact_no",
+        "consignee_state",
+        "consignee_gstin",
+        "payment_terms",
+        "delivery",
+        "freight",
+        "taxes",
+        "items",
+        "grand_total",
+        "pdf_url"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for quotation record.",
+        "timestamp": "When the quotation record was created/entered.",
+        "quotation_no": "Business quotation number (e.g., QN-006).",
+        "quotation_date": "Date of quotation issuance.",
+        "prepared_by": "User/person who prepared the quotation.",
+        "consigner_state": "Consignor (seller) state.",
+        "reference_name": "Reference/contact person (could be salesperson or customer ref).",
+        "consigner_address": "Seller address printed on quotation.",
+        "consigner_mobile": "Seller mobile contact printed on quotation.",
+        "consigner_phone": "Seller phone contact printed on quotation.",
+        "consigner_gstin": "Seller GSTIN.",
+        "consigner_state_code": "Seller state code for GST.",
+        "company_name": "Customer company name on quotation.",
+        "consignee_address": "Customer billing address.",
+        "ship_to": "Ship-to address or instructions.",
+        "consignee_state": "Customer state.",
+        "contact_name": "Customer contact person name.",
+        "contact_no": "Customer contact number.",
+        "consignee_gstin": "Customer GSTIN.",
+        "consignee_state_code": "Customer state code.",
+        "msme_no": "Seller MSME number (or related MSME reference).",
+        "validity": "Validity text for quoted prices.",
+        "payment_terms": "Payment terms text block.",
+        "delivery": "Delivery terms text block.",
+        "freight": "Freight terms text block.",
+        "insurance": "Insurance terms text block.",
+        "taxes": "Tax terms text block.",
+        "notes": "Additional notes printed on quotation.",
+        "account_no": "Bank account number for payment.",
+        "bank_name": "Bank name.",
+        "bank_address": "Bank branch/address.",
+        "ifsc_code": "IFSC code.",
+        "email": "Contact email printed on quotation.",
+        "website": "Website printed on quotation.",
+        "pan": "PAN printed on quotation.",
+        "items": "JSONB array of quotation line items (code/name/qty/rate/gst/etc.).",
+        "pdf_url": "Generated PDF URL for the quotation document.",
+        "grand_total": "Grand total amount of the quotation."
+      }
+    },
+    "enquiry_tracker": {
+      "description": "Enquiry follow-up and decision tracking table capturing pipeline stage, follow-up scheduling, order receipt status, acceptance/payment/transport details, and reason/hold metadata. Acts as a downstream tracker from lead/enquiry to order number.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Logical join to fms_leads via enquiry_no = lead_no in practice (not enforced)",
+        "Logical join to enquiry_to_order via en_enquiry_no/enquiry_no (naming mismatch; not enforced)",
+        "Logical join to dropdown for statuses and reason categories (not enforced)"
+      ],
+      "important_columns": [
+        "timestamp",
+        "enquiry_no",
+        "enquiry_status",
+        "current_stage",
+        "followup_status",
+        "next_call_date",
+        "next_call_time",
+        "is_order_received_status",
+        "acceptance_via",
+        "payment_mode",
+        "payment_terms_in_days",
+        "transport_mode",
+        "if_no_relevant_reason_status",
+        "customer_order_hold_reason_category",
+        "holding_date",
+        "order_no",
+        "party_name",
+        "sales_person_name"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for enquiry tracker entry.",
+        "timestamp": "When the tracker entry was recorded.",
+        "enquiry_no": "Enquiry identifier (sometimes appears to store lead_no like LD-003).",
+        "enquiry_status": "Enquiry status (open/hot/warm).",
+        "what_did_customer_say": "Customer response/feedback.",
+        "current_stage": "Pipeline stage (e.g., order-expected, order-status).",
+        "followup_status": "Follow-up status label.",
+        "next_call_date": "Next planned call date.",
+        "next_call_time": "Next planned call time.",
+        "is_order_received_status": "Order received status (yes/no/hold).",
+        "acceptance_via": "Acceptance channel.",
+        "payment_mode": "Payment mode if won.",
+        "payment_terms_in_days": "Payment terms in days (integer).",
+        "transport_mode": "Transport mode if won.",
+        "remark": "General remarks.",
+        "if_no_relevant_reason_status": "Reason category when not received.",
+        "if_no_relevant_reason_remark": "Details for not received reason.",
+        "customer_order_hold_reason_category": "Hold category.",
+        "holding_date": "Date the enquiry/order was put on hold.",
+        "hold_remark": "Remarks for hold.",
+        "sales_cordinator": "Sales coordinator name (spelling 'cordinator').",
+        "calling_days": "Calling cadence/days (stored as varchar).",
+        "order_no": "Generated order/delivery order number when won.",
+        "party_name": "Customer/party name.",
+        "sales_person_name": "Salesperson responsible."
+      }
+    },
+    "enquiry_to_order": {
+      "description": "Centralized enquiry record (EN-xx) capturing customer identity, enquiry details, requested items, planned vs actual dates/delay, follow-up scheduling, and conversion to order including PO number and acceptance file. Represents the enquiry-to-order workflow in a single row.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Logical join to enquiry_tracker via en_enquiry_no ~ enquiry_no (not enforced)",
+        "Logical join to dropdown for lead_source/enquiry_status/etc. (not enforced)"
+      ],
+      "important_columns": [
+        "timestamp",
+        "en_enquiry_no",
+        "lead_source",
+        "company_name",
+        "phone_number",
+        "sales_person_name",
+        "enquiry_receiver_name",
+        "enquiry_date",
+        "enquiry_approach",
+        "item_qty",
+        "planned",
+        "actual",
+        "delay",
+        "enquiry_status",
+        "current_stage",
+        "next_call_date",
+        "next_call_time",
+        "is_order_received",
+        "acceptance_via",
+        "payment_mode",
+        "payment_terms_days",
+        "transport_mode",
+        "po_number",
+        "planned_days"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for enquiry-to-order record.",
+        "timestamp": "When this enquiry record was created/updated in system.",
+        "en_enquiry_no": "Enquiry number (e.g., EN-01).",
+        "lead_source": "Source channel for the enquiry.",
+        "company_name": "Customer company name.",
+        "phone_number": "Customer phone number.",
+        "sales_person_name": "Assigned salesperson name.",
+        "location": "Customer address/location.",
+        "email": "Customer email.",
+        "enquiry_receiver_name": "Person who received the enquiry.",
+        "enquiry_date": "Date the enquiry was made/received.",
+        "enquiry_approach": "Approach channel (phone/email/inward/etc.).",
+        "item_qty": "Requested items and quantities (JSON stored as text).",
+        "planned": "Planned date for next step (visit/quotation/follow-up).",
+        "actual": "Actual completion date for that step.",
+        "delay": "Delay in days for that step.",
+        "enquiry_status": "Current enquiry status.",
+        "what_did_customer_say": "Customer feedback statement.",
+        "current_stage": "Pipeline stage label.",
+        "followup_status": "Follow-up status label.",
+        "next_call_date": "Next follow-up call date.",
+        "next_call_time": "Next follow-up call time.",
+        "is_order_received": "Boolean indicating if order was received.",
+        "status": "Generic status field (possibly redundant with enquiry_status).",
+        "acceptance_via": "Acceptance channel.",
+        "payment_mode": "Payment mode.",
+        "payment_terms_days": "Payment terms in days (integer).",
+        "transport_mode": "Transport mode.",
+        "po_number": "Customer purchase order number.",
+        "acceptance_file_upload": "Attachment path/URL for acceptance/PO document.",
+        "remark": "General remarks.",
+        "if_no_relevant_reason_status": "Reason category when not received.",
+        "if_no_relevant_reason_remark": "Reason remarks.",
+        "customer_order_hold_reason_category": "Hold category.",
+        "holding_date": "Hold date.",
+        "hold_remark": "Hold remarks.",
+        "sales_coordinator_name": "Sales coordinator name.",
+        "planned_days": "Planned SLA days for this enquiry (for delay/cadence tracking)."
+      }
+    },
+    "laddle_return": {
+      "description": "Operational record for laddle/ladle return event including return date/time, pouring temperature, CCM temperatures before/after purging, responsible staff (crane drivers/operators), reason for return, and photo evidence.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Potential logical link to sms_register/qc_lab_samples via laddle_number (not present here; only implied by process)",
+        "Potential link across operations via unique_code (not enforced)"
+      ],
+      "important_columns": [
+        "sample_timestamp",
+        "laddle_return_date",
+        "laddle_return_time",
+        "poring_temperature",
+        "ccm_temperature_before_pursing",
+        "laddle_return_reason",
+        "unique_code",
+        "created_at"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for ladle return record.",
+        "sample_timestamp": "When the record was captured (required).",
+        "laddle_return_date": "Date when ladle was returned (required).",
+        "laddle_return_time": "Time when ladle was returned (required).",
+        "poring_temperature": "Pouring temperature reading (text).",
+        "poring_temperature_photo": "Photo URL/path for pouring temperature proof.",
+        "furnace_shift_incharge": "Furnace shift in-charge name.",
+        "furnace_crane_driver": "Furnace crane driver name.",
+        "ccm_temperature_before_pursing": "CCM temperature before purging (text).",
+        "ccm_temp_before_pursing_photo": "Photo URL/path before purging temperature proof.",
+        "ccm_temp_after_pursing_photo": "Photo URL/path after purging temperature proof.",
+        "ccm_crane_driver": "CCM crane driver name.",
+        "stand1_mould_operator": "Mould operator for strand 1.",
+        "stand2_mould_operator": "Mould operator for strand 2.",
+        "shift_incharge": "Shift in-charge name.",
+        "timber_man": "Timber man name.",
+        "operation_incharge": "Operations in-charge name.",
+        "laddle_return_reason": "Reason/description for ladle return.",
+        "unique_code": "Cross-form unique identifier for correlation.",
+        "created_at": "Record creation time."
+      }
+    },
+    "client_followups": {
+      "description": "Simple calling/follow-up log by client and salesperson, including date of calling and next calling date, with optional actual order amount/date. Used for sales activity tracking independent of lead/enquiry numbering.",
+      "primary_keys": [
+        "followup_id"
+      ],
+      "foreign_keys": [
+        "Potential join to clients via client_name text (not enforced)",
+        "Potential join to users/login via sales_person text match (not enforced)"
+      ],
+      "important_columns": [
+        "client_name",
+        "sales_person",
+        "date_of_calling",
+        "next_calling_date",
+        "actual_order",
+        "actual_order_date",
+        "created_at",
+        "updated_at"
+      ],
+      "column_descriptions": {
+        "followup_id": "Primary identifier for the follow-up record.",
+        "client_name": "Client/customer name called.",
+        "sales_person": "Salesperson who made the call.",
+        "actual_order": "Order amount received (if any) attributed to this follow-up.",
+        "actual_order_date": "Date the actual order was received.",
+        "date_of_calling": "Date when the call occurred (required).",
+        "next_calling_date": "Scheduled next call date.",
+        "created_at": "Record creation timestamp.",
+        "updated_at": "Last update timestamp."
+      }
+    },
+    "sms_register": {
+      "description": "Shop-floor SMS register capturing heat/sequence context: sequence number, ladle number, furnace number, shift in-charge, temperature, and supporting links/pictures. Likely a central 'heat/batch' register that other QC and process forms reference via short codes or batch codes.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Potential link to qc_lab_samples via (furnace_number, laddle_number, sequence_number/sequence_code) (not enforced)",
+        "Potential link to laddle_checklist/laddle_return via laddle_number (not enforced)"
+      ],
+      "important_columns": [
+        "sample_timestamp",
+        "sequence_number",
+        "laddle_number",
+        "furnace_number",
+        "temperature",
+        "unique_code",
+        "created_at"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for SMS register record.",
+        "sample_timestamp": "When the register entry was recorded (required).",
+        "sequence_number": "Casting/production sequence number (required).",
+        "laddle_number": "Laddle/ladle number used (required).",
+        "sms_head": "SMS head/operator/section identifier.",
+        "furnace_number": "Furnace identifier.",
+        "remarks": "Remarks about heat/sequence.",
+        "picture": "Photo URL/path for evidence.",
+        "shift_incharge": "Shift in-charge name.",
+        "temperature": "Recorded temperature (text).",
+        "unique_code": "Unique cross-reference code (note: typed as INTEGER here).",
+        "created_at": "Record creation time.",
+        "prefilled_link": "Link to create prefilled related forms.",
+        "update_link": "Link to update this entry."
+      }
+    },
+    "login": {
+      "description": "Legacy/simple authentication table storing username, password and usertype. Appears redundant with users table; likely earlier auth mechanism.",
+      "primary_keys": [
+        "username"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "username",
+        "usertype"
+      ],
+      "column_descriptions": {
+        "username": "Login username (also used as primary key).",
+        "password": "Password (stored in plaintext in sample\u2014security risk).",
+        "usertype": "Role classification (admin/user)."
+      }
+    },
+    "users": {
+      "description": "Primary user master for system access control, containing credentials, contact info, department, role/status, and granular page/system access settings for modules (lead-to-order, o2d, batchcode).",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "user_name",
+        "email_id",
+        "department",
+        "role",
+        "status",
+        "page_access",
+        "system_access",
+        "created_at",
+        "given_by"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for the user.",
+        "user_name": "Display name / username.",
+        "password": "User password (stored as text; should be hashed).",
+        "email_id": "User email address.",
+        "number": "User phone number.",
+        "department": "Department name.",
+        "role": "Role (admin/user).",
+        "status": "User status (e.g., active).",
+        "user_access": "Additional access metadata (possibly feature flags).",
+        "remark": "Admin remark/notes about user.",
+        "employee_id": "Internal employee identifier.",
+        "page_access": "Comma-separated list of allowed UI routes/pages.",
+        "system_access": "Comma-separated list of allowed systems/modules.",
+        "created_at": "When the user was created (required).",
+        "given_by": "Who granted/created the user."
+      }
+    },
+    "enq_erp": {
+      "description": "ERP-facing enquiry line capture table: normalized product specification (item_type/size/thickness), enquiry date, customer, and quantity. Likely used to import/export enquiries between CRM and ERP or to analyze demand by product specs.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Logical link to size_master via (item_type, size, thickness) (not enforced)"
+      ],
+      "important_columns": [
+        "enquiry_date",
+        "customer",
+        "item_type",
+        "size",
+        "thickness",
+        "quantity",
+        "created_at"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate identifier for ERP enquiry line.",
+        "item_type": "Product type/shape (required).",
+        "size": "Product size (required).",
+        "thickness": "Product thickness (numeric, required).",
+        "enquiry_date": "Date of enquiry (required).",
+        "customer": "Customer name (required).",
+        "quantity": "Requested quantity (required).",
+        "created_at": "Record creation timestamp."
+      }
+    },
+    "clients": {
+      "description": "Client/customer master list with contact info, assigned sales person (by id), client type segmentation, and status. Used for managing customer base and linking follow-ups.",
+      "primary_keys": [
+        "client_id"
+      ],
+      "foreign_keys": [
+        "clients.sales_person_id -> (unknown sales person master; likely users.id but values suggest mismatch) (not enforced)"
+      ],
+      "important_columns": [
+        "client_name",
+        "city",
+        "contact_person",
+        "contact_details",
+        "sales_person_id",
+        "client_type",
+        "status",
+        "created_at",
+        "updated_at"
+      ],
+      "column_descriptions": {
+        "client_id": "Primary identifier for client.",
+        "client_name": "Client/customer name (required).",
+        "city": "Client city.",
+        "contact_person": "Primary contact person name.",
+        "contact_details": "Contact phone/email details.",
+        "sales_person_id": "Identifier of assigned salesperson (integer; not clearly referencing users.id).",
+        "client_type": "Client segment/type (CRR/NBD/PCRR).",
+        "status": "Client status (e.g., active).",
+        "created_at": "Client creation timestamp.",
+        "updated_at": "Last update timestamp."
+      }
+    }
+  },
+  "suggested_semantic_schema": "SYSTEM OVERVIEW\n- The database contains two main domains:\n  (A) Sales CRM Lead-to-Order: leads, enquiries, follow-ups, quotations, clients.\n  (B) Operations/Production Batchcode & QC: shop-floor forms (SMS register, QC lab, coil/mill logs, equipment checklists).\n\nIMPORTANT BUSINESS IDENTIFIERS\n- Lead identifier: fms_leads.lead_no (e.g., 'LD-003').\n- Enquiry identifier: enquiry_to_order.en_enquiry_no (e.g., 'EN-01').\n- Order identifier: fms_leads.orderno and enquiry_tracker.order_no (e.g., 'DO-05').\n- Quotation identifier: make_quotation.quotation_no (e.g., 'QN-006').\n- Operations correlation key: many operations tables use unique_code (TEXT/VARCHAR/INTEGER) to correlate entries across different forms.\n- Heat/batch context: sms_register.sequence_number + sms_register.laddle_number + sms_register.furnace_number (and qc_lab_samples.sms_batch_code / sequence_code).\n\nSALES / CRM TABLES (USE THESE FOR MOST SALES QUESTIONS)\n1) fms_leads\n- One row per lead (LD-xxx). Contains customer identity, enquiry details, scheduling (planned/actual/delay), and conversion fields.\n- item_qty is stored as a JSON string; total_qty is a numeric summary.\n- is_order_received is stored as TEXT ('yes'/'no'), not boolean.\n\n2) enquiry_to_order\n- One row per enquiry (EN-xx). Similar to lead but more explicitly enquiry-focused and includes po_number and acceptance_file_upload.\n- item_qty stored as JSON string.\n\n3) enquiry_tracker\n- Event/snapshot tracker for enquiry progress and conversion decision.\n- Use to see changes over time: enquiry_status, current_stage, followup scheduling, order receipt status, and reasons for no/hold.\n\n4) leads_tracker\n- Event/snapshot tracker keyed by lead_no.\n- item_qty is JSONB here (easier to parse than fms_leads.item_qty).\n\n5) make_quotation\n- One row per quotation (QN-xxx) with header fields and items JSONB; includes pdf_url and grand_total.\n- Link to leads/enquiries generally via company_name/contact fields (no explicit FK).\n\n6) clients and client_followups\n- clients: customer master (client_id, segmentation).\n- client_followups: activity log by client_name and sales_person; not strongly keyed.\n\n7) dropdown\n- Treated as picklist/master values for UI; not transactional. Do not aggregate amounts here except rate.\n\nOPERATIONS / PRODUCTION TABLES\n1) sms_register\n- Central register of heat/sequence data: sequence_number, laddle_number, furnace_number, temperature, shift_incharge.\n- Often used as the anchor for batch tracing.\n\n2) qc_lab_samples\n- Chemical results per sample; tie to sms_register via furnace_number/laddle_number/sequence_code where possible.\n\n3) hot_coil, re_coiler, pipe_mill\n- Process logs; often include short codes and unique_code for correlation.\n\n4) laddle_checklist, tundish_checklist, laddle_return\n- Safety/maintenance/compliance checklists and events for casting equipment.\n\nUSERS / ACCESS\n- users is the main user master with role/status and page/system access. login appears legacy.\n\nJOINING GUIDANCE (PRACTICAL, NOT ENFORCED)\n- leads_tracker.lead_no = fms_leads.lead_no\n- enquiry_tracker.enquiry_no sometimes equals fms_leads.lead_no (data shows LD-xxx values stored in enquiry_no).\n- enquiry_tracker.order_no can match fms_leads.orderno\n- hot_coil.unique_code / re_coiler.unique_code / pipe_mill.unique_code / qc_lab_samples.unique_code can be used to correlate a batch across forms.\n- qc_lab_samples can be associated to sms_register by matching (laddle_number, furnace_number) and sequence_code ~ sequence_number.\n\nANALYTICS NOTES / DATA QUALITY\n- Many status fields are free-text; dropdown table contains suggested allowed values but enforcement is not guaranteed.\n- item_qty is inconsistently typed: TEXT JSON string (fms_leads, enquiry_to_order) vs JSONB (leads_tracker).\n- user identity is often stored as free-text names; do not assume stable FK to users.\n\nDEFAULT FILTERS / BEST PRACTICES FOR TEXT-TO-SQL\n- Prefer fms_leads for lead-centric metrics (lead counts, conversion, delays, sources).\n- Prefer enquiry_to_order for enquiry-centric metrics and PO/acceptance tracking.\n- Prefer make_quotation for quotation totals and line items analysis.\n- For timeline/event analysis, use leads_tracker and enquiry_tracker ordered by created_at/timestamp.\n- For operations, anchor on sample_timestamp and unique_code; if absent, use laddle_number + furnace_number + sequence values."
+}

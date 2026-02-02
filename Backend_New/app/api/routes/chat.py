@@ -12,81 +12,93 @@ import json
 import uuid
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
-
-from app.services.agent_nodes import sql_agent
+from app.core.config import settings
 from app.services.session_manager import session_manager
 from app.services.cache_service import query_cache
 from app.services.context_manager import context_manager
-from app.core.config import settings
+
+from app.core.router import determine_database, get_agent_for_database, get_answer_generator
 
 router = APIRouter()
 
 class ChatRequest(BaseModel):
-    question: str  # Frontend sends 'question' not 'message'
+    question: str
     session_id: Optional[str] = None
-
-async def stream_natural_answer(question: str, raw_result: str, sql_query: str, is_sample: bool = False, total_count: int = 0) -> AsyncGenerator[str, None]:
-    """Stream natural language answer generation word by word"""
-    
-    sample_note = ""
-    if is_sample and total_count > 0:
-        sample_note = f"\n\n⚠️ IMPORTANT: The results show a SAMPLE of 15 rows out of {total_count:,} total records. Mention this prominently in your answer."
-    
-    answer_prompt = f"""You are a Database Analyst. Your job is to fill out the Report Template below based on the query results.
-
-Basic Information:
-- User Question: "{question}"
-- SQL Query: {sql_query}
-- Results: {raw_result}{sample_note}
-
-────────────────────────────────────────────────────────────
-REQUIRED RESPONSE TEMPLATE (Fill this out):
-────────────────────────────────────────────────────────────
-
-### 1. 📊 Executive Summary
-[Write a natural language summary of the answer here. Use bold numbers. Explain "Pending" (submission_date is NULL) vs "Completed".]
-
-### 2. 📝 Technical Note
-(Note: To derive this answer, I queried the `[insert table names]` table(s). I filtered `[insert column]` to match the date range, used `[insert column]` to determine status, and filtered `[insert column]` to match the user.)
-
-────────────────────────────────────────────────────────────
-RULES:
-1. You MUST explicitly name the SQL columns used in the Technical Note.
-2. Do NOT leave the Technical Note empty.
-3. Do NOT output the identifiers "### 1." or "### 2." - just the content.
-4. Put the Note in a new paragraph at the very end.
-
-Generate the response now:"""
-
-    try:
-        from langchain_openai import ChatOpenAI
-        answer_llm = ChatOpenAI(model=settings.LLM_MODEL, temperature=0, openai_api_key=settings.OPENAI_API_KEY, streaming=True)
-        
-        # Stream response word by word
-        async for chunk in answer_llm.astream(answer_prompt):
-            if chunk.content:
-                yield chunk.content
-    except Exception as e:
-        print(f"[ERROR] Answer generation failed: {e}")
-        # Fallback
-        yield "Query executed successfully. "
-        yield f"Result: {raw_result}"
 
 async def stream_agent_response(question: str, session_id: str) -> AsyncGenerator[str, None]:
     """Stream agent responses with cache and context"""
-    
+
+    # 0. Context Fusion (Handle Clarification Replies)
     try:
-        # Check cache first
+        messages = session_manager.get_session_messages(session_id)
+        # Structure: [..., User_Org, Bot_Ask, User_Current (Added in Line 312)]
+        if len(messages) >= 3:
+            last_bot_msg = messages[-2]['content']
+            original_user_msg = messages[-3]['content']
+            
+            # Heuristic: Did the bot ask a clarification question?
+            if any(phrase in last_bot_msg.lower() for phrase in ["which database", "which list", "which specific", "clarify"]):
+                print(f"[CONTEXT FUSION] Detected Clarification Reply!")
+                print(f"[CONTEXT FUSION] Original: {original_user_msg}")
+                print(f"[CONTEXT FUSION] Clarification: {question}")
+                
+                # Fuse the intent
+                question = f"{original_user_msg} (Context: {question})"
+                print(f"[CONTEXT FUSION] Fused Query: {question}")
+                
+                yield f"data: {json.dumps({'type': 'status', 'message': '🔗 Connecting context...'})}\n\n"
+    except Exception as e:
+        print(f"[CONTEXT FUSION ERROR] {e}")
+
+    # 1. Determine Target Database (Router)
+    db_name, reasoning, clarification_question = determine_database(question)
+    
+    # Show Router's Thinking
+    yield f"data: {json.dumps({'type': 'status', 'message': f'🧠 Router Logic: {reasoning}'})}\n\n"
+    
+    # Handle Ambiguity / Unsure Router
+    if db_name == "AMBIGUOUS":
+        print(f"[ROUTER] Ambiguous query. Asking user for clarification.")
+        yield f"data: {json.dumps({'type': 'status', 'message': '🤔 Query seems ambiguous...'})}\n\n"
+        yield f"data: {json.dumps({'type': 'status', 'message': '❓ Asking for clarification...'})}\n\n"
+        
+        clarification_msg = clarification_question
+        
+        # Stream the clarification question
+        for word in clarification_msg.split(" "):
+            yield f"data: {json.dumps({'type': 'chunk', 'content': word + ' '})}\n\n"
+            import asyncio
+            await asyncio.sleep(0.01)
+            
+        yield f"data: {json.dumps({'type': 'done'})}\n\n"
+        return
+
+    print(f"[ROUTER] Question routed to: '{db_name}' ({reasoning})")
+    
+    yield f"data: {json.dumps({'type': 'status', 'message': f'🔀 Routing to {db_name} database...'})}\n\n"
+
+    try:
+        # Check cache first (scoped by DB)
         yield f"data: {json.dumps({'type': 'status', 'message': '🔍 Checking cache...'})}\n\n"
         
-        cached = query_cache.find_similar_query(question)
+        cached = query_cache.find_similar_query(question, db_name=db_name)
         if cached:
             print(f"[CACHE HIT] Using cached SQL for '{question[:50]}...'")
             yield f"data: {json.dumps({'type': 'cache_hit', 'value': True})}\n\n"
             yield f"data: {json.dumps({'type': 'status', 'message': '⚡ Using cached query'})}\n\n"
             yield f"data: {json.dumps({'type': 'query', 'content': cached['sql']})}\n\n"
             
-            # Execute cached query directly
+            # Execute cached query directly (Using specific DB logic implied by router, but simplified for now)
+            # CAUTION: We need to execute against the specific DB here too.
+            # Ideally the cache metadata stores connection string, but for now we trust the router.
+            
+            # TODO: Refactor execute_query to accept db_connection or use agent's tool
+            # For immediate compatibility, we will allow the agent to re-validate if we can't easily execute directly
+            # OR better: Use the generic execute_query which (currently) defaults to env vars.
+            # To be 100% correct, we should use the same connection as the agent.
+            
+            # Temporary Fix: Use the agent's run_query node logic or global execute if env matches.
+            # Since we only have checklist now (global env), execute_query works.
             from app.services.db_service import execute_query
             try:
                 result = execute_query(cached['sql'])
@@ -101,10 +113,20 @@ async def stream_agent_response(question: str, session_id: str) -> AsyncGenerato
                     is_sample = True
                     yield f"data: {json.dumps({'type': 'status', 'message': f'📊 Showing 15/{total_count:,} rows...'})}\n\n"
                 
-                # Generate answer with cached result
+                # Generate answer with cached result using DB-specific generator
                 yield f"data: {json.dumps({'type': 'status', 'message': '💬 Generating answer...'})}\n\n"
-                async for word in stream_natural_answer(question, str(display_result), cached['sql'], is_sample, total_count):
-                    yield f"data: {json.dumps({'type': 'chunk', 'content': word})}\n\n"
+                
+                # Dynamic Answer Streaming
+                # For now using the logic from router helper (blocking), but to keep streaming we might inline specific logic
+                # To keep it simple and safe for this port: we use the blocking call from router then yield chunks (simulated)
+                answer_func = get_answer_generator(db_name)
+                answer_gen = answer_func(question, str(display_result), cached['sql'])
+                
+                # Stream the result
+                full_answer = ""
+                async for chunk in answer_gen:
+                    full_answer += chunk
+                    yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
                 
                 # Store context
                 context_manager.extract_and_store(session_id, question, cached['sql'])
@@ -113,7 +135,7 @@ async def stream_agent_response(question: str, session_id: str) -> AsyncGenerato
                 return
             except Exception as e:
                 print(f"[CACHE ERROR] Cached query failed: {e}")
-                query_cache.invalidate(question)
+                query_cache.invalidate(question, db_name=db_name)
                 yield f"data: {json.dumps({'type': 'status', 'message': '🔄 Cache failed, generating new query...'})}\n\n"
         else:
             yield f"data: {json.dumps({'type': 'cache_hit', 'value': False})}\n\n"
@@ -124,7 +146,7 @@ async def stream_agent_response(question: str, session_id: str) -> AsyncGenerato
             print(f"[CONTEXT] {context_hint[:100]}...")
         
         # Send initial status
-        yield f"data: {json.dumps({'type': 'status', 'message': '🔄 Analyzing schema...'})}\n\n"
+        yield f"data: {json.dumps({'type': 'status', 'message': f'🔄 Analyzing {db_name} schema...'})}\n\n"
         
         print(f"[DEBUG] Starting agent for question: {question[:50]}...")
         print(f"[DEBUG] Session ID: {session_id}")
@@ -145,7 +167,10 @@ async def stream_agent_response(question: str, session_id: str) -> AsyncGenerato
         if context_hint:
              agent_input_message = f"{context_hint}\n\nUser Question: {question}"
 
-        for event in sql_agent.stream(
+        # DYNAMIC AGENT RETRIEVAL
+        target_agent = get_agent_for_database(db_name)
+
+        for event in target_agent.stream(
             {"messages": [HumanMessage(content=agent_input_message)]},
             config,
             stream_mode="updates"
@@ -172,10 +197,17 @@ async def stream_agent_response(question: str, session_id: str) -> AsyncGenerato
                     # Check if query was generated and capture it
                     if "messages" in node_state and node_state["messages"]:
                         last_msg = node_state["messages"][-1]
+                        
+                        # Case A: Tool Call (Checklist Agent)
                         if hasattr(last_msg, 'tool_calls') and last_msg.tool_calls:
                             generated_sql = last_msg.tool_calls[0]['args']['query']
-                            print(f"[DEBUG] Generated query: {generated_sql[:100]}...")
+                        
+                        # Case B: Content (Lead-To-Order Agent)
+                        elif hasattr(last_msg, 'content') and "SELECT" in str(last_msg.content).upper():
+                            generated_sql = last_msg.content.strip().replace("```sql", "").replace("```", "")
                             
+                        if generated_sql:
+                            print(f"[DEBUG] Generated query: {generated_sql[:100]}...")
                             # Show generated query
                             yield f"data: {json.dumps({'type': 'query', 'content': generated_sql})}\n\n"
                 
@@ -241,13 +273,22 @@ async def stream_agent_response(question: str, session_id: str) -> AsyncGenerato
             print(f"[DEBUG] Generating natural language answer with streaming...")
             yield f"data: {json.dumps({'type': 'status', 'message': '💬 Generating answer...'})}\n\n"
             
+            # Use Dynamic Answer Generator (Blocking for now, simulated streaming)
+            # Use Dynamic Answer Generator (Real Streaming)
+            answer_func = get_answer_generator(db_name)
+            answer_gen = answer_func(question, final_result, generated_sql or "")
+
             # Stream answer generation with captured SQL
-            async for word in stream_natural_answer(question, final_result, generated_sql or "", is_sample, total_count):
-                yield f"data: {json.dumps({'type': 'chunk', 'content': word})}\n\n"
+            full_answer = ""
+            async for chunk in answer_gen:
+                full_answer += chunk
+                yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
             
-            # Cache ONLY successful queries
+            # Cache ONLY successful queries (Scoped)
+            
+            # Cache ONLY successful queries (Scoped)
             if generated_sql:
-                query_cache.cache_query(question, generated_sql)
+                query_cache.cache_query(question, generated_sql, db_name=db_name)
             
             # Store context for follow-ups
             if generated_sql:

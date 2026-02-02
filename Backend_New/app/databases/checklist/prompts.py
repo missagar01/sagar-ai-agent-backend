@@ -1,153 +1,14 @@
 """
-LangGraph SQL Agent with Dual-LLM Validation
-=============================================
-Complete port of sagar.ipynb logic:
-- LLM 1: Query Generator with 5-step mandatory analysis
-- LLM 2: Query Validator with schema-evidence validation
-- LangGraph state machine with validation loop
-- Human-in-the-loop via interrupt points
-"""
-
-from typing import Literal, TypedDict, Annotated, AsyncGenerator
-from datetime import datetime
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
-from langchain_community.utilities import SQLDatabase
-from langchain_community.agent_toolkits import SQLDatabaseToolkit
-from langgraph.graph import END, START, StateGraph, MessagesState
-from langgraph.checkpoint.memory import MemorySaver
-import json
-
-from app.core.config import settings
-from app.core.security import validate_sql_security
-
-# ============================================================================
-# RESTRICTED DATABASE ACCESS
-# ============================================================================
-
-class RestrictedSQLDatabase(SQLDatabase):
-    """Database with table restrictions"""
-    def get_usable_table_names(self):
-        all_tables = super().get_usable_table_names()
-        return [t for t in all_tables if t.lower() in [x.lower() for x in settings.ALLOWED_TABLES]]
-
-# Initialize database
-# Initialize database
-# print(f"[DEBUG] Connecting to default database: {settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}")
-try:
-    db = RestrictedSQLDatabase.from_uri(settings.DATABASE_URL)
-    # print(f"[DEBUG] Default Database connected successfully")
-    # print(f"[DEBUG] Available tables: {db.get_usable_table_names()}")
-except Exception as e:
-    print(f"[ERROR] Default Database connection failed: {e}")
-    raise
-
-# Initialize OpenAI model
-model = ChatOpenAI(
-    model=settings.LLM_MODEL,
-    temperature=settings.LLM_TEMPERATURE,
-    openai_api_key=settings.OPENAI_API_KEY
-)
-
-# Initialize toolkit
-toolkit = SQLDatabaseToolkit(db=db, llm=model)
-tools = toolkit.get_tools()
-
-get_schema_tool = next(t for t in tools if t.name == "sql_db_schema")
-list_tables_tool = next(t for t in tools if t.name == "sql_db_list_tables")
-run_query_tool = next(t for t in tools if t.name == "sql_db_query")
-
-# ============================================================================
-# STATE DEFINITION
-# ============================================================================
-
-class EnhancedState(MessagesState):
-    """Enhanced state to track validation loops"""
-    validation_attempts: int = 0
-    last_feedback: str = ""
-    schema_info: str = ""
-    original_question: str = ""
-
-# ============================================================================
-# SEMANTIC SCHEMA DEFINITION (The "Brain" of the System)
-# ============================================================================
-
-SEMANTIC_SCHEMA = """
-📊 **DATABASE SEMANTIC SCHEMA & WORKING RULES**
-------------------------------------------------------------------------------------------------
-This database tracks employee tasks across two main tables (`checklist`, `delegation`) and user info in (`users`).
-
-1. **TABLE: `checklist`** (Routine/Daily Tasks)
-   - **Working:** Contains recurring tasks automatically generated or assigned for daily/weekly routines.
-   - **Allowed Columns & Usage:**
-     * `task_id` (BIGINT): Unique identifier.
-     * `name` (TEXT): Name of the person responsible for the task.
-     * `department` (TEXT): Department (e.g., 'PC', 'ADMIN').
-     * `task_description` (TEXT): Description of work to be done.
-     * `frequency` (TEXT): 'Daily', 'Weekly', etc.
-     * `task_start_date` (TIMESTAMP): The **SCHEDULED DATE** when the task should be done.
-     * `submission_date` (TIMESTAMP): The **ACTUAL COMPLETION DATE**.
-         - IF `NULL` → Task is **PENDING**.
-         - IF `NOT NULL` → Task is **COMPLETED**.
-     * `admin_done` (TEXT): Admin override flag ('Yes'/'No') - rarely used but allowed.
-     * `given_by` (TEXT): Who created the routine (usually system or admin).
-   - **❌ FORBIDDEN COLUMNS (DO NOT USE):**
-     * `status` (Unreliable/Mixed types), `remark`, `image`, `delay`, `planned_date` (Checklist does NOT use planned_date).
-
-2. **TABLE: `delegation`** (One-time/Assigned Tasks)
-   - **Working:** Ad-hoc tasks assigned by one person to another with a specific deadline.
-   - **Allowed Columns & Usage:**
-     * `task_id` (BIGINT): Unique identifier.
-     * `name` (TEXT): Name of the person DOING the task (Assignee).
-     * `given_by` (TEXT): Name of the person GIVING the task (Assigner).
-     * `department` (TEXT): Department.
-     * `task_description` (TEXT): Task details.
-     * `frequency` (TEXT): usually 'One-time'.
-     * `task_start_date` (TIMESTAMP): Date when task was assigned.
-     * `planned_date` (TIMESTAMP): The **DUE DATE/DEADLINE**.
-     * `submission_date` (TIMESTAMP): The **ACTUAL COMPLETION DATE**.
-         - IF `NULL` → Task is **PENDING**.
-         - IF `NOT NULL` → Task is **COMPLETED**.
-   - **❌ FORBIDDEN COLUMNS (DO NOT USE):**
-     * `status`, `remarks`, `image`, `delay` (Calculate delay using SQL instead).
-
-3. **TABLE: `users`** (System Users)
-   - **Working:** Employee login and department details.
-   - **Allowed:** 
-     * `user_name` (TEXT): Employee full name.
-     * `department` (TEXT): User's department.
-     * `role` (TEXT): 'user' or 'admin'.
-     * `given_by` (TEXT): Reporting manager/Assigner.
-     * `email_id` (TEXT): User email address (Nullable).
-     * `number` (BIGINT): Contact number (Nullable).
-     * `status` (USER-DEFINED/ENUM): User status (e.g. 'active').
-     * `password` (TEXT): User login password (Manager Access Only).
-   - **Forbidden:** None (Manager has full access).
-
-------------------------------------------------------------------------------------------------
-🧠 **LOGIC & CALCULATIONS**
-------------------------------------------------------------------------------------------------
-1. **PENDING vs COMPLETED:**
-   - Always check `submission_date IS NULL` for Pending.
-   - Always check `submission_date IS NOT NULL` for Completed.
-   - **NEVER** use the `status` column.
-
-2. **DATE FILTERING ("This Month"):**
-   - **Standard "This Month":** (Past & Future in month)
-     `task_start_date >= DATE_TRUNC('month', CURRENT_DATE) AND task_start_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'`
-   - **"This Month Till Today":** (Dashboard Style)
-     `task_start_date >= DATE_TRUNC('month', CURRENT_DATE) AND task_start_date < CURRENT_DATE + INTERVAL '1 day'`
-
-3. **PERFORMANCE REPORTS:**
-   - Must include BOTH `checklist` and `delegation` tables (UNION ALL).
-   - Metrics: Total, Completed, Pending, Overdue (Delegation only), On-time.
+Checklist System - Prompts
+==========================
+System prompts for Generator and Validator agents.
 """
 
 # ============================================================================
 # LLM 1: GENERATOR PROMPT (Intent -> Schema -> SQL)
 # ============================================================================
 
-GENERATE_QUERY_SYSTEM_PROMPT = """You are an EXPERT SQL GENERATOR for a Task Management System AND an AI ANALYTICS MANAGER for the company.
+GENERATOR_SYSTEM_PROMPT = """You are an EXPERT SQL GENERATOR for a Task Management System AND an AI ANALYTICS MANAGER for the company.
 
 Your ONLY responsibility:
 → Understand the USER'S INTENT
@@ -238,7 +99,6 @@ FEEDBACK FROM PREVIOUS ATTEMPT (IF ANY)
 {feedback_section}
 
 Now generate the SQL query.
-
 """
 
 # ============================================================================
@@ -314,7 +174,35 @@ OUTPUT FORMAT (JSON ONLY)
     "Exact fix required (no redesign)"
   ]
 }}
-
 """
 
-# Continue in next file...
+# ============================================================================
+# LLM 3: ANSWER SYNTHESIS PROMPT (SQL Result -> Natural Language)
+# ============================================================================
+
+ANSWER_SYNTHESIS_SYSTEM_PROMPT = """You are an AI ASSISTANT for a Task Management System.
+Your job is to explain the results of a database query to the user in a professional, easy-to-read format.
+
+CONTEXT:
+The user asked: "{query}"
+The database returned: "{result}"
+
+INSTRUCTIONS:
+1. **Summarize the Findings**: Start with a direct answer.
+2. **Present Metrics**: If the result contains numbers (counts, completion rates), present them clearly (bullet points or bold text).
+3. **Highlight Key Insights**:
+   - If looking at performance, mention completion rate.
+   - If looking at pending tasks, list the most important/overdue ones first.
+   - Identify specific users or departments mentioned.
+4. **Format for Readability**:
+   - Use Markdown tables for lists of tasks.
+   - Use Emoji for status (✅ Completed, ⏳ Pending, ⚠️ Late/Overdue).
+5. **Tone**: Professional, encouraging, and data-driven.
+
+⚠️ IMPORTANT:
+- If the result is empty, say "No records found matching your criteria."
+- Do NOT mention "SQL" or "Database internals" in the main response (that goes in the technical note).
+- Focus on the BUSINESS meaning of the data (e.g., "Hem Kumar has 5 pending tasks" instead of "Row count is 5").
+
+GENERATE RESPONSE:
+"""

@@ -11,8 +11,13 @@ from datetime import datetime
 
 # CONFIGURATION
 DB_NAME = "Checklist & Delegation System"
-# Using the specific URL for this DB
-DB_URL = "postgresql://postgres:Sagar00112233@database-2-mumbai.c1wm8i46kcmm.ap-south-1.rds.amazonaws.com/checklist-delegation"
+# Using the specific URL for this DB (Loaded from Env for Security)
+from dotenv import load_dotenv
+load_dotenv()
+DB_URL = os.getenv("DB_CHECKLIST_URL")
+if not DB_URL:
+    print("❌ Error: DB_CHECKLIST_URL not found in .env")
+    exit(1)
 
 def generate():
     print(f"🔌 Connecting to: {DB_NAME}...")

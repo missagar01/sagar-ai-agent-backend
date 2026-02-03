@@ -37,20 +37,36 @@ The following diagram illustrates how a user query travels through the system:
 
 ```mermaid
 graph TD
-    User([👤 User]) --> API[📡 API Endpoint]
-    API --> Router{🔀 Router Agent}
+    %% -- Styling Definitions --
+    classDef userNode fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef routerNode fill:#e1f5fe,stroke:#0277bd,stroke-width:2px;
+    classDef dbNode fill:#fff3e0,stroke:#ef6c00,stroke-width:1px;
+    classDef logicNode fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px;
+    classDef errorNode fill:#ffebee,stroke:#c62828,stroke-width:1px;
+
+    %% -- The Main Flow --
+    User([👤 User]):::userNode --> API[📡 API Gateway]
+    API --> Router{🔀 Intelligent Router}:::routerNode
     
-    Router -- Ambiguous? --> Clarify[❓ Ambiguity Handler]
+    %% -- Ambiguity Path --
+    Router -- "Ambiguous?" --> Clarify[❓ Ambiguity Handler]:::errorNode
     Clarify --> User
     
-    Router -- Clear Intent --> Reformulate[🔄 Context Engine]
-    Reformulate --> Generator[🧠 SQL Generator]
+    %% -- Multi-Database Routing --
+    Router -- "Employee Intent" --> DB_Checklist[(📋 Checklist DB)]:::dbNode
+    Router -- "Machine Intent" --> DB_Sagar[(⚙️ Maintenance DB)]:::dbNode
+    Router -- "Sales Intent" --> DB_L2O[(💼 Sales DB)]:::dbNode
     
-    Generator --> Validator{🛡️ Validator}
-    Validator -- ❌ Reject --> Generator
-    Validator -- ✅ Approve --> Executor[⚡ SQL Executor]
+    %% -- The Autonomous Agent Loop (Shared Logic) --
+    DB_Checklist & DB_Sagar & DB_L2O --> Context[🔄 Context Engine]:::logicNode
+    Context --> Generator[🧠 SQL Generator]:::logicNode
     
-    Executor --> Synthesizer[📝 Answer Synthesizer]
+    Generator --> Validator{🛡️ Safety Validator}:::routerNode
+    Validator -- "❌ Reject (Unsafe)" --> Generator
+    Validator -- "✅ Approve" --> Executor[⚡ SQL Executor]:::logicNode
+    
+    %% -- Final Response --
+    Executor --> Synthesizer[📝 Answer Synthesizer]:::userNode
     Synthesizer --> User
 ```
 

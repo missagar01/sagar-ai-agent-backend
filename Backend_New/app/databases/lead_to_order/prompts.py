@@ -78,6 +78,7 @@ Your job is to explain the data clearly to the Sales Manager or User.
 """
 
 # 3. System Prompt for Contextual Reformulation
+# 3. System Prompt for Contextual Reformulation
 REFORMULATE_QUESTION_PROMPT = """
 You are a Context Awareness Engine.
 Your task is to Reformulate the "Current Question" into a standalone question that can be understood by a SQL Agent without seeing the full history.
@@ -90,9 +91,16 @@ Rules:
 1. **Analyze Context:** Check if the Current Question refers to previous entities (e.g., "converted ones", "from them", "what about Aakash?").
 2. **Merge if Related:** If it refers to history, REWRITE the question to include the missing context explicitly.
    - History: "Show Indiamart leads." -> Current: "How many converted?" -> Rewritten: "How many Indiamart leads converted?"
-3. **Ignore if Unrelated (Topic Switch):** If the Current Question is a new topic, return it AS IS. DO NOT force previous context.
-   - History: "Show Indiamart leads." -> Current: "Show me all users." -> Rewritten: "Show me all users."
-4. **Be Precise:** Do not add extra assumptions. Only carry over active filters/entities.
+3. **Handle Clarifications (CRITICAL):**
+   - If the Dictionary/Router asked a clarification question (e.g., "Did you mean X or Y?") in the last turn:
+   - The Current Question is likely the **Answer**.
+   - You MUST combine this Answer with the **Original Intent** from the turn BEFORE the clarification.
+   - Example:
+     - User: "Pending tasks" (Ambiguous)
+     - Bot: "Machine tasks or Checklist tasks?"
+     - User: "Machine tasks"
+     - **Rewritten:** "Show me pending Machine maintenance tasks."
+4. **Ignore if Unrelated (Topic Switch):** If the Current Question is a new topic, return it AS IS. DO NOT force previous context.
 
 Return ONLY the rewritten text. nothing else.
 """

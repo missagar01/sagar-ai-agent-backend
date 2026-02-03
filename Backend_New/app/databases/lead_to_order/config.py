@@ -11,11 +11,12 @@ ALLOWED_TABLES = ["fms_leads", "enquiry_to_order", "make_quotation", "login"]
 # Router Metadata (Used for Auto-Discovery)
 ROUTER_METADATA = {
     "name": "lead_to_order",
-    "description": "Sales Pipeline, Leads, Enquiries, Quotations, Orders, Customer Interactions, CRM Access.",
+    "description": "A full-cycle Sales CRM & Pipeline Management System. It tracks the entire customer journey from initial Lead (FMS Leads) -> Enquiry -> Quotation -> Final Order. Use this database for questions about sales figures, lead conversion rates, quotation details, customer enquiries, and sales team performance. It focuses on 'money', 'customers', and the 'sales process'.",
     "keywords": [
         "lead", "enquiry", "quote", "quotation", "sales", "customer", "call", 
         "planned", "actual", "converted", "fms", "lead to order database", 
-        "crm", "sales system", "sales db", "users", "admin", "login", "password"
+        "crm", "sales system", "sales db", "users", "admin", "login", "password",
+        "revenue", "pipeline", "conversion"
     ]
 }
 

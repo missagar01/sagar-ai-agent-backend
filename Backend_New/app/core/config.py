@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     # 2. Lead-To-Order System (New)
     DB_LEAD_TO_ORDER_URL: str = os.getenv("DB_LEAD_TO_ORDER_URL", "")
     
+    # 3. Sagar001122 System (New)
+    DB_SAGAR_URL: str = os.getenv("DB_SAGAR_URL", "")
+    
     @property
     def DATABASE_URL(self) -> str:
         """Default Connection (Legacy Support)"""

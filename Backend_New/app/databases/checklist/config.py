@@ -7,11 +7,11 @@ Defines schema, allowed columns, and business rules.
 # Router Metadata (Used for Auto-Discovery)
 ROUTER_METADATA = {
     "name": "checklist",
-    "description": "Employee tasks, delegations, daily reports, user performance, attendance, routine checks.",
+    "description": "A comprehensive Task & Employee Performance System. It tracks recurring daily/weekly routines (checklist) and one-time assigned duties (delegation). Use this database for queries related to employee task completion rates, pending daily duties, ad-hoc task delegation between staff, user attendance/performance reports, and departmental task summaries. It focuses on the 'workforce' and their 'to-do lists'.",
     "keywords": [
         "task", "pending", "completed", "late", "given by", "department", 
         "users", "report", "summary", "checklist system", "task db", 
-        "employee", "delegation"
+        "employee", "delegation", "performance", "attendance", "routine"
     ]
 }
 
@@ -139,3 +139,5 @@ def get_columns_description(table_name: str) -> str:
     """Get formatted column list for prompts"""
     cols = get_column_list(table_name)
     return ", ".join(cols) if cols else "all columns"
+# (No Change Needed - SEMANTIC_SCHEMA is already there)
+# Just a placeholder to ensure the tool call valid

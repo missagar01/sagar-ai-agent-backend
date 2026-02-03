@@ -1,235 +1,133 @@
-# 🤖 DB Assistant - Intelligent SQL Agent
+# 🤖 Intelligent Multi-Database Assistant
 
-> **An advanced, context-aware AI assistant that translates natural language into secure SQL queries with dual-layer validation and real-time streaming.**
+**Version 2.0 - Deep Schema Aware**
 
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Python](https://img.shields.io/badge/python-3.10+-blue.svg)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.95+-green.svg)
-![LangGraph](https://img.shields.io/badge/LangGraph-Agent-orange)
-
-## 📖 Overview
-
-**DB Assistant** is a full-stack application designed to interact with PostgreSQL databases using natural language. Unlike standard text-to-SQL tools, it employs a sophisticated **Agentic Workflow** with two distinct LLMs:
-
-1. **Generator Agent:** Crafts the SQL query based on schema and user intent.
-2. **Validator Agent:** Critiques the query for safety, accuracy, and intent matching before execution.
-
-The system features real-time answer streaming, query caching (semantic search via ChromaDB), and sticky context management for follow-up questions.
+An advanced AI-powered system designed to interact with **multiple disparate databases** (PostgreSQL) using natural language. Unlike standard Text-to-SQL bots, this system uses a **Router-Validator Architecture** to understand context, handle ambiguity across different business domains, and self-correct SQL errors.
 
 ---
 
-## 🏗️ Architecture
+## 🌟 Key Features
 
-The system uses a highly modular Agentic Architecture.
+### 🧠 1. Intelligent "Deep Router"
+*   **Schema-Aware Routing**: The router analyzes the **Actual Table & Column Names** of every registered database, not just keywords.
+*   **Ambiguity Protocol**: If a user asks "Show me the status" and multiple databases have a "Status" column, the agent **pauses** and asks: *"Did you mean Lead Status or Machine Repair Status?"*
+*   **Clarification Memory**: Once you clarify (e.g., "The machine one"), it merges this with your original question to execute the correct query.
+
+### 🛡️ 2. Self-Correcting SQL Agents
+*   **Generate-Validate-Regenerate Loop**:
+    1.  **Generator**: Writes the initial SQL query.
+    2.  **Validator (The Critic)**: Checks the query against business rules (e.g., "Did you use the allowed columns? Does this match the user's intent?").
+    3.  **Refiner**: If the Validator rejects it, the Generator automatically rewrites the query with the specific feedback.
+*   **Ghost Record Filtering**: Automatically ignores incomplete or "test" data (rows with NULL names/dates).
+
+### 📊 3. Supported Integrations
+The system currently integrates these distinct business domains:
+
+| Database | Domain | Key Capabilities |
+| :--- | :--- | :--- |
+| **Checklist DB** | 📋 Employee Management | Track daily checklists, delegations, and employee performance. |
+| **Sagar DB** | ⚙️ Machine Maintenance | Track breakdown history, repair status (`Actual_Date` vs `Start_Date`), and technician assignments. |
+| **Lead-To-Order** | 💼 Sales CRM | Analyze leads (`fms_leads`), conversions, inquiries, and quotations (`make_quotation`). |
+
+---
+
+## 🛠️ System Architecture
+
+The following diagram illustrates how a user query travels through the system:
+
+```mermaid
+graph TD
+    User([👤 User]) --> API[📡 API Endpoint]
+    API --> Router{🔀 Router Agent}
+    
+    Router -- Ambiguous? --> Clarify[❓ Ambiguity Handler]
+    Clarify --> User
+    
+    Router -- Clear Intent --> Reformulate[🔄 Context Engine]
+    Reformulate --> Generator[🧠 SQL Generator]
+    
+    Generator --> Validator{🛡️ Validator}
+    Validator -- ❌ Reject --> Generator
+    Validator -- ✅ Approve --> Executor[⚡ SQL Executor]
+    
+    Executor --> Synthesizer[📝 Answer Synthesizer]
+    Synthesizer --> User
+```
+
+---
+
+## 📂 Project Structure
 
 ```text
-🟢 [USER] 
-    │
-    │ (Question)
-    ▼
-.-----------------.
-| 🖥️ FRONTEND UI | 
-'-----------------'
-    │
-    │ (Stream)
-    ▼
-.-----------------------.      Hit       .------------------------.
-| ⚙️ FASTAPI BACKEND  | ───────────▶ | 🧠 CHROMADB CACHE    |
-'-----------------------'              '------------------------'
-    │
-    │ Miss
-    ▼
-.---------------------------------------------------------------.
-| 🤖 AGENTIC WORKFLOW                                           |
-|                                                               |
-|  [1. 🔍 SCHEMA] ──▶ [2. 🧠 GENERATOR AGENT] (Writer)          |
-|                                    │                          |
-|                                  (SQL)                        |
-|                                    ▼                          |
-|  [4. ⚡ EXECUTOR] ◀── [3. 🛡️ VALIDATOR AGENT] (Critic)        |
-'---------------------------------------------------------------'
-    │
-    │ (Run Query)
-    ▼
-.-----------------.
-| 🗄️ POSTGRES DB  |
-'-----------------'
-    │
-    │ (Results)
-    ▼
-.-----------------------.
-| 💬 ANSWER GENERATOR |
-'-----------------------'
-    │
-    │ (Natural Language)
-    ▼
-[ 🟢 FINAL RESPONSE ]
+DB_Assistant/
+├── Backend_New/              # FastAPI Python Backend
+│   ├── app/
+│   │   ├── core/
+│   │   │   ├── router.py     # Main Router Logic (The Brain)
+│   │   │   ├── config.py     # Global Settings
+│   │   ├── databases/        # 🔌 Modular Database Agents
+│   │   │   ├── checklist/    # Employee DB Module
+│   │   │   ├── sagar_db/     # Maintenance DB Module
+│   │   │   └── lead_to_order/# Sales DB Module
+│   │   └── services/         # Shared Utilities (Session, Graph)
+├── Database_Schemas/         # 📊 Auto-Generated Schema Reports
+│   ├── checklist/
+│   ├── sagar_db/
+│   └── ...
+└── DATABASE_INTEGRATION_GUIDE.md  # 📘 How to add new DBs
 ```
 
 ---
 
-## ✨ Key Features
-
-- **🎓 Dual Persona:** Acts as both a **Task Management Expert** and an **Analytics Manager** with high-level access.
-- **🛡️ Secure & Smart:** Access to sensitive data (like user passwords) is restricted to Manager personas, while standard queries remain safe.
-- **🧠 Dual-LLM Validation:** Generator creates queries; Validator critiques them (Read-Only checks, Intent verification).
-- **⚡ Real-Time Streaming:** Zero-latency streaming responses via SSE.
-- **💾 Semantic Caching:** Vector search remembers previous answers.
-- **🔗 Sticky Context:** "Show me his tasks" works by remembering the last user discussed.
-
----
-
-## 🛠️ Technology Stack
-
-### Backend
-
-- **Framework:** Python (FastAPI)
-- **Agent Orchestration:** LangGraph (Stateful Multi-Actor Applications)
-- **Database:** PostgreSQL (Core Data), ChromaDB (Vector Cache)
-- **LLM:** OpenAI GPT-4o (or compatible) via LangChain
-- **Server:** Uvicorn (ASGI)
-
-### Frontend
-
-- **Core:** HTML5, CSS3, Vanilla JavaScript (ES6+)
-- **Icons:** FontAwesome
-- **Formatting:** Marked.js (Markdown rendering)
-
----
-
-## 🚀 Setup & Installation
-
-Follow these steps to get the project running locally.
+## 🚀 Getting Started
 
 ### Prerequisites
+*   Python 3.10+
+*   PostgreSQL Database
+*   OpenAI API Key
 
-- Python 3.10+
-- PostgreSQL Database
-- OpenAI API Key
+### Installation
 
-### 1. Clone the Repository
+1.  **Clone & Setup**:
+    ```bash
+    git clone repo_url
+    cd DB_Assistant
+    ```
 
-```bash
-git clone https://github.com/Prabhat9801/DB_Assistant.git
-cd DB_Assistant
-```
+2.  **Environment Variables**:
+    Create a `.env` file in the root:
+    ```properties
+    OPENAI_API_KEY=sk-...
+    DB_CHECKLIST_URL=postgresql://user:pass@localhost:5432/checklist
+    DB_SAGAR_URL=postgresql://user:pass@localhost:5432/sagar_db
+    DB_L2O_URL=postgresql://user:pass@localhost:5432/lead_to_order
+    ```
 
-### 2. Backend Setup
-
-Navigate to the backend directory and set up the environment.
-
-```bash
-cd Backend_New
-
-# Create virtual environment
-python -m venv .venv
-
-# Activate (Windows)
-.venv\Scripts\activate
-
-# Activate (Mac/Linux)
-source .venv/bin/activate
-
-# Install Dependencies
-pip install -r requirements.txt
-```
-
-### 3. Environment Configuration
-
-Create a `.env` file in `Backend_New/` with your credentials:
-
-```env
-OPENAI_API_KEY=sk-your-openai-key
-DB_HOST=your-db-host
-DB_PORT=5432
-DB_NAME=your-db-name
-DB_USER=your-db-user
-DB_PASSWORD=your-db-password
-```
-
-### 4. Run the Backend
-
-Start the FastAPI server.
-
-```bash
-# Make sure you are in Backend_New/ and .venv is active
-uvicorn main:app --reload
-```
-
-*Server will start at `http://127.0.0.1:8000`*
-
-### 5. Frontend Setup
-
-The frontend is a static web application. You can simply open `Frontend/index.html` in your browser, or serve it using a lightweight server (recommended).
-
-```bash
-# Using Python to serve (Run in separate terminal from root)
-cd Frontend
-python -m http.server 5500
-```
-
-*Access the app at `http://127.0.0.1:5500`*
+3.  **Run the Backend**:
+    ```bash
+    cd Backend_New
+    uvicorn main:app --reload
+    ```
+    The API will start at `http://127.0.0.1:8000`.
 
 ---
 
-## 🔄 Workflow Details
+## 🔧 Developer Guide
 
-The **Agentic Workflow** is defined in `app/services/agent_nodes.py`. Here is the detailed lifecycle of a user request:
+### How to Add a New Database
+1.  **Generate Schema**: Use `schema_generator_tool.py` to inspect your new database.
+2.  **Create Module**: Copy the `app/databases/template/` structure to `app/databases/your_new_db/`.
+3.  **Configure**:
+    *   **`config.py`**: Add `ROUTER_METADATA` (Description) and `DB_SCHEMA` (Columns).
+    *   **`prompts.py`**: Customize the system prompt with domain-specific rules.
+4.  **Register**: Import your metadata in `app/core/router.py`.
 
-### 1. Schema Loading
-
-The agent connects to the database to fetch the list of tables (`checklist`, `delegation`) and their schemas.
-
-### 2. Context Injection
-
-If the user asks a follow-up question (e.g., "pending ones?"), the `ContextManager` injects details from the previous query (User Filters, Date Ranges) into the prompt.
-
-### 3. Query Generation (Loop)
-
-- **Generator (LLM 1):** Proposes a SQL query.
-- **Validator (LLM 2):** Reviews the query against a strict checklist:
-  - Is it read-only?
-  - Does it match User Intent?
-  - Are columns valid?
-- **Feedback:** If rejected, the Validator provides specific feedback, and the Generator retries (up to 3 times).
-
-### 4. Execution & Response
-
-- Once approved, the query is executed securely.
-- Results are passed to the **Answer Generator**, which crafts a natural language summary.
-- The summary is **Streamed** to the frontend efficiently.
+### Troubleshooting Common Issues
+*   **"Ambiguous Query" loop**: If the bot keeps asking for clarification, check if your `ROUTER_METADATA` descriptions are too similar.
+*   **"Column does not exist"**: If using PostgreSQL Mixed-Case columns (e.g., `TaskID`), ensure you have added quotes in `config.py` (e.g., `"- "TaskID"`).
+*   **"No result returned"**: The agent might be generating a query that validly returns 0 rows (e.g., searching for a name that doesn't exist). Check the debug logs.
 
 ---
 
-## 📁 Project Structure
-
-```
-DB_Assistant/
-├── Backend_New/             # Python FastAPI Backend
-│   ├── app/
-│   │   ├── api/routes/      # API Endpoints (Chat, Sessions)
-│   │   ├── core/            # Config & Security
-│   │   ├── services/        # Business Logic
-│   │   │   ├── agent_nodes.py   # LangGraph Nodes
-│   │   │   ├── sql_agent.py     # Graph Definition
-│   │   │   └── validator.py     # Validator Logic
-│   │   └── main.py          # App Entrypoint
-│   └── requirements.txt     # Python Dependencies
-│
-├── Frontend/                # UI Code
-│   ├── index.html           # Main Interface
-│   ├── app.js               # Frontend Logic & State
-│   └── styles.css           # (Embedded in HTML/JS)
-│
-└── README.md                # Project Documentation
-```
-
-## 🤝 Contribution
-
-Contributions are welcome! Please fork the repository and submit a Pull Request.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### 📞 Support
+For bugs or feature requests, please check the logs in `Backend_New/logs/` or contact the development team.

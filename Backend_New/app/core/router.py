@@ -26,43 +26,61 @@ router_llm = ChatOpenAI(
 )
 
 # Import Metadata for Dynamic Discovery
-from app.databases.checklist.config import ROUTER_METADATA as CHECKLIST_META
-from app.databases.lead_to_order.config import ROUTER_METADATA as L2O_META
+# Import Metadata & Schema for Dynamic Discovery
+from app.databases.checklist.config import ROUTER_METADATA as CHECKLIST_META, SEMANTIC_SCHEMA as CHECKLIST_SCHEMA
+from app.databases.lead_to_order.config import ROUTER_METADATA as L2O_META, DB_SCHEMA as L2O_SCHEMA
+from app.databases.sagar_db.config import ROUTER_METADATA as SAGAR_META, DB_SCHEMA as SAGAR_SCHEMA
 
 # Registry of Available Databases
-REGISTERED_DATABASES = [CHECKLIST_META, L2O_META]
+# Structure: (Metadata Dict, Schema String)
+REGISTERED_DATABASES = [
+    (CHECKLIST_META, CHECKLIST_SCHEMA),
+    (L2O_META, L2O_SCHEMA),
+    (SAGAR_META, SAGAR_SCHEMA)
+]
 
 def _build_router_prompt() -> str:
     """
     Dynamically constructs the router system prompt based on registered databases.
+    Enforces Deep Semantic Analysis using actual DB Schemas.
     """
     db_descriptions = ""
-    for i, db in enumerate(REGISTERED_DATABASES, 1):
-        keywords = ", ".join(db["keywords"])
+    for i, (meta, schema) in enumerate(REGISTERED_DATABASES, 1):
+        # We now include the SCHEMA Context
+        # Truncate schema slightly if it's too huge, but usually fine for 4o-mini
+        safe_schema = schema[:1500] + "..." if len(schema) > 1500 else schema
+        
         db_descriptions += f"""
-{i}. '{db["name"]}'
-   - Scope: {db["description"]}
-   - Keywords: {keywords}.
+{i}. NAME: '{meta["name"]}'
+   DESCRIPTION: {meta["description"]}
+   SCHEMA SNIPPET:
+   {safe_schema}
+   ------------------------------------------------
 """
 
     return f"""
-You are the Database Router. Classify the user query into one of the available databases.
+You are the **Intelligent Database Router**. Your goal is to route the User's Query to the correct database by analyzing the match between the query and the DATABASE SCHEMA.
 
-AVAILABLE DATABASES:
+### AVAILABLE DATABASES (With Schema Context)
 {db_descriptions}
 
-INSTRUCTIONS:
-- Analyze the user's intent.
-- Return a JSON object with:
-  - "database": The selected database name (one of the names above or 'AMBIGUOUS').
-  - "reason": A short explanation of WHY you chose this.
-  - "clarification_question": (If AMBIGUOUS) A polite question asking the user to clarify (e.g. "Did you mean sales users or task users?").
+### ROUTING LOGIC (Deep Schema Analysis)
+1. **Analyze:** Look at the user's terms (e.g. "leads", "machine", "task_id").
+2. **Scan Schemas:** Check which database actually contains tables/columns matching those terms.
+   - User asks for "converted leads"? -> Check which schema has "leads" or "conversion" logic.
+   - User asks for "machine repairs"? -> Check which schema has "machine_name" or "maintenance".
+3. **Detect Ambiguity (CRITICAL):**
+   - If a term (like "status" or "tasks") appears conceptually in MULTIPLE schemas, you **MUST** return AMBIGUOUS.
+   - **Construct the Clarification Question based on the specific columns/tables you found.**
+     - BAD: "Did you mean X or Y?"
+     - GOOD: "Did you mean the **Lead Status** (from Sales DB) or the **Repair Status** (from Maintenance DB)?"
 
-Example Output:
+### OUTPUT FORMAT (JSON ONLY)
+Return a valid JSON object.
 {{
-  "database": "AMBIGUOUS",
-  "reason": "Both databases have users.",
-  "clarification_question": "I see users in both the Sales and Checklist systems. Which list are you looking for?"
+  "database": "Target Database Name" OR "AMBIGUOUS",
+  "reason": "Explain which table/column matched the user's intent.",
+  "clarification_question": "If AMBIGUOUS, ask a specific question comparing the specific tables/concepts found in the schemas."
 }}
 """
 
@@ -96,9 +114,9 @@ def determine_database(query: str) -> tuple[str, str, str]:
         clarification_question = data.get("clarification_question", "Could you please clarify which database you mean?")
         
         # Check against registered names
-        for db in REGISTERED_DATABASES:
-            if db["name"] in db_name:
-                return db["name"], reason, ""
+        for meta, schema in REGISTERED_DATABASES:
+            if meta["name"] in db_name:
+                return meta["name"], reason, ""
             
         return "AMBIGUOUS", reason, clarification_question
         
@@ -113,6 +131,10 @@ def get_agent_for_database(db_name: str = "checklist"):
     if db_name == "lead_to_order":
         from app.databases.lead_to_order.workflow import lead_to_order_app
         return lead_to_order_app
+        
+    if db_name == "sagar_db":
+        from app.databases.sagar_db.workflow import sagar_app
+        return sagar_app
         
     # Default
     return checklist_app
@@ -187,6 +209,10 @@ def get_answer_generator(db_name: str = "checklist"):
     """
     if db_name == "lead_to_order":
         from app.databases.lead_to_order.prompts import ANSWER_SYNTHESIS_SYSTEM_PROMPT
+        return create_answer_generator(ANSWER_SYNTHESIS_SYSTEM_PROMPT)
+    
+    if db_name == "sagar_db":
+        from app.databases.sagar_db.prompts import ANSWER_SYNTHESIS_SYSTEM_PROMPT
         return create_answer_generator(ANSWER_SYNTHESIS_SYSTEM_PROMPT)
     
     # Default Checklist

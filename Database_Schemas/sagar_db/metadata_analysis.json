@@ -1,0 +1,275 @@
+{
+  "business_summary": "This database supports a lightweight plant/enterprise maintenance management workflow (CMMS-like) focused on registering machines/assets and assigning recurring preventive maintenance tasks to personnel. It includes user authentication/authorization (roles and page access), an asset register captured via a form, a task assignment ledger (including schedule/frequency, priority, responsible person, and basic completion/inspection results like sound/temperature), plus a calendar dimension for date-based reporting. Some tables appear to be staging/import artifacts (raw text fields) that feed a cleaner operational task table.",
+  "table_insights": {
+    "persons": {
+      "description": "Simple directory of people (likely demo or auxiliary contact list). Not clearly integrated with the maintenance workflow (names do not match doer/given_by fields consistently).",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "id",
+        "name",
+        "address"
+      ],
+      "column_descriptions": {
+        "id": "Unique identifier for a person record.",
+        "name": "Person's full name.",
+        "address": "Person's address/location (free text)."
+      }
+    },
+    "login": {
+      "description": "Application login accounts and authorization metadata. Stores credentials, role, allowed page/module access, and account creation timestamp.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "id",
+        "username",
+        "role",
+        "page_access",
+        "created_at"
+      ],
+      "column_descriptions": {
+        "id": "Unique identifier for a login account.",
+        "username": "Display name or username used to log in (appears to be a person's name).",
+        "password": "Stored password (appears plaintext in sample; should be hashed in a real system).",
+        "role": "Authorization role (e.g., admin vs user).",
+        "page_access": "List/array of pages/modules the user can access in the UI (RBAC-like).",
+        "created_at": "When the account was created."
+      }
+    },
+    "form_responses": {
+      "description": "Asset (machine/equipment) register captured from a form. Contains identification (serial/tag), machine attributes, purchase/warranty info, maintenance schedule hints, departmental ownership, and optional document links (manual, bill).",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "id",
+        "serial_no",
+        "tag_no",
+        "machine_name",
+        "department",
+        "location",
+        "maintenance_schedule",
+        "purchase_date",
+        "purchase_price",
+        "warranty_expiration",
+        "initial_maintenance_date",
+        "vendor",
+        "manufacturer",
+        "model_no",
+        "user_allot"
+      ],
+      "column_descriptions": {
+        "id": "Unique identifier for the form/asset record (stored as text but sample shows numeric-like values).",
+        "serial_no": "Asset serial number or internal asset code (often resembles tag format).",
+        "machine_name": "Common name of the asset (e.g., ALL IN ONE PC).",
+        "purchase_date": "Date the asset was purchased.",
+        "purchase_price": "Purchase cost of the asset.",
+        "vendor": "Supplier/vendor name.",
+        "model_no": "Model number of the asset.",
+        "warranty_expiration": "Warranty end date.",
+        "manufacturer": "Manufacturer/brand of the asset.",
+        "maintenance_schedule": "Suggested/declared maintenance cadence (inconsistent formatting; likely intended as periodicity).",
+        "department": "Owning/using department for the asset.",
+        "location": "Physical location of the asset within the plant/site.",
+        "initial_maintenance_date": "Date of the first maintenance or commissioning maintenance start.",
+        "user_manual": "Link/path to user manual document (or free text).",
+        "purchase_bill": "Link/path to purchase bill/invoice document (or free text).",
+        "notes": "Additional notes about the asset.",
+        "tag_no": "Asset tag number (appears to duplicate serial_no in sample).",
+        "user_allot": "Person/user or identifier to whom the asset is allotted/assigned."
+      }
+    },
+    "working_day_calendar": {
+      "description": "Date dimension / working calendar table used for reporting and scheduling analytics (week/month breakdown, day of week).",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "working_date",
+        "day_name",
+        "week_num",
+        "month_num"
+      ],
+      "column_descriptions": {
+        "id": "Unique identifier for the calendar row.",
+        "working_date": "Calendar date.",
+        "day_name": "Day-of-week label (Mon-Sun).",
+        "week_num": "Week number (likely ISO-ish or internal numbering).",
+        "month_num": "Month number (1-12)."
+      }
+    },
+    "master": {
+      "description": "Reference/master list relating task assignment metadata: who gives tasks, who does tasks, departments, and default task attributes. Could be a personnel-task mapping, assignment roster, or a historical capture of who is assigned by whom. Field naming suggests it supports the 'Assign Task' UI dropdowns.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "id",
+        "doer_name",
+        "given_by",
+        "department1",
+        "department",
+        "priority",
+        "task_type",
+        "task_status",
+        "created_at"
+      ],
+      "column_descriptions": {
+        "id": "Unique identifier for a master mapping row.",
+        "doer_name": "Name of the person responsible for doing the task (assignee).",
+        "department1": "Department of the doer/assignee (alternate/legacy department field).",
+        "given_by": "Name of the person assigning/giving the task (requester/supervisor).",
+        "task_status": "Default or categorized task status (sample shows only 'In House').",
+        "task_type": "Default or categorized task type (sample shows maintenance misspelled 'Maintence').",
+        "priority": "Priority label (High/Low/Urgent).",
+        "created_at": "When this mapping/reference row was created.",
+        "department": "Department related to the task or the requester (appears as a separate department dimension from department1)."
+      }
+    },
+    "maintenance_task_assign_staging": {
+      "description": "Staging/import table for maintenance task assignments and execution feedback. Almost all fields are text, indicating raw ingestion (e.g., from CSV/Google Form). Intended to be transformed into the typed operational table `maintenance_task_assign`.",
+      "primary_keys": [],
+      "foreign_keys": [
+        "serial_no likely references form_responses.serial_no or form_responses.tag_no (asset identity), but not enforced",
+        "task_no likely corresponds to maintenance_task_assign.Task_No (task identifier), but not enforced"
+      ],
+      "important_columns": [
+        "time_stamp",
+        "task_no",
+        "serial_no",
+        "machine_name",
+        "given_by",
+        "doer_name",
+        "task_type",
+        "task_start_date",
+        "frequency",
+        "priority",
+        "department",
+        "location",
+        "actual_date",
+        "delay",
+        "task_status",
+        "maintenance_cost",
+        "sound_status",
+        "temperature_status",
+        "image_link"
+      ],
+      "column_descriptions": {
+        "time_stamp": "Raw creation timestamp from the source system/form (string).",
+        "task_no": "Task identifier/code (e.g., TM-001).",
+        "serial_no": "Asset identifier tied to the task (string).",
+        "machine_name": "Asset name at time of task creation (denormalized).",
+        "given_by": "Person assigning the task (string).",
+        "doer_name": "Assignee/executor name (string).",
+        "task_type": "Task category (Maintenance).",
+        "machine_area": "Plant area where the machine is located (free text with variants).",
+        "part_name": "Part/component targeted by the maintenance activity.",
+        "need_sound_test": "Whether sound/vibration test is required (Yes/No as text).",
+        "temperature": "Whether temperature check is required (Yes/No as text).",
+        "enable_reminders": "Whether reminders are enabled (Yes/No as text).",
+        "require_attachment": "Whether an attachment is required for completion (Yes/No as text).",
+        "task_start_date": "Scheduled start/due date-time for the task (string).",
+        "frequency": "Recurrence pattern (daily/weekly/monthly/one-time).",
+        "description": "Maintenance instructions or checklist description.",
+        "priority": "Priority/urgency (sometimes overloaded with schedule terms in staging).",
+        "department": "Department related to the machine/task (string; may map to machine_department).",
+        "location": "Physical location (string).",
+        "purchase_price": "Asset purchase price captured/denormalized (string).",
+        "actual_date": "Completion date captured from executor (string).",
+        "delay": "Delay indicator/value (string; could be days late).",
+        "task_status": "Completion flag/status (string; sample shows Yes).",
+        "remarks": "Completion remarks/notes.",
+        "sound_status": "Result of sound test (Ok/Bad/etc.).",
+        "temperature_status": "Recorded temperature value/status (string).",
+        "image_link": "Link to an image proof/attachment.",
+        "file_name": "Uploaded file name (attachment).",
+        "file_type": "Uploaded file MIME/type or extension.",
+        "maintenance_cost": "Cost incurred for maintenance (string)."
+      }
+    },
+    "maintenance_task_assign": {
+      "description": "Core operational table for scheduled/assigned maintenance tasks, including schedule, assignee, asset reference (denormalized), and completion/inspection outcomes. Serves as the main fact table for maintenance KPIs (due vs done, delays, costs, compliance).",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        "Serial_No likely references form_responses.serial_no or form_responses.tag_no (asset), but not enforced",
+        "Task_Start_Date and/or Actual_Date can join to working_day_calendar.working_date for calendar analytics (not enforced)"
+      ],
+      "important_columns": [
+        "id",
+        "created_at",
+        "Time_Stamp",
+        "Task_No",
+        "Serial_No",
+        "Machine_Name",
+        "Given_By",
+        "Doer_Name",
+        "Task_Type",
+        "Machine_Area",
+        "Part_Name",
+        "Task_Start_Date",
+        "Frequency",
+        "Priority",
+        "machine_department",
+        "doer_department",
+        "Actual_Date",
+        "Delay",
+        "Task_Status",
+        "Maintenance_Cost",
+        "Need_Sound_Test",
+        "Sound_Status",
+        "Temperature",
+        "Temperature_Status",
+        "Enable_Reminders",
+        "Require_Attachment",
+        "Image_Link",
+        "File_Name",
+        "File_Type",
+        "Description",
+        "Remarks"
+      ],
+      "column_descriptions": {
+        "id": "Surrogate primary key for the task assignment record.",
+        "created_at": "When the record was created in the database/app.",
+        "Time_Stamp": "Source timestamp for the task creation/assignment event.",
+        "Task_No": "Business task identifier/code (e.g., TM-082).",
+        "Serial_No": "Asset identifier the task applies to.",
+        "Machine_Name": "Asset name (denormalized snapshot).",
+        "Given_By": "Person who assigned/issued the task.",
+        "Doer_Name": "Person who is responsible for executing the task.",
+        "Task_Type": "Task category (Maintenance).",
+        "Machine_Area": "Area/line/unit where the asset resides.",
+        "Part_Name": "Targeted part/component for maintenance.",
+        "Need_Sound_Test": "Boolean indicating whether a sound test is required.",
+        "Temperature": "Whether temperature check is required (stored as text in this table).",
+        "Enable_Reminders": "Boolean indicating if reminders should be sent.",
+        "Require_Attachment": "Boolean indicating if completion requires an attachment.",
+        "Task_Start_Date": "Scheduled date for task execution (next due/start date).",
+        "Frequency": "Recurrence frequency (daily/weekly/monthly).",
+        "Description": "Work instruction / checklist for the maintenance task.",
+        "Priority": "Task urgency/priority (sometimes includes schedule-like values).",
+        "machine_department": "Department that owns the machine/asset (asset-side dept).",
+        "Actual_Date": "Date the task was actually performed/completed.",
+        "Delay": "Delay measure/flag (e.g., days late or textual status).",
+        "Task_Status": "Completion status (Yes/No variants).",
+        "Remarks": "Notes captured upon completion/verification.",
+        "Sound_Status": "Result of sound test (OK/Bad/Need Repair/etc.).",
+        "Temperature_Status": "Recorded temperature value or status string.",
+        "Image_Link": "Link to image evidence/attachment.",
+        "File_Name": "Name of attached file for the task.",
+        "File_Type": "Type/extension of attached file.",
+        "Maintenance_Cost": "Cost incurred for this maintenance event.",
+        "doer_department": "Department of the assigned doer/executor."
+      }
+    }
+  },
+  "suggested_semantic_schema": "Domain: Maintenance Management / Asset Register\n\nCore Entities:\n1) Assets (machines/equipment)\n- Source table: form_responses\n- Grain: one row per asset as captured from intake form\n- Primary identifier: id (text), business identifiers: serial_no and tag_no\n- Key attributes: machine_name, department (asset owner), location, purchase_date, purchase_price, vendor, manufacturer, model_no, warranty_expiration, maintenance_schedule, initial_maintenance_date, user_allot\n- Notes: serial_no and tag_no appear redundant in samples; treat both as potential asset_key.\n\n2) Maintenance Tasks (Assignments / Scheduled PM instances)\n- Source table: maintenance_task_assign\n- Grain: one row per scheduled maintenance occurrence (Task_No) for an asset and assignee\n- Primary key: id\n- Business key: Task_No (TM-xxx) (not enforced unique but should be treated as unique in reporting if possible)\n- Asset link: Serial_No -> form_responses.serial_no (soft join; not enforced)\n- People fields are name strings (Given_By, Doer_Name); no enforced person dimension.\n- Scheduling fields: Task_Start_Date (due/scheduled date), Frequency (daily/weekly/monthly), Priority\n- Execution fields: Actual_Date (completion), Task_Status (Yes/No), Delay, Maintenance_Cost, Remarks\n- Inspection fields: Need_Sound_Test (boolean), Sound_Status, Temperature (Yes/No), Temperature_Status\n- Attachment fields: Require_Attachment, Image_Link, File_Name, File_Type\n- Department fields: machine_department (asset dept snapshot), doer_department (assignee dept)\n\n3) Staging Tasks (Raw Imports)\n- Source table: maintenance_task_assign_staging\n- Purpose: raw text ingestion before typing/cleaning into maintenance_task_assign\n- Use only for troubleshooting ingestion, not primary analytics.\n\n4) Users / Authorization\n- Source table: login\n- Grain: one row per application account\n- Fields: username, role (admin/user), page_access (array), created_at\n- No reliable foreign key to task tables; mapping is by name string if needed.\n\n5) Calendar Dimension\n- Source table: working_day_calendar\n- Grain: one row per date\n- Use to build time-series reports by joining:\n  - maintenance_task_assign.Task_Start_Date -> working_day_calendar.working_date\n  - maintenance_task_assign.Actual_Date -> working_day_calendar.working_date\n\n6) Master / Reference Mapping\n- Source table: master\n- Likely supports dropdown/reference lists for doer_name, given_by, departments, default priority/task_type/status.\n- Treat as reference data; not a normalized dimension due to free-text fields.\n\nCommon Analytics Questions (supported):\n- Preventive maintenance compliance: tasks due (Task_Start_Date) vs completed (Actual_Date/Task_Status)\n- Overdue analysis: Delay, or compute lateness = Actual_Date - Task_Start_Date\n- Cost tracking: sum Maintenance_Cost by department/asset/period\n- Workload: tasks assigned/completed by Doer_Name and doer_department\n- Reliability signals: Sound_Status, Temperature_Status distributions by asset/area\n\nImportant Data Quality Notes for Text-to-SQL:\n- Task_Status has multiple variants (Yes/yes/No/no). Normalize in queries using LOWER(Task_Status).\n- Machine_Area / Part_Name contain many spelling/case variants; consider grouping using case-insensitive matching.\n- Some scheduling concepts are conflated: Priority sometimes contains cadence terms (WEEKLY/MONTHLY).\n- Assets are not strictly keyed; Serial_No is the best available join field.\n- Staging table dates/timestamps are strings; prefer maintenance_task_assign where Task_Start_Date and Actual_Date are typed.\n"
+}

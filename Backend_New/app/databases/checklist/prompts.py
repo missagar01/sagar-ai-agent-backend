@@ -92,6 +92,7 @@ SQL GENERATION RULES (STRICT)
 8. Cast TEXT dates explicitly when required.
 9. Output ONLY SQL. No markdown. No explanation.
 10. **CRITICAL:** Always use `LOWER(column) = LOWER('Value')` for names (e.g., `LOWER(name) = LOWER('Hem Kumar Jagat')`). Never compare string literals directly without LOWER().
+11. **VAGUE REFERENCES:** If the user says "this task" or "it" WITHOUT a specific ID, do NOT use a parameter. Instead, query for **Recent Tasks** (LIMIT 5).
 
 ────────────────────────────────────────────────────────────
 FEEDBACK FROM PREVIOUS ATTEMPT (IF ANY)
@@ -129,6 +130,7 @@ VALIDATION CHECKS (IN ORDER)
 - Example:
   • "completed tasks" → submission_date IS NOT NULL
   • "pending tasks"   → submission_date IS NULL
+- **EXCEPTION:** If the user says "this task" (singular) with NO ID, it is **VALID** to return the top 5 recent tasks. Do NOT reject this.
 
 2. SCHEMA COMPLIANCE
 - Are only allowed tables used?

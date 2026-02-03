@@ -36,37 +36,47 @@ The system currently integrates these distinct business domains:
 The following diagram illustrates how a user query travels through the system:
 
 ```mermaid
-graph TD
-    %% -- Styling Definitions --
-    classDef userNode fill:#f9f9f9,stroke:#333,stroke-width:2px;
-    classDef routerNode fill:#e1f5fe,stroke:#0277bd,stroke-width:2px;
-    classDef dbNode fill:#fff3e0,stroke:#ef6c00,stroke-width:1px;
-    classDef logicNode fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px;
-    classDef errorNode fill:#ffebee,stroke:#c62828,stroke-width:1px;
+graph LR
+    %% -- Modern Color Palette --
+    classDef userNode fill:#2d3436,stroke:#636e72,stroke-width:2px,color:#fff;
+    classDef routerNode fill:#0984e3,stroke:#74b9ff,stroke-width:2px,color:#fff;
+    classDef dbNode fill:#e17055,stroke:#fab1a0,stroke-width:2px,color:#fff;
+    classDef agentNode fill:#00b894,stroke:#55efc4,stroke-width:2px,color:#fff;
+    classDef errorNode fill:#d63031,stroke:#ff7675,stroke-width:2px,color:#fff;
+    classDef outputNode fill:#6c5ce7,stroke:#a29bfe,stroke-width:2px,color:#fff;
 
-    %% -- The Main Flow --
+    %% -- User Entry --
     User([👤 User]):::userNode --> API[📡 API Gateway]
-    API --> Router{🔀 Intelligent Router}:::routerNode
-    
-    %% -- Ambiguity Path --
+    API --> Router{{🔀 Deep Schema Router}}:::routerNode
+
+    %% -- Logic Fork --
     Router -- "Ambiguous?" --> Clarify[❓ Ambiguity Handler]:::errorNode
-    Clarify --> User
+    Clarify -.-> User
     
-    %% -- Multi-Database Routing --
-    Router -- "Employee Intent" --> DB_Checklist[(📋 Checklist DB)]:::dbNode
-    Router -- "Machine Intent" --> DB_Sagar[(⚙️ Maintenance DB)]:::dbNode
-    Router -- "Sales Intent" --> DB_L2O[(💼 Sales DB)]:::dbNode
+    %% -- Routing --
+    Router -- "Employee Intent" --> Check[(📋 Checklist DB)]:::dbNode
+    Router -- "Machine Intent" --> Sagar[(⚙️ Sagar DB)]:::dbNode
+    Router -- "Sales Intent" --> L2O[(💼 Sales DB)]:::dbNode
     
-    %% -- The Autonomous Agent Loop (Shared Logic) --
-    DB_Checklist & DB_Sagar & DB_L2O --> Context[🔄 Context Engine]:::logicNode
-    Context --> Generator[🧠 SQL Generator]:::logicNode
-    
-    Generator --> Validator{🛡️ Safety Validator}:::routerNode
-    Validator -- "❌ Reject (Unsafe)" --> Generator
-    Validator -- "✅ Approve" --> Executor[⚡ SQL Executor]:::logicNode
-    
-    %% -- Final Response --
-    Executor --> Synthesizer[📝 Answer Synthesizer]:::userNode
+    %% -- The Autonomous Agent Core --
+    subgraph Core_Agent_Logic [🤖 Autonomous SQL Agent Loop]
+        direction TB
+        Reformulate[🔄 Context Engine]:::agentNode
+        Generator[[🧠 SQL Generator]]:::agentNode
+        Validator{🛡️ Safety Validator}:::agentNode
+        Executor[⚡ SQL Executor]:::agentNode
+        
+        Reformulate --> Generator
+        Generator --> Validator
+        Validator -- "❌ Reject" --> Generator
+        Validator -- "✅ Approve" --> Executor
+    end
+
+    %% -- Connections to Core --
+    Check & Sagar & L2O --> Reformulate
+
+    %% -- Final Output --
+    Executor --> Synthesizer([📝 Answer Synthesizer]):::outputNode
     Synthesizer --> User
 ```
 

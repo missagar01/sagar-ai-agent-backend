@@ -43,26 +43,9 @@ The system currently integrates these distinct business domains:
 The following diagram illustrates how a user query travels through the system:
 
 ```mermaid
----
-config:
-  theme: base
-  themeVariables:
-    background: "#0a0c0f"
-    primaryColor: "#0f1116"
-    primaryTextColor: "#e2e8f0"
-    primaryBorderColor: "#1e2028"
-    lineColor: "#475569"
-    fontFamily: "Rajdhani, sans-serif"
-    fontSize: "15px"
-    edgeLabelBackground: "#0f1116"
-    tertiaryTextColor: "#94a3b8"
-  flowchart:
-    curve: basis
-    rankSpacing: 58
-    nodeSpacing: 40
----
 flowchart TD
-    classDef userNode fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#c7d2fe,border-radius:12px
+    %% -- GitHub Compatible Styling --
+    classDef userNode fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#c7d2fe
     classDef gatewayNode fill:#0c1e2e,stroke:#06b6d4,stroke-width:2px,color:#a5f3fc
     classDef routerNode fill:#0c1e2e,stroke:#22d3ee,stroke-width:2.5px,color:#67e8f9
     classDef dbNode fill:#1c1410,stroke:#fb923c,stroke-width:2px,color:#fdba74
@@ -71,28 +54,28 @@ flowchart TD
     classDef outputNode fill:#1e1b3a,stroke:#8b5cf6,stroke-width:2px,color:#c4b5fd
     classDef coreNode fill:#0d1a14,stroke:#34d399,stroke-width:2.5px,color:#a7f3d0
 
-    U["👤  User"]:::userNode
-    AG["📡  API Gateway\n───────────────\nEntry Point"]:::gatewayNode
-    RT["🔀  Deep Schema Router\n───────────────\nIntent Classification"]:::routerNode
-    AH["❓  Ambiguity Handler\n───────────────\nClarify & Re-route"]:::errorNode
+    U("👤  User"):::userNode
+    AG("📡  API Gateway<br/>Entry Point"):::gatewayNode
+    RT{"🔀  Deep Schema Router<br/>Intent Classification"}:::routerNode
+    AH["❓  Ambiguity Handler<br/>Clarify & Re-route"]:::errorNode
 
-    CE["🔄  Context Engine\n───────────────\nReformulate Query"]:::agentNode
-    SG["🧠  SQL Generator\n───────────────\nBuild Query"]:::agentNode
-    SV["🛡️  Safety Validator\n───────────────\nCheck & Approve"]:::coreNode
-    EX["⚡  SQL Executor\n───────────────\nRun Query"]:::agentNode
+    CE["🔄  Context Engine<br/>Reformulate Query"]:::agentNode
+    SG["🧠  SQL Generator<br/>Build Query"]:::agentNode
+    SV{"🛡️  Safety Validator<br/>Check & Approve"}:::coreNode
+    EX["⚡  SQL Executor<br/>Run Query"]:::agentNode
 
-    DB1["📋  Checklist DB\n───────────────\nEmployee Data"]:::dbNode
-    DB2["⚙️  Sagar DB\n───────────────\nMachine Data"]:::dbNode
-    DB3["💼  Sales DB\n───────────────\nSales Data"]:::dbNode
+    DB1[("📋  Checklist DB<br/>Employee Data")]:::dbNode
+    DB2[("⚙️  Sagar DB<br/>Machine Data")]:::dbNode
+    DB3[("💼  Sales DB<br/>Sales Data")]:::dbNode
 
-    SY["📝  Answer Synthesizer\n───────────────\nGenerate Response"]:::outputNode
-    UR["👤  User\n───────────────\nReceives Result"]:::userNode
+    SY["📝  Answer Synthesizer<br/>Generate Response"]:::outputNode
+    UR("👤  User<br/>Receives Result"):::userNode
 
     U --> AG
     AG --> RT
 
-    RT -. "Ambiguous Input?" .-> AH
-    AH -.->|"Back to User"| U
+    RT -.->|"Ambiguous?"| AH
+    AH -.->|"Clarify"| U
 
     RT -->|"Employee Intent"| DB1
     RT -->|"Machine Intent"| DB2
@@ -102,11 +85,12 @@ flowchart TD
         direction TB
         CE --> SG
         SG --> SV
-        SV -->|"❌  Reject"| SG
-        SV -->|"✅  Approve"| EX
+        SV -->|"❌ Reject"| SG
+        SV -->|"✅ Approve"| EX
     end
-
-    style CORE fill:#0a1512,stroke:#10b981,stroke-width:2px,color:#6ee7b7,border-radius:16px
+    
+    %% Style the subgraph (GitHub ignores this usually, but safe to keep)
+    style CORE fill:#0a1512,stroke:#10b981,stroke-width:2px,color:#fff
 
     DB1 --> CE
     DB2 --> CE

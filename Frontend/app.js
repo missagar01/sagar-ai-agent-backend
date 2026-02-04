@@ -247,9 +247,12 @@ async function createNewSession() {
 async function deleteSession(sessionId, skipConfirm = false) {
     console.log(`Attempting to delete session: ${sessionId}, skipConfirm: ${skipConfirm}`);
 
-    if (!skipConfirm && !confirm('Are you sure you want to delete this conversation?')) {
-        console.log('Delete cancelled by user');
-        return;
+    if (!skipConfirm) {
+        const confirmed = await showConfirmDialog('Are you sure you want to delete this conversation?');
+        if (!confirmed) {
+            console.log('Delete cancelled by user');
+            return;
+        }
     }
 
     try {
@@ -276,14 +279,14 @@ async function deleteSession(sessionId, skipConfirm = false) {
 
     } catch (error) {
         console.error('Failed to delete session:', error);
-        alert(`Failed to delete session: ${error.message}`);
+        showSystemMessage(`Failed to delete session: ${error.message}`, 'error');
     }
 }
 
 async function deleteCurrentSession(skipConfirm = false) {
     if (!currentSessionId) {
         console.error('No active session to delete');
-        alert('No active session selected');
+        showSystemMessage('No active session selected', 'error');
         return;
     }
     await deleteSession(currentSessionId, skipConfirm);
@@ -292,7 +295,10 @@ async function deleteCurrentSession(skipConfirm = false) {
 async function clearCurrentChat(skipConfirm = false) {
     if (!currentSessionId) return;
 
-    if (!skipConfirm && !confirm('Clear all messages in this conversation?')) return;
+    if (!skipConfirm) {
+        const confirmed = await showConfirmDialog('Clear all messages in this conversation?');
+        if (!confirmed) return;
+    }
 
     try {
         const response = await fetch(`${API_BASE_URL}/chat/sessions/${currentSessionId}/clear`, {
@@ -303,11 +309,11 @@ async function clearCurrentChat(skipConfirm = false) {
         await loadSessionMessages(currentSessionId);
         await loadSessions();
 
-        alert(`✅ ${result.message}`);
+        showSystemMessage(result.message, 'success');
 
     } catch (error) {
         console.error('Failed to clear chat:', error);
-        alert('Failed to clear chat');
+        showSystemMessage('Failed to clear chat', 'error');
     }
 }
 
@@ -325,8 +331,7 @@ function updateSessionIndicator() {
 
 async function sendMessage() {
     if (isGenerating) {
-        stopGeneration();
-        return;
+        return; // Strictly disable send action while generating
     }
 
     const question = userInput.value.trim();
@@ -345,6 +350,7 @@ async function sendMessage() {
             await loadSessions();
         } catch (error) {
             console.error('Failed to create session:', error);
+            showSystemMessage('Failed to create session: ' + error.message, 'error');
             return;
         }
     }
@@ -352,8 +358,12 @@ async function sendMessage() {
     // Set generating state
     isGenerating = true;
     abortController = new AbortController();
-    sendIcon.className = 'fas fa-stop';
-    userInput.disabled = true;
+
+    // Disable send button but KEEP INPUT ENABLED
+    sendBtn.disabled = true;
+    sendBtn.style.opacity = '0.5';
+    sendBtn.style.cursor = 'not-allowed';
+    // userInput.disabled = true; // REMOVED per requirements
 
     // Hide welcome screen
     const welcomeEl = document.getElementById('welcomeScreen');
@@ -411,6 +421,11 @@ async function sendMessage() {
             const chunk = decoder.decode(value, { stream: true });
             const lines = chunk.split('\n');
 
+            // SMART SCROLL: Check if user is near bottom BEFORE updating content
+            // Threshold of 100px. If user is within 100px of bottom, we auto-scroll.
+            const threshold = 150;
+            const isNearBottom = chatDisplay.scrollHeight - chatDisplay.scrollTop - chatDisplay.clientHeight < threshold;
+
             for (const line of lines) {
                 if (!line.trim() || !line.startsWith('data: ')) continue;
 
@@ -422,7 +437,6 @@ async function sendMessage() {
 
                     switch (data.type) {
                         case 'status':
-                            // Update status message with animation
                             statusDiv.innerHTML = `
                                 <div class="status-dot active"></div>
                                 <span>${data.message}</span>
@@ -440,7 +454,6 @@ async function sendMessage() {
                             break;
 
                         case 'sql':
-                            // Show SQL was generated
                             statusDiv.innerHTML = `
                                 <div class="status-dot active"></div>
                                 <span>Query ready, generating response...</span>
@@ -448,26 +461,24 @@ async function sendMessage() {
                             break;
 
                         case 'chunk':
-                            // Stream text chunk - INSTANT feel
                             if (statusDiv.style.display !== 'none') {
                                 statusDiv.style.display = 'none';
                             }
                             fullText += data.content;
+
                             // Render markdown incrementally
                             let rendered = marked.parse(fullText);
                             rendered = rendered.replace(/<table>/g, '<div class="table-wrapper"><table>');
                             rendered = rendered.replace(/<\/table>/g, '</table></div>');
                             contentDiv.innerHTML = rendered;
-                            chatDisplay.scrollTop = chatDisplay.scrollHeight;
                             break;
 
                         case 'done':
-                            // Streaming complete
                             if (isCacheHit) {
                                 botMsgDiv.classList.add('cached');
                                 cacheIndicator.style.display = 'flex';
                             }
-                            await loadSessions(); // Refresh counts
+                            await loadSessions();
                             break;
 
                         case 'error':
@@ -478,6 +489,11 @@ async function sendMessage() {
                 } catch (parseError) {
                     console.log('Parse error for line:', line);
                 }
+            }
+
+            // SMART SCROLL: Apply scroll ONLY if criteria met
+            if (isNearBottom) {
+                chatDisplay.scrollTop = chatDisplay.scrollHeight;
             }
         }
 
@@ -497,22 +513,50 @@ async function sendMessage() {
         isGenerating = false;
         currentRequestId = null;
         abortController = null;
+
+        // Restore Send Button
         sendIcon.className = 'fas fa-arrow-up';
-        userInput.disabled = false;
+        sendBtn.disabled = false;
+        sendBtn.style.opacity = '1';
+        sendBtn.style.cursor = 'pointer';
+
+        // Focus back on input so user can type next query immediately
         userInput.focus();
-        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+
+        // Final scroll check
+        const threshold = 150;
+        const isNearBottom = chatDisplay.scrollHeight - chatDisplay.scrollTop - chatDisplay.clientHeight < threshold;
+        if (isNearBottom) chatDisplay.scrollTop = chatDisplay.scrollHeight;
     }
 }
 
 function stopGeneration() {
+    // Legacy function, might not be triggered via UI anymore but good to keep clean
     if (abortController) {
         abortController.abort();
     }
-
     isGenerating = false;
     sendIcon.className = 'fas fa-arrow-up';
-    userInput.disabled = false;
+    sendBtn.disabled = false;
+    sendBtn.style.opacity = '1';
+    sendBtn.style.cursor = 'pointer';
     userInput.focus();
+}
+
+/**
+ * System Message Helper (Replaces Alerts)
+ */
+function showSystemMessage(message, type = 'info') {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'message system';
+    msgDiv.innerHTML = `
+        <div class="system-msg-content ${type}">
+            <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    chatDisplay.appendChild(msgDiv);
+    chatDisplay.scrollTop = chatDisplay.scrollHeight;
 }
 
 function addMessage(text, type, animate = true) {
@@ -592,7 +636,11 @@ async function showCacheStats() {
 }
 
 async function clearCache() {
-    if (!confirm('Are you sure you want to clear the System Cache?')) return;
+    const confirmed = await showConfirmDialog(
+        'Are you sure you want to clear the System Cache?',
+        '<strong>Note:</strong> This will delete all cached SQL queries. The next queries might take longer to process.'
+    );
+    if (!confirmed) return;
     try {
         const response = await fetch(`${API_BASE_URL}/chat/cache/clear`, {
             method: 'POST'
@@ -604,10 +652,10 @@ async function clearCache() {
             await showCacheStats();
         }
 
-        alert(`✅ ${result.message}`);
+        showSystemMessage(result.message, 'success');
     } catch (error) {
         console.error('Failed to clear cache:', error);
-        alert('Failed to clear cache');
+        showSystemMessage('Failed to clear cache', 'error');
     }
 }
 
@@ -620,3 +668,58 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+/**
+ * Replaces native confirm() with a custom inline system message that has Yes/No buttons.
+ * Returns a Promise that resolves to true (confirmed) or false (cancelled).
+ */
+/**
+ * Shows the Global Confirmation Modal (Overlay)
+ * Returns a Promise that resolves to true (confirmed) or false (cancelled).
+ */
+function showConfirmDialog(messageText, noteText = '') {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('confirmationModal');
+        const messageEl = document.getElementById('confirmMessage');
+        const noteEl = document.getElementById('confirmNote');
+        const closeBtn = document.getElementById('closeConfirmModal');
+        const cancelBtn = document.getElementById('cancelConfirmBtn');
+        const actionBtn = document.getElementById('actionConfirmBtn');
+
+        // Set Content
+        messageEl.textContent = messageText;
+
+        if (noteText) {
+            noteEl.innerHTML = noteText;
+            noteEl.style.display = 'block';
+        } else {
+            noteEl.style.display = 'none';
+        }
+
+        // Show Modal
+        modal.style.display = 'flex';
+
+        // Cleanup function to remove event listeners and hide modal
+        let cleanup = () => {
+            modal.style.display = 'none';
+            // Remove listeners to prevent duplicates next time
+            closeBtn.removeEventListener('click', onClose);
+            cancelBtn.removeEventListener('click', onCancel);
+            actionBtn.removeEventListener('click', onAction);
+            window.removeEventListener('click', onWindowClick);
+        };
+
+        // Handlers
+        const onClose = () => { cleanup(); resolve(false); };
+        const onCancel = () => { cleanup(); resolve(false); };
+        const onAction = () => { cleanup(); resolve(true); };
+        const onWindowClick = (e) => { if (e.target === modal) { cleanup(); resolve(false); } };
+
+        // Attach Listeners
+        closeBtn.addEventListener('click', onClose);
+        cancelBtn.addEventListener('click', onCancel);
+        actionBtn.addEventListener('click', onAction);
+        window.addEventListener('click', onWindowClick);
+    });
+}
+

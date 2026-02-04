@@ -64,9 +64,7 @@
           <div class="input-top">
             <input type="text" id="userInput" placeholder="Ask Anything..." autocomplete="off" />
             <div class="input-actions">
-              <button class="icon-btn" id="voiceBtn" title="Voice input (coming soon)">
-                <i class="fas fa-microphone"></i>
-              </button>
+
               <button class="send-btn" id="sendBtn" title="Send message">
                 <i class="fas fa-arrow-up" id="sendIcon"></i>
               </button>
@@ -156,6 +154,90 @@
     .modal-btn.cache-btn:hover {
       background: #fff9db;
     }
+
+    /* System Message Styles */
+    .message.system {
+      align-self: center;
+      width: 100%;
+      margin: 10px 0;
+      display: flex;
+      justify-content: center;
+      background: transparent;
+      box-shadow: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .system-msg-content {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .system-msg-content.info {
+      background: rgba(33, 150, 243, 0.1);
+      color: #2196f3;
+      border: 1px solid rgba(33, 150, 243, 0.2);
+    }
+
+    .system-msg-content.error {
+      background: rgba(244, 67, 54, 0.1);
+      color: #f44336;
+      border: 1px solid rgba(244, 67, 54, 0.2);
+    }
+
+    .system-msg-content.success {
+      background: rgba(76, 175, 80, 0.1);
+      color: #4caf50;
+      border: 1px solid rgba(76, 175, 80, 0.2);
+    }
+
+    /* Confirm Dialog Styles */
+    .system-msg-content.confirm {
+      background: rgba(108, 117, 125, 0.1);
+      color: #495057;
+      border: 1px solid rgba(108, 117, 125, 0.2);
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 5px;
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .confirm-btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .confirm-btn.yes {
+      background: #22c55e;
+      color: white;
+    }
+
+    .confirm-btn.yes:hover {
+      background: #16a34a;
+    }
+
+    .confirm-btn.no {
+      background: #ef4444;
+      color: white;
+    }
+
+    .confirm-btn.no:hover {
+      background: #dc2626;
+    }
   </style>
 
   <!-- Clear Options Modal -->
@@ -180,6 +262,24 @@
             <i class="fas fa-database"></i> Clear System Cache
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic Confirmation Modal -->
+  <div class="modal" id="confirmationModal" style="display: none; z-index: 2000;">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-question-circle"></i> Confirmation</h3>
+        <button class="modal-close" id="closeConfirmModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMessage" style="font-size: 1rem; color: #e2e8f0; margin-bottom: 20px;">Are you sure?</p>
+        <div class="modal-note" id="confirmNote" style="display: none; margin-bottom: 0;"></div>
+      </div>
+      <div class="modal-footer" style="display: flex; gap: 10px; padding-top: 0; border: none;">
+        <button class="btn-secondary" id="cancelConfirmBtn" style="flex: 1; justify-content: center;">Cancel</button>
+        <button class="btn-danger" id="actionConfirmBtn" style="flex: 1;">Yes, Proceed</button>
       </div>
     </div>
   </div>

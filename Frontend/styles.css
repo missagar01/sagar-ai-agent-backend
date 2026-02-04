@@ -597,9 +597,20 @@ body {
   background: var(--sidebar-bg);
   border-radius: 20px;
   width: 90%;
-  max-width: 400px;
+  max-width: 500px;
   border: 1px solid var(--border-color);
   overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modal-note {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-top: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px;
+  border-radius: 8px;
+  border-left: 2px solid var(--accent-purple);
 }
 
 .modal-header {

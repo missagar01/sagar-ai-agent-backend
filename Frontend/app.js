@@ -570,6 +570,21 @@ function showSystemMessage(message, type = 'info') {
     `;
     chatDisplay.appendChild(msgDiv);
     chatDisplay.scrollTop = chatDisplay.scrollHeight;
+
+    // Auto-dismiss logic
+    setTimeout(() => {
+        // Fade out transition
+        msgDiv.style.transition = 'opacity 0.5s ease, margin-top 0.5s ease';
+        msgDiv.style.opacity = '0';
+        msgDiv.style.marginTop = '-50px'; // Slide up effect
+
+        // Remove from DOM after transition completes
+        setTimeout(() => {
+            if (msgDiv.parentNode) {
+                msgDiv.remove();
+            }
+        }, 500);
+    }, 3000); // 3 seconds delay
 }
 
 function addMessage(text, type, animate = true) {

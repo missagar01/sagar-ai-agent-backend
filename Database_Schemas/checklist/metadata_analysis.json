@@ -1,0 +1,629 @@
+{
+  "business_summary": "This database supports an internal operations platform used in an industrial/plant environment to (1) assign and track operational tasks via checklists and one-off delegations, (2) record task completion/extension events with evidence (images/attachments) and delay metrics, (3) manage users, roles, and fine-grained access to modules/pages/departments, and (4) provide adjacent operational modules including store & purchase indents (requisitions), GRN bill approval workflow, repair gate-pass follow-ups, and visitor gate-pass tracking with approvals. The system is designed for multi-department usage with reminders, planned vs actual dates, and auditability of who assigned, executed, and verified work.",
+  "table_insights": {
+    "delegation": {
+      "description": "Operational delegation tasks (typically one-time assignments) given by a manager/supervisor to a person/department, with planning dates, submission/completion, reminders, attachment requirement, and computed delay.",
+      "primary_keys": [
+        "task_id"
+      ],
+      "foreign_keys": [
+        {
+          "column": "department",
+          "references": "departments.department",
+          "relationship": "Delegation is categorized to an organizational department (text-based reference)."
+        },
+        {
+          "column": "name",
+          "references": "users.user_name",
+          "relationship": "Delegation is assigned to a user by their display name (denormalized)."
+        },
+        {
+          "column": "given_by",
+          "references": "users.user_name",
+          "relationship": "Delegation is created/assigned by a user/manager name (denormalized)."
+        }
+      ],
+      "important_columns": [
+        "created_at",
+        "task_start_date",
+        "planned_date",
+        "submission_date",
+        "status",
+        "delay",
+        "enable_reminder",
+        "require_attachment",
+        "department",
+        "given_by",
+        "name"
+      ],
+      "column_descriptions": {
+        "task_id": "Unique identifier of the delegation task.",
+        "created_at": "When the task record was created/assigned in the system.",
+        "department": "Department responsible for the task or to which the assignee belongs.",
+        "name": "Person responsible for executing the task (assignee display name).",
+        "task_description": "Free-text description/instructions for the task.",
+        "frequency": "Recurrence type for the task; in observed data it's primarily one-time.",
+        "remarks": "Notes/remarks entered during or after execution (often completion notes).",
+        "task_start_date": "Scheduled start datetime for the task (often equals planned_date for one-time).",
+        "given_by": "Who assigned the task (manager/supervisor display name).",
+        "image": "URL/path to an image evidence or related file (if used).",
+        "enable_reminder": "Whether reminder notifications are enabled (e.g., 'yes').",
+        "require_attachment": "Whether completion requires an attachment/evidence.",
+        "status": "Current task status (e.g., Done/done/extend).",
+        "updated_at": "Last update timestamp to the task record.",
+        "planned_date": "Planned/scheduled datetime for completion or occurrence.",
+        "submission_date": "When the assignee submitted/completed the task.",
+        "color_code_for": "Likely UI color coding bucket/flag (e.g., priority/overdue indicator).",
+        "delay": "Computed time difference between planned and submission (positive = late; negative = early)."
+      }
+    },
+    "delegation_done": {
+      "description": "Event/audit log of delegation task outcomes (completion or extension), including optional reasons, next extension date, and evidence URL. Acts like a history table for delegation updates.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "column": "task_id",
+          "references": "delegation.task_id",
+          "relationship": "Links an outcome event to the underlying delegation task."
+        },
+        {
+          "column": "name",
+          "references": "users.user_name",
+          "relationship": "User who is associated with the task event (assignee), stored as text."
+        },
+        {
+          "column": "given_by",
+          "references": "users.user_name",
+          "relationship": "Manager/assigner associated with the task, stored as text."
+        }
+      ],
+      "important_columns": [
+        "created_at",
+        "status",
+        "next_extend_date",
+        "reason",
+        "image_url",
+        "task_id"
+      ],
+      "column_descriptions": {
+        "task_id": "Delegation task identifier this event belongs to.",
+        "created_at": "Timestamp when the event (done/extend) was recorded.",
+        "status": "Outcome status for this event (done/completed/extend).",
+        "next_extend_date": "If extended, the next planned date for completion/next review.",
+        "reason": "Reason for extension or completion notes.",
+        "image_url": "Evidence attachment URL (photo/document).",
+        "name": "Assignee name captured at the time of the event.",
+        "task_description": "Task description snapshot (denormalized for history).",
+        "given_by": "Assigner name snapshot (denormalized for history).",
+        "id": "UUID primary key for the event record."
+      }
+    },
+    "working_day_calender": {
+      "description": "Calendar dimension table for working dates, capturing weekday name (Hindi), week number, and month number. Used for reporting, scheduling, and KPI rollups by time.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "working_date",
+        "day",
+        "week_num",
+        "month"
+      ],
+      "column_descriptions": {
+        "working_date": "Calendar date used as the reporting/scheduling date grain.",
+        "day": "Day-of-week label (Hindi abbreviations).",
+        "week_num": "Week number (likely ISO-like or custom fiscal week index).",
+        "month": "Month number (1-12).",
+        "id": "Surrogate identifier for the calendar row."
+      }
+    },
+    "checklist": {
+      "description": "Checklist task instances for recurring operational work (daily/weekly/monthly/etc.). Each row appears to represent a generated occurrence (planned_date) assigned to a user/department, with user submission status and admin verification.",
+      "primary_keys": [
+        "task_id"
+      ],
+      "foreign_keys": [
+        {
+          "column": "department",
+          "references": "departments.department",
+          "relationship": "Checklist task is associated with a department (text-based reference)."
+        },
+        {
+          "column": "name",
+          "references": "users.user_name",
+          "relationship": "Checklist task assignee (denormalized user name)."
+        },
+        {
+          "column": "given_by",
+          "references": "users.user_name",
+          "relationship": "Checklist task creator/assigner (denormalized user name)."
+        }
+      ],
+      "important_columns": [
+        "frequency",
+        "planned_date",
+        "task_start_date",
+        "created_at",
+        "submission_date",
+        "user_status_checklist",
+        "admin_done",
+        "require_attachment",
+        "enable_reminder",
+        "delay",
+        "department",
+        "name",
+        "given_by"
+      ],
+      "column_descriptions": {
+        "task_id": "Unique identifier for a checklist task occurrence/instance.",
+        "department": "Owning/responsible department for the checklist work.",
+        "given_by": "Person who created/assigned the checklist task.",
+        "name": "Person responsible for completing the checklist item (assignee).",
+        "task_description": "What needs to be checked/done.",
+        "enable_reminder": "Whether reminders should be sent for this checklist item.",
+        "require_attachment": "Whether completion requires evidence/attachment.",
+        "frequency": "Recurrence pattern (daily/weekly/monthly/quarterly/yearly/one-time etc.).",
+        "remark": "User/admin notes; may capture completion remarks.",
+        "status": "General yes/no flag; likely indicates whether task is enabled/active or some completion toggle (values show yes/no).",
+        "image": "Evidence attachment/image URL for completion.",
+        "admin_done": "Admin verification state (e.g., Confirmed/Done/No).",
+        "delay": "Computed lateness/earliness interval relative to planned date/time.",
+        "planned_date": "Planned scheduled datetime for this occurrence (stored as text; often ISO string).",
+        "created_at": "When the task occurrence row was created/generated.",
+        "task_start_date": "Scheduled start datetime for the occurrence.",
+        "submission_date": "Datetime when user submitted/completed this checklist occurrence.",
+        "user_status_checklist": "User-side status (Pending/Yes/No) indicating completion state."
+      }
+    },
+    "users": {
+      "description": "System users/employees with authentication fields, department affiliation, role (admin/user), status, leave windows, and extensive access-control configuration to modules/pages/departments/areas.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "column": "department",
+          "references": "departments.department",
+          "relationship": "User belongs to a department (text-based)."
+        },
+        {
+          "column": "given_by",
+          "references": "users.user_name",
+          "relationship": "Indicates who created/onboarded the user (self-referential, text-based)."
+        }
+      ],
+      "important_columns": [
+        "created_at",
+        "user_name",
+        "email_id",
+        "number",
+        "department",
+        "role",
+        "status",
+        "employee_id",
+        "leave_date",
+        "leave_end_date",
+        "page_access",
+        "system_access",
+        "subscription_access_system",
+        "store_access",
+        "verify_access",
+        "verify_access_dept",
+        "last_punch_time",
+        "last_punch_device"
+      ],
+      "column_descriptions": {
+        "id": "Unique user identifier.",
+        "created_at": "When the user record was created.",
+        "user_name": "User display/login name (used widely as denormalized reference).",
+        "password": "Password credential (appears stored in plain text in samples; security risk).",
+        "email_id": "User email address.",
+        "number": "User phone number (stored as bigint).",
+        "department": "Primary department of the user.",
+        "given_by": "Creator/onboarder/manager associated with the user.",
+        "role": "Application role (admin/user).",
+        "status": "Account status (e.g., active).",
+        "user_access": "Department or access scope label(s) (often duplicates department).",
+        "leave_date": "Start datetime of leave/unavailability.",
+        "remark": "Administrative remark about the user.",
+        "leave_end_date": "End datetime of leave/unavailability.",
+        "employee_id": "Internal employee identifier/badge number.",
+        "last_punch_time": "Last attendance punch timestamp (integration with attendance device).",
+        "last_punch_device": "Device identifier for last punch.",
+        "page_access": "Comma-separated UI page permissions (dashboard, all-task, delegation, etc.).",
+        "system_access": "Comma-separated modules/systems user can access (Checklist, Store & Purchase, HRMS, etc.).",
+        "subscription_access_system": "JSON-like string detailing subscription/document/payment systems and page permissions.",
+        "user_access1": "Comma-separated physical area/location access list (site/plant areas).",
+        "store_access": "Store module permissions (indent, PO, GRN approvals, etc.).",
+        "emp_image": "Employee profile image URL.",
+        "verify_access": "Verification authority level (e.g., hod/manager).",
+        "verify_access_dept": "Departments over which the user has verification authority (comma-separated list)."
+      }
+    },
+    "indent_approvals": {
+      "description": "Approval records for indents/requisitions, capturing approver, approval timestamp, remarks, and status. Supports multi-step approvals.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "column": "indent_id",
+          "references": "indent.id",
+          "relationship": "Approval belongs to a specific indent line/record."
+        },
+        {
+          "column": "approver_id",
+          "references": "users.id",
+          "relationship": "Approver user identifier; stored as varchar so may contain user id or name."
+        }
+      ],
+      "important_columns": [
+        "indent_id",
+        "approver_id",
+        "approval_date",
+        "status"
+      ],
+      "column_descriptions": {
+        "id": "Unique identifier for an approval record.",
+        "indent_id": "Indent being approved.",
+        "approver_id": "Approver identifier (intended to map to a user).",
+        "approval_date": "When approval decision was made.",
+        "remarks": "Approver notes/comments.",
+        "status": "Approval decision/status (e.g., approved/rejected/pending)."
+      }
+    },
+    "users_staging": {
+      "description": "Staging/import table for users (onboarding pipeline). Mirrors core user attributes before being promoted to the main users table.",
+      "primary_keys": [],
+      "foreign_keys": [
+        {
+          "column": "department",
+          "references": "departments.department",
+          "relationship": "Staged user's department (text-based)."
+        }
+      ],
+      "important_columns": [
+        "id",
+        "created_at",
+        "user_name",
+        "email_id",
+        "number",
+        "department",
+        "role",
+        "status",
+        "employee_id"
+      ],
+      "column_descriptions": {
+        "id": "Candidate user id (may match users.id when promoted).",
+        "created_at": "When the staged record was created/imported.",
+        "user_name": "Staged user name.",
+        "password": "Staged password (should be hashed in production).",
+        "email_id": "Staged email.",
+        "number": "Staged phone number.",
+        "department": "Staged department.",
+        "given_by": "Onboarded/created by (manager/admin).",
+        "role": "Staged role (admin/user).",
+        "status": "Staged status (active/inactive).",
+        "user_access": "Staged access scope (often department list).",
+        "leave_date": "Planned leave start (if captured during onboarding).",
+        "remark": "Notes about staging record.",
+        "leave_end_date": "Planned leave end.",
+        "employee_id": "Employee identifier."
+      }
+    },
+    "systems": {
+      "description": "Master list of application modules/systems and their base URLs. Used for navigation and entitlement mapping.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "systems",
+        "link"
+      ],
+      "column_descriptions": {
+        "id": "Unique identifier for the system/module.",
+        "systems": "System/module name (e.g., HRMS, STORE AND PURCHASE).",
+        "link": "Base URL to launch the system."
+      }
+    },
+    "repair_followup": {
+      "description": "Tracks repair gate-pass items issued to external parties/vendors and monitors follow-up stages with planned vs actual dates, delays, and status per stage until gate-pass closure.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "column": "department",
+          "references": "departments.department",
+          "relationship": "Department responsible for the repair follow-up."
+        }
+      ],
+      "important_columns": [
+        "gate_pass_date",
+        "gate_pass_no",
+        "department",
+        "party_name",
+        "item_name",
+        "item_code",
+        "qty_issued",
+        "lead_time",
+        "planned1",
+        "actual1",
+        "time_delay1",
+        "stage1_status",
+        "planned2",
+        "actual2",
+        "time_delay2",
+        "stage2_status",
+        "gate_pass_status",
+        "extended_date",
+        "created_at",
+        "updated_at"
+      ],
+      "column_descriptions": {
+        "id": "Unique record id for a repair follow-up line.",
+        "gate_pass_date": "Date the repair gate pass was issued.",
+        "gate_pass_no": "Gate pass reference number.",
+        "department": "Department that issued/owns the repair follow-up.",
+        "party_name": "Vendor/party to whom item was sent for repair.",
+        "item_name": "Item description sent for repair.",
+        "item_code": "Internal item code/sku.",
+        "remarks": "Notes about repair/follow-up.",
+        "uom": "Unit of measure.",
+        "qty_issued": "Quantity issued for repair.",
+        "lead_time": "Expected lead time (days) for repair/return.",
+        "planned1": "Planned date for stage 1 milestone.",
+        "actual1": "Actual date for stage 1 milestone completion.",
+        "time_delay1": "Delay in days for stage 1 (planned vs actual).",
+        "stage1_status": "Status label for stage 1.",
+        "planned2": "Planned date for stage 2 milestone.",
+        "actual2": "Actual date for stage 2 milestone completion.",
+        "time_delay2": "Delay in days for stage 2.",
+        "stage2_status": "Status label for stage 2.",
+        "gate_pass_status": "Overall gate pass/repair status (open/closed/in-progress).",
+        "created_at": "Record creation timestamp.",
+        "updated_at": "Record last update timestamp.",
+        "extended_date": "If extended, revised target date."
+      }
+    },
+    "departments": {
+      "description": "Reference/master data for organizational departments used across tasks, users, and operational workflows.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "department"
+      ],
+      "column_descriptions": {
+        "id": "Unique identifier for a department.",
+        "department": "Department name/code (e.g., ADMIN, ACCOUNTS)."
+      }
+    },
+    "visitors": {
+      "description": "Visitor gate-pass register capturing visitor identity, visit purpose, person to meet, entry/exit times, approval workflow, and closure flag.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "column": "person_to_meet",
+          "references": "person_to_meet.person_to_meet",
+          "relationship": "Text-based reference to the person/host being visited."
+        },
+        {
+          "column": "approved_by",
+          "references": "users.user_name",
+          "relationship": "Approver name (often an employee), stored as text."
+        }
+      ],
+      "important_columns": [
+        "date_of_visit",
+        "time_of_entry",
+        "visitor_out_time",
+        "approval_status",
+        "approved_by",
+        "approved_at",
+        "status",
+        "gate_pass_closed",
+        "created_at",
+        "person_to_meet"
+      ],
+      "column_descriptions": {
+        "id": "Unique visitor record id.",
+        "visitor_name": "Name of the visitor.",
+        "mobile_number": "Visitor contact number.",
+        "visitor_photo": "Photo URL for the visitor.",
+        "visitor_address": "Address/details of the visitor.",
+        "purpose_of_visit": "Reason for visit (maintenance, official, etc.).",
+        "person_to_meet": "Host/employee to meet.",
+        "date_of_visit": "Visit date.",
+        "time_of_entry": "Entry time.",
+        "visitor_out_time": "Exit time (null if still inside).",
+        "approval_status": "Approval workflow status (pending/approved).",
+        "approved_by": "Name of the approver.",
+        "approved_at": "When approval was granted.",
+        "status": "Current in/out state (IN/OUT).",
+        "gate_pass_closed": "Whether the gate pass is closed (true when OUT and finalized).",
+        "created_at": "Record creation timestamp."
+      }
+    },
+    "person_to_meet": {
+      "description": "Master list of hosts/employees who can be selected as the 'person to meet' in the visitor gate-pass module, including their phone number.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "important_columns": [
+        "person_to_meet",
+        "phone"
+      ],
+      "column_descriptions": {
+        "id": "Unique identifier for the host person record.",
+        "person_to_meet": "Host/employee name.",
+        "phone": "Host contact number.",
+        "created_at": "When the host record was created."
+      }
+    },
+    "indent": {
+      "description": "Detailed indent/requisition line records for store & purchase: what item is requested, by whom, for which department/division, quantities, planned vs actual processing timestamps, and approval status/approved quantity.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "column": "department",
+          "references": "departments.department",
+          "relationship": "Requesting department (text-based)."
+        }
+      ],
+      "important_columns": [
+        "sample_timestamp",
+        "form_type",
+        "request_number",
+        "indent_series",
+        "indent_number",
+        "requester_name",
+        "department",
+        "division",
+        "item_code",
+        "product_name",
+        "request_qty",
+        "approved_quantity",
+        "planned_1",
+        "actual_1",
+        "time_delay_1",
+        "request_status",
+        "created_at",
+        "updated_at",
+        "group_name",
+        "cost_location"
+      ],
+      "column_descriptions": {
+        "id": "Unique identifier for the indent line record.",
+        "sample_timestamp": "Timestamp when the line was captured/ingested (appears to be source timestamp).",
+        "form_type": "Document type (INDENT or REQUISITION).",
+        "request_number": "Request code/series prefix (e.g., IND01/REQ01).",
+        "indent_series": "Series code (e.g., I1/R1) used for numbering/workflow.",
+        "requester_name": "Name of the employee who raised the request.",
+        "department": "Department raising the request.",
+        "division": "Division/plant unit (e.g., SM/PM/CO).",
+        "item_code": "Inventory/item master code.",
+        "product_name": "Item/product description.",
+        "request_qty": "Quantity requested.",
+        "uom": "Unit of measure for the requested item.",
+        "specification": "Technical specs/notes.",
+        "make": "Preferred make/brand.",
+        "purpose": "Reason/use-case for the request.",
+        "cost_location": "Cost center/location where expense should be booked.",
+        "planned_1": "Planned timestamp for first workflow milestone (e.g., approval/processing).",
+        "actual_1": "Actual timestamp when milestone completed.",
+        "time_delay_1": "Measured delay duration for milestone 1.",
+        "request_status": "Overall status of the request line (APPROVED/PENDING).",
+        "approved_quantity": "Quantity approved (may differ from requested).",
+        "created_at": "Record creation timestamp in this system.",
+        "updated_at": "Last update timestamp.",
+        "group_name": "Item group/category.",
+        "indent_number": "External/printed indent number (e.g., srm001)."
+      }
+    },
+    "store_grn": {
+      "description": "Goods Receipt Note (GRN) bill tracking and approval workflow for vendor invoices: planned processing date, GRN metadata, bill amount, and boolean flags for sending/approvals/closure.",
+      "primary_keys": [],
+      "foreign_keys": [],
+      "important_columns": [
+        "planned_date",
+        "grn_no",
+        "grn_date",
+        "party_name",
+        "party_bill_no",
+        "party_bill_amount",
+        "sended_bill",
+        "approved_by_admin",
+        "approved_by_gm",
+        "close_bill"
+      ],
+      "column_descriptions": {
+        "planned_date": "Planned datetime for processing/approval of the GRN bill.",
+        "grn_no": "GRN reference number.",
+        "grn_date": "GRN date (receipt date).",
+        "party_name": "Vendor/party name.",
+        "party_bill_no": "Vendor invoice/bill number.",
+        "party_bill_amount": "Invoice amount.",
+        "sended_bill": "Whether bill has been sent/forwarded for approval.",
+        "approved_by_admin": "Admin approval flag.",
+        "approved_by_gm": "GM approval flag.",
+        "close_bill": "Whether the bill/GRN is closed in workflow."
+      }
+    },
+    "indent_requests": {
+      "description": "Header-level indent request table (one request per indent number) storing department, requester, priority, purpose, and overall status. Intended parent of indent_items and indent_approvals.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "column": "indent_no",
+          "references": "indent.indent_number",
+          "relationship": "Connects request header to detailed indent lines by indent number (logical; not enforced)."
+        },
+        {
+          "column": "department",
+          "references": "departments.department",
+          "relationship": "Requesting department (text-based)."
+        }
+      ],
+      "important_columns": [
+        "indent_no",
+        "request_date",
+        "department",
+        "requested_by",
+        "status",
+        "priority",
+        "created_at"
+      ],
+      "column_descriptions": {
+        "id": "Unique identifier for the indent request header.",
+        "indent_no": "Indent request number (business identifier).",
+        "request_date": "When the request was raised.",
+        "department": "Department raising the request.",
+        "requested_by": "Requester name or identifier.",
+        "status": "Overall request status.",
+        "priority": "Priority classification (e.g., high/medium/low).",
+        "purpose": "Summary purpose for the request.",
+        "created_at": "Record creation timestamp."
+      }
+    },
+    "indent_items": {
+      "description": "Line items for an indent request header: requested item name, quantities, and optional available stock snapshot.",
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "column": "indent_id",
+          "references": "indent_requests.id",
+          "relationship": "Items belong to an indent request header."
+        }
+      ],
+      "important_columns": [
+        "indent_id",
+        "item_name",
+        "quantity",
+        "available_stock"
+      ],
+      "column_descriptions": {
+        "id": "Unique identifier for the indent item line.",
+        "indent_id": "Parent indent request header id.",
+        "item_name": "Requested item description.",
+        "quantity": "Requested quantity.",
+        "available_stock": "Available stock at time of request (snapshot for decision-making)."
+      }
+    }
+  },
+  "suggested_semantic_schema": "DOMAIN OVERVIEW\n- This database powers an internal operations platform with modules:\n  1) Checklist tasks (recurring tasks) and Delegation tasks (one-off assignments)\n  2) Task completion/extension history (delegation_done)\n  3) User management and access control (users, users_staging)\n  4) Store & Purchase indents / approvals (indent, indent_requests, indent_items, indent_approvals)\n  5) GRN bill approval workflow (store_grn)\n  6) Repair gate-pass follow-up tracking (repair_followup)\n  7) Visitor gate-pass and approvals (visitors, person_to_meet)\n  8) Reference data: departments, systems, working_day_calender\n\nENTITY NOTES (HOW TO QUERY)\n- Users are identified by users.id, but many operational tables store user_name text in columns like name / given_by / approved_by. Joins may require matching on users.user_name (string join), not users.id.\n- Departments are stored as free text in many tables; optionally map to departments.department.\n\nTASKS: CHECKLIST VS DELEGATION\n- checklist: recurring operational task occurrences.\n  - Key fields: task_id, department, name (assignee), given_by (assigner), frequency, planned_date (TEXT), task_start_date, submission_date, user_status_checklist, admin_done, delay.\n  - Interpretation:\n    - user_status_checklist indicates user completion (Pending/Yes/No).\n    - admin_done indicates administrative verification.\n    - delay is lateness vs planned.\n- delegation: one-off delegated tasks.\n  - Key fields: task_id, department, name, given_by, planned_date, task_start_date, submission_date, status, delay.\n  - delegation_done is the event log for delegation status changes.\n\nDELEGATION HISTORY\n- delegation_done: multiple rows per delegation.task_id; newest created_at is latest event.\n  - status in delegation_done can be done/completed/extend.\n  - next_extend_date used when status='extend'.\n\nTIME DIMENSION\n- working_day_calender can be used to roll up by working_date, week_num, month.\n  - Many task tables use TIMESTAMP while checklist.planned_date is TEXT; cast as timestamp when needed.\n\nSTORE & PURCHASE (INDENTS)\n- indent: appears to hold detailed line-level indent records including item_code/product_name/qty and request_status.\n- indent_requests + indent_items: a more normalized header/line model (may be unused currently; sample empty).\n- indent_approvals: approvals per indent_id (likely maps to indent.id or indent_requests.id depending on implementation; use indent_id semantics carefully).\n\nGRN WORKFLOW\n- store_grn: GRN/bill tracking.\n  - approval flags: sended_bill, approved_by_admin, approved_by_gm, close_bill.\n\nVISITOR GATE PASS\n- visitors: one row per visit.\n  - status: IN/OUT; approval_status: pending/approved; gate_pass_closed boolean.\n  - person_to_meet is a text name; can be mapped to person_to_meet.person_to_meet.\n\nSYSTEMS NAVIGATION\n- systems: list of modules and links; users.system_access lists module entitlements as comma-separated text.\n\nCOMMON ANALYTICS QUESTIONS (SUPPORTED)\n- Overdue tasks: filter checklist/delegation where submission_date is null and planned_date/task_start_date < now().\n- Delay reporting: use delay interval; for checklist you may need to compute delay if null using submission_date - task_start_date.\n- Completion rates by department/user: group by department, name with status fields (delegation.status; checklist.user_status_checklist/admin_done).\n- Approval throughput: indent.request_status and store_grn approval flags over time.\n\nDATA QUALITY / NORMALIZATION CAVEATS\n- status and categorical fields vary by case (Done vs done; Yes vs yes). Normalize using LOWER() for comparisons.\n- checklist.planned_date is TEXT; cast to timestamp for date logic.\n- Many references are denormalized strings (names/departments). Prefer robust joins (case-insensitive) or maintain mapping tables if possible."
+}

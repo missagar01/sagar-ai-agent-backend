@@ -13,12 +13,20 @@
 <body>
   <div class="app-container">
     <!-- Sidebar for Chat History -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <h2><i class="fas fa-comments"></i> Chats</h2>
-        <button class="new-chat-btn" id="newChatBtn" title="New Chat">
-          <i class="fas fa-plus"></i>
-        </button>
+        <div style="display: flex; gap: 8px;">
+          <button class="new-chat-btn" id="newChatBtn" title="New Chat">
+            <i class="fas fa-plus"></i>
+          </button>
+          <!-- Mobile Close Button -->
+          <button class="icon-btn close-sidebar-mobile" id="closeSidebarMobile" title="Close Menu"
+            style="display: none; border: none; background: transparent; color: var(--text-dim);">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
       </div>
       <div class="session-list" id="sessionList">
         <!-- Sessions will be populated here -->

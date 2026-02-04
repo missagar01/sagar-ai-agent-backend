@@ -64,6 +64,15 @@ function setupEventListeners() {
     newChatBtn.addEventListener('click', createNewSession);
     toggleSidebarBtn.addEventListener('click', toggleSidebar);
 
+    // Mobile Close Button Listener
+    const closeSidebarMobile = document.getElementById('closeSidebarMobile');
+    if (closeSidebarMobile) {
+        closeSidebarMobile.addEventListener('click', () => {
+            sidebar.classList.add('collapsed');
+            sidebarOverlay.classList.remove('active');
+        });
+    }
+
     // Clear Button opens Modal now
     clearChatBtn.addEventListener('click', openClearModal);
 
@@ -165,6 +174,10 @@ function renderSessionList(sessions) {
 
         item.querySelector('.session-info').addEventListener('click', () => {
             selectSession(session.session_id);
+            if (window.innerWidth <= 768) {
+                sidebar.classList.add('collapsed');
+                sidebarOverlay.classList.remove('active');
+            }
         });
 
         item.querySelector('.session-delete').addEventListener('click', (e) => {
@@ -587,9 +600,66 @@ function addMessage(text, type, animate = true) {
 // SIDEBAR
 // ============================================================================
 
+// ============================================================================
+// SIDEBAR
+// ============================================================================
+
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+
 function toggleSidebar() {
-    sidebar.classList.toggle('collapsed');
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+        // limit logic for mobile: 'collapsed' means hidden
+        // So clicking toggle:
+        // If has 'collapsed', remove it (Show)
+        // If not 'collapsed', add it (Hide)
+
+        // However, we want to maintain the same class logic for simplicity if possible.
+        // CSS: .sidebar.collapsed { transform: translateX(-100%); }
+        // Desktop: .sidebar (Visible). .sidebar.collapsed (Hidden).
+        // Mobile: .sidebar (Visible - BAD). .sidebar.collapsed (Hidden). 
+
+        // So on Mobile, we want to start with 'collapsed'.
+        sidebar.classList.toggle('collapsed');
+
+        // Toggle Overlay accordingly
+        if (sidebar.classList.contains('collapsed')) {
+            sidebarOverlay.classList.remove('active');
+        } else {
+            sidebarOverlay.classList.add('active');
+        }
+
+    } else {
+        // Desktop
+        sidebar.classList.toggle('collapsed');
+    }
 }
+
+// Mobile Sidebar Initialization
+function initSidebar() {
+    if (window.innerWidth <= 768) {
+        sidebar.classList.add('collapsed'); // Default hidden on mobile
+    }
+
+    // Close sidebar when clicking overlay
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.add('collapsed');
+            sidebarOverlay.classList.remove('active');
+        });
+    }
+
+    // Handle Resize events to reset state if moving to desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            sidebarOverlay.classList.remove('active');
+            sidebar.classList.remove('collapsed'); // Reset to visible on desktop
+        }
+    });
+}
+// Call Init immediately
+initSidebar();
 
 // ============================================================================
 // CACHE MANAGEMENT

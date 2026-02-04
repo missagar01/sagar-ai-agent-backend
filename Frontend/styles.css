@@ -298,6 +298,7 @@ body {
     transform: scale(1);
     opacity: 0.4;
   }
+
   to {
     transform: scale(1.2);
     opacity: 0.7;
@@ -339,6 +340,7 @@ body {
     opacity: 0;
     transform: translateY(15px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -397,8 +399,15 @@ body {
 }
 
 @keyframes statusPulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 .stream-content {
@@ -430,13 +439,29 @@ body {
   animation: bounce 1.4s infinite ease-in-out;
 }
 
-.typing-dot:nth-child(1) { animation-delay: 0s; }
-.typing-dot:nth-child(2) { animation-delay: 0.2s; }
-.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+.typing-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes bounce {
-  0%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-8px); }
+
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-8px);
+  }
 }
 
 /* ============================================================================
@@ -693,7 +718,9 @@ body {
    MARKDOWN STYLES
    ============================================================================ */
 
-.message h1, .message h2, .message h3 {
+.message h1,
+.message h2,
+.message h3 {
   margin: 15px 0 10px;
 }
 
@@ -701,7 +728,8 @@ body {
   margin: 8px 0;
 }
 
-.message ul, .message ol {
+.message ul,
+.message ol {
   margin: 10px 0;
   padding-left: 25px;
 }
@@ -748,28 +776,183 @@ body {
    RESPONSIVE
    ============================================================================ */
 
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+/* Tablet & Mobile (Up to 768px) */
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+/* Small Desktop / Laptop (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .message {
+    max-width: 90%;
+  }
+}
+
+/* Tablet & Mobile (Up to 768px) */
 @media (max-width: 768px) {
+  body {
+    height: 100vh;
+    height: 100dvh;
+    /* Better mobile viewport support */
+  }
+
+  .app-container {
+    position: relative;
+    overflow-x: hidden;
+  }
+
   .sidebar {
     position: absolute;
     left: 0;
     top: 0;
     height: 100%;
-    z-index: 100;
+    z-index: 9999;
+    /* Responsive Width */
+    width: min(280px, 80vw);
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+    background: var(--bg-dark);
   }
-  
+
+  /* Show Mobile Close Button */
+  .close-sidebar-mobile {
+    display: flex !important;
+  }
+
   .sidebar.collapsed {
     transform: translateX(-100%);
+    width: min(280px, 80vw);
+    /* Match the non-collapsed width */
   }
-  
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9998;
+    backdrop-filter: blur(2px);
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+  }
+
   .chat-display {
-    padding: 20px;
+    padding: 15px;
   }
-  
+
   .chat-input-container {
-    padding: 15px 20px 20px;
+    padding: 10px 15px 15px;
   }
-  
+
   .message {
-    max-width: 95%;
+    max-width: 92%;
+    padding: 14px 18px;
+    font-size: 0.9rem;
+  }
+
+  .welcome-screen h1 {
+    font-size: 1.8rem;
+  }
+
+  .welcome-orb {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* Mobile Specific (Up to 480px) */
+@media (max-width: 480px) {
+  .chat-header {
+    padding: 0 10px;
+    gap: 8px;
+    height: 60px;
+  }
+
+  .toggle-sidebar-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .model-selector {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn-secondary span {
+    display: none;
+  }
+
+  .btn-secondary {
+    padding: 8px;
+    width: 36px;
+    justify-content: center;
+  }
+
+  .header-actions {
+    gap: 5px;
+  }
+
+  .input-wrapper {
+    padding: 8px 12px;
+  }
+
+  .input-top {
+    gap: 6px;
+  }
+
+  .input-wrapper input {
+    font-size: 16px;
+  }
+
+  .icon-btn,
+  .send-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .modal-content {
+    width: 92%;
+    max-width: 92%;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-secondary,
+  .btn-danger {
+    width: 100%;
+    /* Full width buttons in modal */
+    justify-content: center;
+  }
+
+  /* Reset header buttons in modal to be normal width/flex */
+  .modal-footer .btn-secondary {
+    width: 100%;
+    display: flex;
+  }
+
+  /* Adjust Confirm Dialog Buttons */
+  .confirm-actions {
+    justify-content: space-between;
+  }
+
+  .confirm-btn {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
   }
 }

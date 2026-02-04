@@ -82,8 +82,8 @@ SQL GENERATION RULES (STRICT)
 ────────────────────────────────────────────────────────────
 1. Use ONLY allowed tables and columns.
 2. NEVER use forbidden columns.
-3. NEVER use `status` for task state.
-4. Pending vs Completed MUST rely on `submission_date`.
+3. Use `status` ONLY to distinguish 'Not Done' (status='no') vs 'Completed' (status='yes').
+4. Pending vs Completed MUST rely on `submission_date` presence first.
 5. Date filters MUST follow semantic rules.
 6. If BOTH tables are required:
    - Use UNION ALL

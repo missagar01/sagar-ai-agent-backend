@@ -26,7 +26,8 @@ ALLOWED_COLUMNS = {
         "frequency",
         "admin_done",
         "task_start_date",
-        "submission_date"
+        "submission_date",
+        "status"
     ],
     "delegation": [
         "task_id",
@@ -68,11 +69,14 @@ This database tracks employee tasks across two main tables (`checklist`, `delega
      * `task_start_date` (TIMESTAMP): The **SCHEDULED DATE** when the task should be done.
      * `submission_date` (TIMESTAMP): The **ACTUAL COMPLETION DATE**.
          - IF `NULL` -> Task is **PENDING**.
-         - IF `NOT NULL` -> Task is **COMPLETED**.
+         - IF `NOT NULL` -> Task is **SUBMITTED** (Check `status` for 'Done' vs 'Not Done').
+     * `status` (TEXT): The outcome of the task.
+         - 'Yes'/'yes' -> **COMPLETED**.
+         - 'No'/'no' -> **NOT DONE**.
      * `admin_done` (TEXT): Admin override flag ('Yes'/'No') - rarely used but allowed.
      * `given_by` (TEXT): Who created the routine (usually system or admin).
    - **❌ FORBIDDEN COLUMNS (DO NOT USE):**
-     * `status` (Unreliable/Mixed types), `remark`, `image`, `delay`, `planned_date` (Checklist does NOT use planned_date).
+     * `remark`, `image`, `delay`, `planned_date` (Checklist does NOT use planned_date).
 
 2. **TABLE: `delegation`** (One-time/Assigned Tasks)
    - **Working:** Ad-hoc tasks assigned by one person to another with a specific deadline.
@@ -107,10 +111,11 @@ This database tracks employee tasks across two main tables (`checklist`, `delega
 ------------------------------------------------------------------------------------------------
 🧠 **LOGIC & CALCULATIONS**
 ------------------------------------------------------------------------------------------------
-1. **PENDING vs COMPLETED:**
-   - Always check `submission_date IS NULL` for Pending.
-   - Always check `submission_date IS NOT NULL` for Completed.
-   - **NEVER** use the `status` column.
+1. **TASK STATES (Valid only for Checklist):**
+   - **Pending:** `submission_date IS NULL`
+   - **Completed:** `submission_date IS NOT NULL` AND `(LOWER(status) = 'yes' OR LOWER(status) = 'done')`
+   - **Not Done:** `submission_date IS NOT NULL` AND `LOWER(status) = 'no'`
+   - **Legacy Note:** Delegation table does NOT use status; rely only on submission_date for it.
 
 2. **DATE FILTERING ("This Month"):**
    - **Standard "This Month":** (Past & Future in month)

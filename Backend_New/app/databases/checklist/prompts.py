@@ -82,8 +82,8 @@ SQL GENERATION RULES (STRICT)
 ────────────────────────────────────────────────────────────
 1. Use ONLY allowed tables and columns.
 2. NEVER use forbidden columns.
-3. Use `status` ONLY to distinguish 'Not Done' (status='no') vs 'Completed' (status='yes').
-4. Pending vs Completed MUST rely on `submission_date` presence first.
+3. NEVER use `status` for task state.
+4. Pending vs Completed MUST rely on `submission_date`.
 5. Date filters MUST follow semantic rules.
 6. If BOTH tables are required:
    - Use UNION ALL
@@ -92,7 +92,6 @@ SQL GENERATION RULES (STRICT)
 8. Cast TEXT dates explicitly when required.
 9. Output ONLY SQL. No markdown. No explanation.
 10. **CRITICAL:** Always use `LOWER(column) = LOWER('Value')` for names (e.g., `LOWER(name) = LOWER('Hem Kumar Jagat')`). Never compare string literals directly without LOWER().
-11. **VAGUE REFERENCES:** If the user says "this task" or "it" WITHOUT a specific ID, do NOT use a parameter. Instead, query for **Recent Tasks** (LIMIT 5).
 
 ────────────────────────────────────────────────────────────
 FEEDBACK FROM PREVIOUS ATTEMPT (IF ANY)
@@ -130,7 +129,6 @@ VALIDATION CHECKS (IN ORDER)
 - Example:
   • "completed tasks" → submission_date IS NOT NULL
   • "pending tasks"   → submission_date IS NULL
-- **EXCEPTION:** If the user says "this task" (singular) with NO ID, it is **VALID** to return the top 5 recent tasks. Do NOT reject this.
 
 2. SCHEMA COMPLIANCE
 - Are only allowed tables used?

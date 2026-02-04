@@ -64,6 +64,8 @@ class ContextManager:
     
     def build_context_hint(self, session_id: str, current_question: str) -> str:
         """Build context hint for SQL generation"""
+        return "" # DISABLE CONTEXT TEMPORARILY
+        
         context = self.get_context(session_id)
         if not context:
             return ""

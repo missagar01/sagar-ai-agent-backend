@@ -134,7 +134,7 @@ def call_get_schema(state: EnhancedState, db=None, allowed_tables=None):
     tables = ", ".join(settings.ALLOWED_TABLES)
     schema = get_schema_tool.invoke({"table_names": tables})
     
-    # Add column restrictions notice (Legacy Checklist Specifics)
+    # Add column restrictions notice (All Checklist DB Tables)
     column_restrictions = f"""
 🔒 COLUMN RESTRICTIONS (Client Requirement):
 ═══════════════════════════════════════════════════════════════════════════════
@@ -143,6 +143,11 @@ ONLY use these columns in your queries:
 📋 CHECKLIST table: {get_columns_description('checklist')}
 📌 DELEGATION table: {get_columns_description('delegation')}
 👤 USERS table: {get_columns_description('users')}
+🎫 TICKET_BOOK table: {get_columns_description('ticket_book')}
+🏖️ LEAVE_REQUEST table: {get_columns_description('leave_request')}
+🏭 PLANT_VISITOR table: {get_columns_description('plant_visitor')}
+✈️ REQUEST table: {get_columns_description('request')}
+📄 RESUME_REQUEST table: {get_columns_description('resume_request')}
 
 ❌ DO NOT query or SELECT any other columns from these tables.
 ═══════════════════════════════════════════════════════════════════════════════

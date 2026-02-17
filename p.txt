@@ -1,0 +1,185 @@
+give me the total active users and also the active users who have not completed their tasks on time and who have completed their tasks on time from the checklist
+Summary (Checklist – current month)
+You have 608 active users in total. From the checklist records in scope, 1 active user has completed tasks on time, and 0 active users have completed tasks late.
+
+Key Metrics
+Total active users: 608
+Active users who completed tasks on time (✅): 1
+Active users who did not complete tasks on time / completed late (⚠️): 0
+Key Insights
+The checklist data being evaluated is limited to tasks for “Hem Kumar Jagat” (current month), so only users matching that name in the checklist contribute to the on-time/late counts.
+Based on this result, Hem Kumar Jagat appears to be the only active user with at least one on-time completion in the filtered checklist scope.
+No active users show any late completions in this same scope.
+Technical note (for reference)
+This result is calculated for tasks starting in the current month, and “on-time” is defined as submitted within 1 day of task_start_date with status Yes/Done.
+
+(Note: This query computes, for the current calendar month, how many active users have at least one checklist task completed on time vs late by querying the users table (filtering users.status to 'active' and selecting users.user_name) and the checklist table (filtering checklist.task_start_date between DATE_TRUNC('month', CURRENT_DATE) and that plus 1 month, and filtering checklist.name case-insensitively to 'Hem Kumar Jagat'; then left-joining on case-insensitive match of checklist.name to users.user_name, counting checklist.task_id as total tasks per user, and using checklist.submission_date, checklist.status, and checklist.task_start_date to sum tasks marked 'yes'/'done' completed within 1 day as on-time and after 1 day as late; finally it outputs counts of users with on_time_completed_tasks > 0 and with late_completed_tasks > 0 along with total active users.) and INFO:     127.0.0.1:53633 - "POST /chat/stream HTTP/1.1" 200 OK
+[ROUTER] Question routed to: 'checklist' (The user is referring to the 'checklist' database, which is specifically designed for tracking employee tasks and performance.)
+[CONTEXT]
+⚠️ CONTEXT FROM PREVIOUS QUERY:
+🔍 Previous user: name = 'Hem Kumar Jagat'
+📊 Previous grouping: GROU...
+[DEBUG] Starting agent for question: from checklist db...
+[DEBUG] Session ID: 58a056d8-3c6d-4e8f-a08d-727bd6401adb
+[DEBUG] Event 1: ['list_tables']
+[DEBUG] Node 'list_tables' state keys: ['messages']
+[DEBUG] Event 2: ['call_get_schema']
+[DEBUG] Node 'call_get_schema' state keys: ['messages']
+[DEBUG] Event 3: ['store_schema']
+[DEBUG] Node 'store_schema' state keys: ['schema_info', 'original_question', 'validation_attempts', 'last_feedback']
+[DEBUG] Event 4: ['generate_query']
+[DEBUG] Node 'generate_query' state keys: ['messages', 'validation_attempts']
+[DEBUG] Generated query: SELECT
+  'checklist' AS source_table,
+  COUNT(*) AS total_tasks,
+  COUNT(*) FILTER (WHERE submission...
+[DEBUG-Checklist] Query APPROVED
+[DEBUG] Event 5: ['validate_query']
+[DEBUG] Node 'validate_query' state keys: ['last_feedback', 'messages']
+[DEBUG-Checklist] Executing: SELECT
+  'checklist' AS source_table,
+  COUNT(*) AS total_tasks,
+  COUNT(*) FILTER (WHERE submission_date IS NULL) AS pending_tasks,
+  COUNT(*) FILTER (
+    WHERE submission_date IS NOT NULL
+      AND (LOWER(status) = 'yes' OR LOWER(status) = 'done')
+  ) AS completed_tasks,
+  COUNT(*) FILTER (
+    WHERE submission_date IS NOT NULL
+      AND LOWER(status) = 'no'
+  ) AS not_done_tasks
+FROM checklist
+WHERE LOWER(name) = LOWER('Hem Kumar Jagat')
+GROUP BY source_table;
+[DEBUG] Event 6: ['run_query']
+[DEBUG] Node 'run_query' state keys: ['messages']
+[DEBUG] run_query node_state keys: ['messages']
+[DEBUG] Messages found: 1 messages
+[DEBUG] Captured final result: [('checklist', 6155, 5000, 1025, 115)]...
+[DEBUG] Generating natural language answer with streaming...
+💾 Cached: 'from checklist db...'
+INFO:     127.0.0.1:60144 - "GET /chat/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54316 - "GET /chat/cache/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63597 - "GET /chat/cache/stats HTTP/1.1" 200 OK
+🧹 Cache cleared
+INFO:     127.0.0.1:63597 - "POST /chat/cache/clear HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63597 - "GET /chat/cache/stats HTTP/1.1" 200 OK
+🗑️ Cache invalidated: 'give me the total active users and also the active...'
+🗑️ Cache invalidated: 'from checklist db...'
+INFO:     127.0.0.1:63597 - "POST /chat/sessions/58a056d8-3c6d-4e8f-a08d-727bd6401adb/clear HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63597 - "GET /chat/sessions/58a056d8-3c6d-4e8f-a08d-727bd6401adb/messages HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63597 - "GET /chat/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58513 - "OPTIONS /chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58513 - "POST /chat/stream HTTP/1.1" 200 OK
+[ROUTER] Question routed to: 'checklist' (The query pertains to user task completion rates, which is tracked in the 'checklist' database.)
+[CONTEXT]
+⚠️ CONTEXT FROM PREVIOUS QUERY:
+🔍 Previous user: name = 'Hem Kumar Jagat'
+📊 Previous grouping: GROU...
+[DEBUG] Starting agent for question: give me the total active users and also the active...
+[DEBUG] Session ID: 58a056d8-3c6d-4e8f-a08d-727bd6401adb
+[DEBUG] Event 1: ['list_tables']
+[DEBUG] Node 'list_tables' state keys: ['messages']
+[DEBUG] Event 2: ['call_get_schema']
+[DEBUG] Node 'call_get_schema' state keys: ['messages']
+[DEBUG] Event 3: ['store_schema']
+[DEBUG] Node 'store_schema' state keys: ['schema_info', 'original_question', 'validation_attempts', 'last_feedback']
+[DEBUG] Event 4: ['generate_query']
+[DEBUG] Node 'generate_query' state keys: ['messages', 'validation_attempts']
+[DEBUG] Generated query: WITH active_users AS (
+  SELECT DISTINCT LOWER(u.user_name) AS user_key
+  FROM users u
+  WHERE u.sta...
+[DEBUG-Checklist] Query REJECTED
+[DEBUG] Event 5: ['validate_query']
+[DEBUG] Node 'validate_query' state keys: ['last_feedback', 'messages']
+[DEBUG] Validation feedback: VALIDATION FAILED:
+Errors:
+- DATE LOGIC / SEMANTIC ERROR: For checklist, task_start_date is the sche...
+[DEBUG] Event 6: ['generate_query']
+[DEBUG] Node 'generate_query' state keys: ['messages', 'validation_attempts']
+[DEBUG] Generated query: WITH active_users AS (
+  SELECT u.user_name
+  FROM users u
+  WHERE LOWER(u.status::text) = LOWER('ac...
+[DEBUG-Checklist] Query REJECTED
+[DEBUG] Event 7: ['validate_query']
+[DEBUG] Node 'validate_query' state keys: ['last_feedback', 'messages']
+[DEBUG] Validation feedback: VALIDATION FAILED:
+Errors:
+- Intent mismatch: Query is hard-filtered to LOWER(name) = 'Hem Kumar Jag...
+[DEBUG] Event 8: ['generate_query']
+[DEBUG] Node 'generate_query' state keys: ['messages', 'validation_attempts']
+[DEBUG] Generated query: WITH active_users AS (
+  SELECT u.user_name
+  FROM users u
+  WHERE LOWER(u.status::text) = LOWER('ac...
+[DEBUG-Checklist] Query REJECTED
+[DEBUG] Event 9: ['validate_query']
+[DEBUG] Node 'validate_query' state keys: ['last_feedback', 'messages']
+[DEBUG] Validation feedback: VALIDATION FAILED:
+Errors:
+- Semantic logic violation: Checklist table has no due date concept; task...
+[DEBUG] Event 10: ['generate_query']
+[DEBUG] Node 'generate_query' state keys: ['messages', 'validation_attempts']
+[DEBUG] Generated query: WITH params AS (
+  SELECT
+    DATE_TRUNC('month', CURRENT_DATE) AS month_start,
+    DATE_TRUNC('mont...
+[DEBUG-Checklist] Executing: WITH params AS (
+  SELECT
+    DATE_TRUNC('month', CURRENT_DATE) AS month_start,
+    DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' AS month_end
+),
+active_users AS (
+  SELECT u.user_name
+  FROM users u
+  WHERE u.status::text = 'active'
+),
+checklist_scope AS (
+  SELECT c.*
+  FROM checklist c
+  JOIN params p
+    ON c.task_start_date >= p.month_start
+   AND c.task_start_date < p.month_end
+  WHERE LOWER(c.name) = LOWER('Hem Kumar Jagat')
+),
+per_user AS (
+  SELECT
+    au.user_name,
+    COUNT(cs.task_id) AS total_tasks,
+    SUM(
+      CASE
+        WHEN cs.submission_date IS NOT NULL
+         AND (LOWER(cs.status) = 'yes' OR LOWER(cs.status) = 'done')
+         AND cs.submission_date <= cs.task_start_date + INTERVAL '1 day'
+        THEN 1 ELSE 0
+      END
+    ) AS on_time_completed_tasks,
+    SUM(
+      CASE
+        WHEN cs.submission_date IS NOT NULL
+         AND (LOWER(cs.status) = 'yes' OR LOWER(cs.status) = 'done')
+         AND cs.submission_date > cs.task_start_date + INTERVAL '1 day'
+        THEN 1 ELSE 0
+      END
+    ) AS late_completed_tasks
+  FROM active_users au
+  LEFT JOIN checklist_scope cs
+    ON LOWER(cs.name) = LOWER(au.user_name)
+  GROUP BY au.user_name
+)
+SELECT
+  'checklist'::text AS source_table,
+  COUNT(*) AS total_active_users,
+  COUNT(*) FILTER (WHERE on_time_completed_tasks > 0) AS active_users_completed_on_time,
+  COUNT(*) FILTER (WHERE late_completed_tasks > 0) AS active_users_not_completed_on_time
+FROM per_user;
+[DEBUG] Event 11: ['run_query']
+[DEBUG] Node 'run_query' state keys: ['messages']
+[DEBUG] run_query node_state keys: ['messages']
+[DEBUG] Messages found: 1 messages
+[DEBUG] Captured final result: [('checklist', 608, 1, 0)]...
+[DEBUG] Generating natural language answer with streaming...
+💾 Cached: 'give me the total active users and also the active...'
+INFO:     127.0.0.1:58513 - "GET /chat/sessions HTTP/1.1" 200 OK why it is always using the hem kumar jagat 

@@ -53,7 +53,11 @@ class Settings(BaseSettings):
     # Security Settings
     MAX_QUERY_LENGTH: int = 50000
     MAX_RESULT_ROWS: int = 200
-    ALLOWED_TABLES: List[str] = ["users", "checklist", "delegation"]
+    ALLOWED_TABLES: List[str] = [
+        "users", "checklist", "delegation",
+        "ticket_book", "leave_request", "plant_visitor",
+        "request", "resume_request"
+    ]
     
     # Validation Settings
     MAX_VALIDATION_ATTEMPTS: int = 3

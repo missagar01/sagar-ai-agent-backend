@@ -143,17 +143,25 @@ def list_tables(state: EnhancedState):
 
 def call_get_schema(state: EnhancedState):
     """Fetch complete schema with samples and add type warnings"""
-    # Use allowed tables from our local config, or global if we want strictness
-    # Here we stick to 'checklist', 'delegation', 'users' as per config
-    target_tables = ["checklist", "delegation", "users"]
+    # All allowed tables in the checklist database
+    target_tables = [
+        "checklist", "delegation", "users",
+        "ticket_book", "leave_request", "plant_visitor",
+        "request", "resume_request"
+    ]
     
     tables_str = ", ".join(target_tables)
     schema = get_schema_tool.invoke({"table_names": tables_str})
     
-    # Build description string dynamically from config
+    # Build description string dynamically from config for each table
     desc_checklist = config.get_columns_description('checklist')
     desc_delegation = config.get_columns_description('delegation')
     desc_users = config.get_columns_description('users')
+    desc_ticket_book = config.get_columns_description('ticket_book')
+    desc_leave_request = config.get_columns_description('leave_request')
+    desc_plant_visitor = config.get_columns_description('plant_visitor')
+    desc_request = config.get_columns_description('request')
+    desc_resume_request = config.get_columns_description('resume_request')
 
     column_restrictions = f"""
 🔒 COLUMN RESTRICTIONS (Client Requirement):
@@ -163,6 +171,11 @@ ONLY use these columns in your queries:
 📋 CHECKLIST table: {desc_checklist}
 📌 DELEGATION table: {desc_delegation}
 👤 USERS table: {desc_users}
+🎫 TICKET_BOOK table: {desc_ticket_book}
+🏖️ LEAVE_REQUEST table: {desc_leave_request}
+🏭 PLANT_VISITOR table: {desc_plant_visitor}
+✈️ REQUEST table: {desc_request}
+📄 RESUME_REQUEST table: {desc_resume_request}
 
 ❌ DO NOT query or SELECT any other columns from these tables.
 ═══════════════════════════════════════════════════════════════════════════════
@@ -181,6 +194,15 @@ ONLY use these columns in your queries:
 🟢 NATIVE DATE/TIMESTAMP COLUMNS:
    - checklist.task_start_date (TIMESTAMP)
    - checklist.submission_date (TIMESTAMP)
+   - leave_request.from_date (DATE), leave_request.to_date (DATE)
+   - plant_visitor.from_date (DATE), plant_visitor.to_date (DATE)
+   - request.from_date (DATE), request.to_date (DATE), request.departure_date (DATE)
+   - ticket_book.created_at (TIMESTAMP)
+   - resume_request.interviewer_planned (TIMESTAMP), resume_request.interviewer_actual (TIMESTAMP)
+
+🔵 NUMERIC COLUMNS:
+   - ticket_book: per_ticket_amount, total_amount, charges (NUMERIC)
+   - resume_request: experience (NUMERIC(4,1)), previous_salary (NUMERIC(12,2))
 ═══════════════════════════════════════════════════════════════════════════════
 """
     return {"messages": [AIMessage(content=enhanced_schema)]}

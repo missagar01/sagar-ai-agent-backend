@@ -54,7 +54,7 @@ def get_table_metadata(table_name: str) -> Dict[str, Any]:
     Get metadata for a specific table
     
     Args:
-        table_name: Name of table (checklist, delegation, users)
+        table_name: Name of table (checklist, delegation, users, ticket_book, leave_request, plant_visitor, request, resume_request)
         
     Returns:
         Table metadata dictionary
@@ -90,18 +90,29 @@ def get_column_restrictions_summary() -> str:
     metadata = load_metadata()
     restrictions = metadata.get("database", {}).get("column_restrictions", {})
     
-    checklist = restrictions.get("checklist", "")
-    delegation = restrictions.get("delegation", "")
-    users = restrictions.get("users", "")
-    forbidden = restrictions.get("forbidden_global", "")
+    # Build restrictions summary dynamically for all known tables
+    table_icons = {
+        "checklist": "📋",
+        "delegation": "📌",
+        "users": "👤",
+        "ticket_book": "🎫",
+        "leave_request": "🏖️",
+        "plant_visitor": "🏭",
+        "request": "✈️",
+        "resume_request": "📄"
+    }
     
-    return f"""
-📋 CHECKLIST: {checklist}
-📋 DELEGATION: {delegation}
-👥 USERS: {users}
-
-❌ FORBIDDEN (DO NOT USE): {forbidden}
-""".strip()
+    lines = []
+    for table_name, icon in table_icons.items():
+        cols = restrictions.get(table_name, "")
+        if cols:
+            lines.append(f"{icon} {table_name.upper()}: {cols}")
+    
+    forbidden = restrictions.get("forbidden_global", "")
+    if forbidden:
+        lines.append(f"\n❌ FORBIDDEN (DO NOT USE): {forbidden}")
+    
+    return "\n".join(lines) if lines else "No column restrictions found in metadata."
 
 
 # ============================================================================

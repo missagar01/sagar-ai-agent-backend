@@ -1,5 +1,5 @@
 # 🗄️ Schema Report: Checklist & Delegation System
-**Generated:** 2026-02-04 12:39
+**Generated:** 2026-02-17 15:37
 
 ---
 
@@ -31,7 +31,7 @@
 
 ### 🏷️ Categorical / Allowed Values:
 - **`frequency`** (1 values): `['one-time']`
-- **`remarks`** (12 values): `['', 'done', 'Done', 'Done', 'follow up by ramesh bhaiya', 'not possible without bank api', 'ok', 'Work Completed', 'Work Completed', 'Work Done', 'work Done and training start', 'Working']`
+- **`remarks`** (13 values): `['', 'botivate walo se hoha ham log nahi kar payege', 'done', 'Done', 'Done', 'follow up by ramesh bhaiya', 'not possible without bank api', 'ok', 'Work Completed', 'Work Completed', 'Work Done', 'work Done and training start', 'Working']`
 - **`given_by`** (12 values): `['AAKASH AGRAWAL', 'AK GUPTA', 'ANUP KUMAR BOPCHE', 'DANVEER SINGH', 'DEEPAK BHALLA', 'RAJNISH BHARDWAJ', 'Rinku Gautam', 'RINKU SINGH', 'SANDEEP DUBEY', 'SHAILESH CHITRE', 'SHEELESH MARELE', 'Shree Ram Patle']`
 - **`enable_reminder`** (1 values): `['yes']`
 - **`require_attachment`** (2 values): `['no', 'yes']`
@@ -44,6 +44,83 @@
 | 19 | 2025-08-19 11:37:00 | ADMIN | Sandeep Kumar Dubey | ajit gupta gm sir meeting today 4.30 | one-time | None | 2025-08-19 16:02:00 | AAKASH AGRAWAL | None | yes | no | Done | None | 2025-08-19 16:02:00 | 2025-08-21 00:00:00 | 1 | 1 day, 7:58:00 |
 | 20 | 2025-08-19 11:42:00 | ADMIN | Sandeep Kumar Dubey | akash bhaiya time 3.30 pm | one-time | None | 2025-08-22 15:25:00 | AAKASH AGRAWAL | None | yes | no | Done | None | 2025-08-22 15:25:00 | 2025-08-21 00:00:00 | 1 | -2 days, 8:35:00 |
 | 21 | 2025-08-19 11:45:00 | ADMIN | Sandeep Kumar Dubey | ashish sir meeting 3.30 pm today | one-time | None | 2025-08-19 15:26:00 | AAKASH AGRAWAL | None | yes | no | Done | None | 2025-08-19 15:26:00 | 2025-08-21 00:00:00 | 1 | 1 day, 8:34:00 |
+
+---
+
+## 📋 Table: `enquiry_to_order`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **timestamp** | `TIMESTAMP` | True |
+| **en_enquiry_no** | `VARCHAR(100)` | True |
+| **lead_source** | `VARCHAR(255)` | True |
+| **company_name** | `VARCHAR(255)` | True |
+| **phone_number** | `VARCHAR(50)` | True |
+| **sales_person_name** | `VARCHAR(255)` | True |
+| **location** | `VARCHAR(255)` | True |
+| **email** | `VARCHAR(255)` | True |
+| **enquiry_receiver_name** | `VARCHAR(255)` | True |
+| **enquiry_date** | `DATE` | True |
+| **enquiry_approach** | `VARCHAR(255)` | True |
+| **item_qty** | `TEXT` | True |
+| **planned** | `DATE` | True |
+| **actual** | `DATE` | True |
+| **delay** | `INTEGER` | True |
+| **enquiry_status** | `VARCHAR(255)` | True |
+| **what_did_customer_say** | `TEXT` | True |
+| **current_stage** | `VARCHAR(255)` | True |
+| **followup_status** | `VARCHAR(255)` | True |
+| **next_call_date** | `DATE` | True |
+| **next_call_time** | `TIME` | True |
+| **is_order_received** | `BOOLEAN` | True |
+| **status** | `VARCHAR(255)` | True |
+| **acceptance_via** | `VARCHAR(255)` | True |
+| **payment_mode** | `VARCHAR(255)` | True |
+| **payment_terms_days** | `INTEGER` | True |
+| **transport_mode** | `VARCHAR(255)` | True |
+| **po_number** | `VARCHAR(255)` | True |
+| **acceptance_file_upload** | `TEXT` | True |
+| **remark** | `TEXT` | True |
+| **if_no_relevant_reason_status** | `VARCHAR(255)` | True |
+| **if_no_relevant_reason_remark** | `TEXT` | True |
+| **customer_order_hold_reason_category** | `VARCHAR(255)` | True |
+| **holding_date** | `DATE` | True |
+| **hold_remark** | `TEXT` | True |
+| **sales_coordinator_name** | `VARCHAR(255)` | True |
+| **planned_days** | `INTEGER` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`en_enquiry_no`** (7 values): `['EN-01', 'EN-02', 'EN-03', 'EN-04', 'EN-05', 'EN-06', 'EN-07']`
+- **`lead_source`** (4 values): `['Direct Visit', 'Google', 'Telephonic', 'TELEPHONIC']`
+- **`company_name`** (7 values): `['3M Projects Pvt Ltd', 'A H ENTERPRISES', 'Ascon Steel Traders', 'Choudhary Scaffolding', 'Lotus Infracon', 'Navkar steel', 'Yash Enterprises']`
+- **`phone_number`** (7 values): `['08048602961', '08999251967', '9422533000', '9731872844', '9765817910', '9823111000', '9827164305']`
+- **`sales_person_name`** (7 values): `['Abhishek Ji', 'Amit Pandey', 'Bashir', 'MR. SANDEEP SONI JI', 'Pradeep Porwar', 'Rajesh Verma', 'Yash ji']`
+- **`location`** (6 values): `['B3/1106 mm Vally, Nr Tihama Complex, Mumbra, Mumbra Kausa Thane, Tihama Complex,', 'Gulbarga', 'IDA Plot 4/A, Visakhapatnam', 'Pachora Road near Yes Bank, Jamner', 'Pune', 'Sambhaji Nagar,Pune']`
+- **`email`** (6 values): `['', 'ascon ste@gmail.com', 'choudharyscaffolding@yahoo.com', 'lotusinfracon@gmail.com', 'vikashchaudhari103@gmail.com', 'yash.enterprise @gmail.com']`
+- **`enquiry_receiver_name`** (3 values): `['Amit Pandey', 'Manish', 'TRIPATI RANA']`
+- **`enquiry_approach`** (3 values): `['INWARD', 'Phone', 'Phone Call']`
+- **`item_qty`** (7 values): `['[{"id":"1","name":"Angle 65x65","quantity":"1212"}]', '[{"id":"1","name":"MS BILLET","quantity":"12121"}]', '[{"id":"1","name":"MS PIPE","quantity":""}]', '[{"id":"1","name":"MS PIPE","quantity":"15mt"}]', '[{"id":"1","name":"Ms PIPE ","quantity":"25"}]', '[{"id":"1","name":"MS PIPE","quantity":"25"}]', '[{"id":"1","name":"Ms pipe ","quantity":"30"}]']`
+- **`enquiry_status`** (1 values): `['open']`
+- **`what_did_customer_say`** (1 values): `['Customer said quotation under review']`
+- **`current_stage`** (1 values): `['order-status']`
+- **`followup_status`** (1 values): `['Reviewing Quote']`
+- **`acceptance_via`** (1 values): `['email']`
+- **`payment_mode`** (1 values): `['neft']`
+- **`transport_mode`** (1 values): `['road transport']`
+- **`remark`** (1 values): `['cdsFSA']`
+- **`sales_coordinator_name`** (2 values): `['Amit Pandey', 'Jay Nirmal']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | timestamp | en_enquiry_no | lead_source | company_name | phone_number | sales_person_name | location | email | enquiry_receiver_name | enquiry_date | enquiry_approach | item_qty | planned | actual | delay | enquiry_status | what_did_customer_say | current_stage | followup_status | next_call_date | next_call_time | is_order_received | status | acceptance_via | payment_mode | payment_terms_days | transport_mode | po_number | acceptance_file_upload | remark | if_no_relevant_reason_status | if_no_relevant_reason_remark | customer_order_hold_reason_category | holding_date | hold_remark | sales_coordinator_name | planned_days |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2 | 2025-11-29 07:36:42.955406+00:00 | EN-01 | TELEPHONIC | A H ENTERPRISES | 9827164305 | MR. SANDEEP SONI JI | B3/1106 mm Vally, Nr Tihama Complex, Mumbra, Mumbr | vikashchaudhari103@gmail.com | TRIPATI RANA | 2025-11-29 | INWARD | [{"id":"1","name":"MS BILLET","quantity":"12121"}] | 2025-11-30 | 2025-11-29 | None | open | Customer said quotation under review | order-status | Reviewing Quote | 2025-11-29 | 13:12:00 | None | None | email | neft | 30 | road transport | None | None | cdsFSA | None | None | None | None | None | None | 1 |
+| 3 | 2025-12-01 09:45:17.417176+00:00 | EN-02 | Google | 3M Projects Pvt Ltd | 9823111000 | Rajesh Verma | IDA Plot 4/A, Visakhapatnam |  | Manish | 2025-12-02 | Phone Call | [{"id":"1","name":"Angle 65x65","quantity":"1212"} | 2025-12-02 | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | Amit Pandey | 1 |
+| 4 | 2026-01-28 05:35:15.651246+00:00 | EN-03 | Telephonic | Choudhary Scaffolding  | 9765817910 | Amit Pandey | Sambhaji Nagar,Pune | choudharyscaffolding@yahoo.com | Amit Pandey | 2026-01-28 | Phone Call | [{"id":"1","name":"Ms pipe ","quantity":"30"}] | 2026-01-29 | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | Jay Nirmal | 1 |
 
 ---
 
@@ -67,7 +144,7 @@
 
 ### 🏷️ Categorical / Allowed Values:
 - **`status`** (3 values): `['completed', 'done', 'extend']`
-- **`reason`** (19 values): `['', 'asdf', 'asdfgh', 'asdfsadf', 'done', 'Done', 'Done', 'fghjkl', 'follow up by ramesh bhaiya', 'have another work', 'mnvhj', 'not possible without bank api', 'ok', 'task_complete', 'Work Completed', 'Work Completed', 'Work Done', 'work Done and training start', 'Working']`
+- **`reason`** (20 values): `['', 'asdf', 'asdfgh', 'asdfsadf', 'botivate walo se hoha ham log nahi kar payege', 'done', 'Done', 'Done', 'fghjkl', 'follow up by ramesh bhaiya', 'have another work', 'mnvhj', 'not possible without bank api', 'ok', 'task_complete', 'Work Completed', 'Work Completed', 'Work Done', 'work Done and training start', 'Working']`
 - **`given_by`** (16 values): `['AAKASH AGRAWAL', 'AK GUPTA', 'ANUP KUMAR BOPCHE', 'ccvgdff', 'DANVEER SINGH', 'DEEPAK BHALLA', 'DM', 'MD Sir', 'nchf', 'RAJNISH BHARDWAJ', 'Rinku Gautam', 'RINKU SINGH', 'SANDEEP DUBEY', 'SHAILESH CHITRE', 'SHEELESH MARELE', 'Shree Ram Patle']`
 
 
@@ -135,10 +212,10 @@
 ### 🏷️ Categorical / Allowed Values:
 - **`enable_reminder`** (2 values): `['yes', 'no']`
 - **`require_attachment`** (2 values): `['yes', 'no']`
-- **`frequency`** (14 values): `['daily', 'Daily', 'F', 'fortnightly', 'monthly', 'Monthly', 'one time', 'one-time', 'quarterly', 'W', 'weekly', 'Weekly', 'Y', 'yearly']`
+- **`frequency`** (11 values): `['daily', 'Daily', 'fortnightly', 'monthly', 'Monthly', 'one time', 'quarterly', 'weekly', 'Weekly', 'Y', 'yearly']`
 - **`status`** (4 values): `['no', 'No', 'yes', 'Yes']`
-- **`admin_done`** (4 values): `['confirmed', 'Confirmed', 'Done', 'No']`
-- **`user_status_checklist`** (5 values): `['no', 'No', 'Pending', 'yes', 'Yes']`
+- **`admin_done`** (4 values): `['confirmed', 'Confirmed', 'Done', 'no']`
+- **`user_status_checklist`** (4 values): `['no', 'No', 'yes', 'Yes']`
 
 
 ### 🔍 Sample Data (First 3 rows):
@@ -179,31 +256,67 @@
 | **emp_image** | `TEXT` | True |
 | **verify_access** | `VARCHAR(20)` | True |
 | **verify_access_dept** | `TEXT` | True |
+| **store_role_access** | `TEXT` | True |
+| **designation** | `TEXT` | True |
+| **profile_img** | `TEXT` | True |
+| **document_img** | `TEXT` | True |
 
 
 
 
 ### 🏷️ Categorical / Allowed Values:
-- **`given_by`** (21 values): `['', 'AAKASH AGRAWAL', 'AK GUPTA', 'ANIL KUMAR MISHRA', 'ANUP KUMAR BOPCHE', 'DEEPAK BHALLA', 'G RAM MOHAN RAO', 'GUNJAN TIWARI', 'HULLAS PASWAN', 'MANTU ANAND GHOSE', 'MRIGENDRA NARAYAN BEPARI', 'MUKESH PATLE', 'RAJNISH BHARDWAJ', 'RAVI KUMAR SINGH', 'RINKU GAUTAM', 'RINKU SINGH', 'ROSHAN RAJAK', 'SANDEEP DUBEY', 'SHAILESH CHITRE', 'SHEELESH MARELE', 'SUMAN JHA']`
+- **`given_by`** (20 values): `['', 'AK GUPTA', 'ANIL KUMAR MISHRA', 'ANUP KUMAR BOPCHE', 'DEEPAK BHALLA', 'G RAM MOHAN RAO', 'GUNJAN TIWARI', 'HULLAS PASWAN', 'MANTU ANAND GHOSE', 'MRIGENDRA NARAYAN BEPARI', 'MUKESH PATLE', 'RAJNISH BHARDWAJ', 'RAVI KUMAR SINGH', 'RINKU GAUTAM', 'RINKU SINGH', 'ROSHAN RAJAK', 'SANDEEP DUBEY', 'SHAILESH CHITRE', 'SHEELESH MARELE', 'SUMAN JHA']`
 - **`role`** (2 values): `['admin', 'user']`
 - **`status`** (1 values): `['active']`
 - **`remark`** (1 values): `['']`
 - **`last_punch_device`** (2 values): `['E03C1CB34D83AA02', 'E03C1CB36042AA02']`
-- **`page_access`** (23 values): `['', 'all-task', 'all-task,assign-task', 'all-task,dashboard', 'assign-task,all-task,dashboard', 'dashboard,all-task', 'dashboard,all-task,assign-task', 'dashboard,all-task,delegation', 'dashboard,all-task,machines', 'dashboard,assign-task,all-task', 'dashboard,assign-task,delegation,all-task', 'dashboard,assign-task,delegation,all-task', 'dashboard,assign-task,delegation,all-task,hrmanager', 'dashboard,assign-task,delegation,all-task,hrmanager', 'dashboard,assign-task,delegation,all-task,hrmanager,machines', 'dashboard,assign-task,delegation,all-task,setting', 'dashboard,assign-task,delegation,all-task,task-verification', 'dashboard,delegation,all-task', 'dashboard,delegation,all-task,assign-task,hrmanager', 'dashboard,delegation,all-task,hrmanager', 'dashboard,machines,assign-task,delegation,all-task,hrmanager', 'dashboard,quick-task,machines,assign-task,delegation,all-task,mis-report,setting,hrmanager', 'delegation,all-task,dashboard,hrmanager']`
-- **`system_access`** (23 values): `['Checklist', 'CHECKLIST', 'CHECKLIST COMBINED,STORE AND PURCHASE,SALES MODULE,ALL PAYMENT SYSTEM,HRMS,VISITOR GATE PASS', 'CHECKLIST,HOUSEKEEPING,MAINTENANCE,STORE AND PURCHASE,HRMS', 'CHECKLIST,HOUSEKEEPING,STORE AND PURCHASE,HRMS', 'Checklist,Maintenance', 'CHECKLIST,MAINTENANCE', 'CHECKLIST,MAINTENANCE,HOUSEKEEPING,CHECKLIST,HOUSEKEEPING,STORE AND PURCHASE,HRMS', 'CHECKLIST,MAINTENANCE,HOUSEKEEPING,HOUSEKEEPING,MAINTENANCE,CHECKLIST,STORE AND PURCHASE,HRMS', 'CHECKLIST,MAINTENANCE,HOUSEKEEPING,STORE AND PURCHASE,HRMS', 'CHECKLIST,MAINTENANCE,HOUSEKEEPING,STORE AND PURCHASE,SALES MODULE,ALL PAYMENT SYSTEM,HRMS,LOGISTIC', 'CHECKLIST,MAINTENANCE,STORE AND PURCHASE,HRMS', 'CHECKLIST,MAINTENANCE,STORE AND PURCHASE,HRMS,ALL PAYMENT SYSTEM', 'CHECKLIST,MAINTENANCE,STORE AND PURCHASE,HRMS,HOUSEKEEPING', 'CHECKLIST,MAINTENANCE,STORE AND PURCHASE,HRMS,HOUSEKEEPING,Housekeeping,Maintenance,Checklist', 'CHECKLIST,MAINTENANCE,STORE AND PURCHASE,HRMS,Housekeeping,Maintenance,Checklist', 'CHECKLIST,MAINTENANCE,STORE AND PURCHASE,HRMS,SALES MODULE', 'CHECKLIST,SALES MODULE,STORE AND PURCHASE,HRMS', 'CHECKLIST,STORE AND PURCHASE,HRMS', 'CHECKLIST,STORE AND PURCHASE,HRMS,VISITOR GATE PASS', 'HOUSEKEEPING,MAINTENANCE,CHECKLIST', 'MAINTENANCE,CHECKLIST', 'MAINTENANCE,HOUSEKEEPING,CHECKLIST,STORE AND PURCHASE,SALES MODULE,HRMS']`
-- **`subscription_access_system`** (4 values): `['{"systems":["subscription","document"],"pages":["Dashboard","Subscription"]}', '{"systems":["subscription","document"],"pages":["Dashboard","Subscription/Approval","Subscription/Renewal","Subscription/All","Subscription/Payment","Document/All","Document/Renewal","Document/Shared","Resource Manager"]}', '{"systems":["subscription","document","payment"],"pages":["Dashboard","Subscription/Renewal","Subscription/All","Subscription/Payment","Document/All","Document/Renewal","Document/Shared","Resource Manager","Payment/Request Form","Payment/Make Payment","Payment/Tally Entry"]}', '{"systems":["subscription","payment"],"pages":["Subscription/Approval"]}']`
-- **`user_access1`** (17 values): `['', 'Admin Office - First Floor, Admin Office - Ground Floor, Back Office, Cabins ग्राउंड फ्लोर: and first floor, Canteen Area 1 & 2, Car Parking Area, CCM, CCM Office, CCM Panel Room, CCM PLC Panel Room, CCM SBO Panel Room, Container Office, Labour Colony & Bathroom, Main Gate, Main Gate Front Area, Mandir, New Lab, Patra Mill AC Panel Room, Patra Mill DC Panel Room, Patra Mill Foreman Office, Patra Mill Pump Room, Patra Mill SBO Panel, Pipe Mill, Plant Area, SMS Electrical Room, SMS Maintenance Off', 'Admin Office - First Floor, Admin Office - Ground Floor, Back Office, Cabins ग्राउंड फ्लोर: and first floor, Canteen Area 1 & 2, Car Parking Area, CCM, CCM Office, CCM Panel Room, CCM PLC Panel Room, CCM SBO Panel Room, Container Office, Labour Colony & Bathroom, Main Gate, Main Gate Front Area, Mandir, New Lab, Patra Mill AC Panel Room, Patra Mill DC Panel Room, Patra Mill Foreman Office, Patra Mill Pump Room, Patra Mill SBO Panel, Pipe Mill, Plant Area, SMS Electrical Room, SMS Maintenance Office, SMS Office, SMS Panel Room, Store Office, Weight Office & Kata In/Out, Workshop', 'Admin Office - First Floor, Admin Office - Ground Floor, Car Parking Area', 'Back Office, Container Office', 'Canteen Area 1 & 2, Labour Colony & Bathroom, Main Gate, Main Gate Front Area, Mandir, Plant Area', 'Canteen Area 1 & 2, Labour Colony, Main Gate, Main Gate Front Area, Mandir, Plant Area', 'CCM PLC Panel Room, CCM SBO Panel Room', 'New Lab', 'Patra Mill AC Panel Room, Patra Mill DC Panel Room', 'Patra Mill SBO Panel', 'Pipe Mill', 'SMS Electrical Store Room, SMS Office', 'SMS Panel Room, SMS Electrical Store Room', 'Store Office', 'Weight Office & Kata In/Out', 'Workshop']`
-- **`store_access`** (6 values): `['APPROVE INDENT DATA', 'INDENT,PURCHASE ORDER,INVENTORY,REPAIR GATE PASS,REPAIR FOLLOW UP', 'PURCHASE ORDER', 'STORE GRN', 'STORE GRN ADMIN APPROVAL', 'STORE GRN CLOSE']`
+- **`subscription_access_system`** (3 values): `['{"systems":["subscription","document"],"pages":["Dashboard","Subscription"]}', '{"systems":["subscription","document"],"pages":["Dashboard","Subscription/Approval","Subscription/Renewal","Subscription/All","Subscription/Payment","Document/All","Document/Renewal","Document/Shared","Resource Manager"]}', '{"systems":["subscription","payment"],"pages":["Subscription/Approval"]}']`
+- **`user_access1`** (16 values): `['', 'Admin Office - First Floor, Admin Office - Ground Floor, Back Office, Cabins ग्राउंड फ्लोर: and first floor, Canteen Area 1 & 2, Car Parking Area, CCM, CCM Office, CCM Panel Room, CCM PLC Panel Room, CCM SBO Panel Room, Container Office, Labour Colony & Bathroom, Main Gate, Main Gate Front Area, Mandir, New Lab, Patra Mill AC Panel Room, Patra Mill DC Panel Room, Patra Mill Foreman Office, Patra Mill Pump Room, Patra Mill SBO Panel, Pipe Mill, Plant Area, SMS Electrical Room, SMS Maintenance Office, SMS Office, SMS Panel Room, Store Office, Weight Office & Kata In/Out, Workshop', 'Admin Office - First Floor, Admin Office - Ground Floor, Car Parking Area', 'Back Office, Container Office', 'Canteen Area 1 & 2, Labour Colony & Bathroom, Main Gate, Main Gate Front Area, Mandir, Plant Area', 'Canteen Area 1 & 2, Labour Colony, Main Gate, Main Gate Front Area, Mandir, Plant Area', 'CCM PLC Panel Room, CCM SBO Panel Room', 'New Lab', 'Patra Mill AC Panel Room, Patra Mill DC Panel Room', 'Patra Mill SBO Panel', 'Pipe Mill', 'SMS Electrical Store Room, SMS Office', 'SMS Panel Room, SMS Electrical Store Room', 'Store Office', 'Weight Office & Kata In/Out', 'Workshop']`
+- **`store_access`** (9 values): `['APPROVE INDENT DATA', 'APPROVE INDENT DATA,APPROVE INDENT GM', 'APPROVE INDENT DATA,COMPLETED ITEMS,STORE OUT APPROVAL', 'APPROVE INDENT HOD', 'INDENT,PURCHASE ORDER,INVENTORY,REPAIR GATE PASS,REPAIR FOLLOW UP', 'INDENT,PURCHASE ORDER,INVENTORY,REPAIR GATE PASS,REPAIR FOLLOW UP,STORE GRN,GRN & PO,COMPLETED ITEMS,RETURNABLE', 'PURCHASE ORDER', 'STORE GRN ADMIN APPROVAL', 'STORE GRN,COMPLETED ITEMS']`
 - **`verify_access`** (2 values): `['hod', 'manager']`
-- **`verify_access_dept`** (24 values): `['ADMIN,ACCOUNTS,AUTOMATION,CCM,CCM ELECTRICAL,CONTRACTORS AJAY GIRI PIPE REPAIRING,CONTRACTORS BIRENDRA SALATING,CONTRACTORS CHANDU TIWARI PIPE MILL,CONTRACTORS CHANDU TIWARI RECOILER,CONTRACTORS GUDDU KR YADAV PIPE REPAIRING,CONTRACTORS MUMTAZ RECOILER & SALATING,CONTRACTORS MUMTAZ RECOILER AND SALATING,CONTRACTORS NAWIK LAB,CONTRACTORS PREM BHARTI PIPE MILL,CONTRACTORS ROHIT MISHRA MILL SAFAI,CONTRACTORS SHIVAM TIWARI PIPE MILL,CONTRACTORS SONU SALATING,CONTRACTORS VIKASH KUMAR PIPE MILL,CRM,CRUSHER,DISPATCH,HR,INWARD,MARKETING,LAB AND QUALITY CONTROL,PC,PIPE MILL ELECTRICAL,PIPE MILL MAINTENANCE,PIPE MILL PRODUCTION,PROJECT,PURCHASE,SECURITY,SMS ELECTRICAL,SMS MAINTENANCE,SMS PRODUCTION,STORE,STRIP MILL ELECTRICAL,STRIP MILL MAINTENANCE,STRIP MILL PRODUCTION,TRANSPORT,WB,WORKSHOP', 'ADMIN,AUTOMATION,ACCOUNTS,DISPATCH,HR,INWARD,PURCHASE,SECURITY,STORE,WB,PC', 'CCM', 'CCM ELECTRICAL,STRIP MILL ELECTRICAL', 'CCM,PROJECT,CCM ELECTRICAL,SMS ELECTRICAL,SMS MAINTENANCE,SMS PRODUCTION', 'CONTRACTORS BIRENDRA SALATING,CONTRACTORS CHANDU TIWARI RECOILER,CONTRACTORS ROHIT MISHRA MILL SAFAI', 'CONTRACTORS MUMTAZ RECOILER AND SALATING,CONTRACTORS SONU SALATING', 'CRM,MARKETING', 'CRM,MARKETING,LAB AND QUALITY CONTROL,PIPE MILL ELECTRICAL,PIPE MILL MAINTENANCE,PIPE MILL PRODUCTION,PC,TRANSPORT,SECURITY,DISPATCH,INWARD', 'DISPATCH,INWARD', 'LAB AND QUALITY CONTROL', 'PC', 'PIPE MILL ELECTRICAL', 'PIPE MILL MAINTENANCE', 'PIPE MILL PRODUCTION', 'PROJECT', 'SECURITY', 'SMS ELECTRICAL', 'SMS MAINTENANCE', 'SMS PRODUCTION', 'STRIP MILL ELECTRICAL,STRIP MILL MAINTENANCE,STRIP MILL PRODUCTION,WORKSHOP', 'STRIP MILL MAINTENANCE', 'TRANSPORT', 'WORKSHOP']`
+- **`store_role_access`** (1 values): `['hod']`
+- **`designation`** (23 values): `['', 'AGM PIPE MILL', 'CCM MANAGER', 'CRANE OPT.', 'CRUSHER INCHARGE', 'CYBER SECURITY MANAGER', 'ELECTRICAL SRPECIALIST', 'EMPLOYEE RELATION MANAGER', 'GENERAL TECHNICIAN', 'LEAD TECHNICIAN', 'LOGISTICS MANAGER', 'LOGISTICS OFFICER', 'MARKETING', 'MIS EXECUTIVE', 'OPERATION CONTROLLER', 'OPERATION CONTROLLER (COIL)', 'OPERATION MANAGER', 'PC', 'QUALITY CONTROLLER', 'QUALITY HEAD', 'QUALITY INCHARGE', 'TURNER', 'WEARHOUSE MANAGER']`
+- **`profile_img`** (1 values): `['https://hrfms.sagartmt.com/uploads/employees/employee-profile-1770636453037-205113536.png']`
+- **`document_img`** (11 values): `['https://hrfms.sagartmt.com/uploads/employees/employee-document-1770636467725-440891120.png', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770715518431-721651306.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770716088427-871000712.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770721468023-934165423.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770722904493-512390339.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770958621497-182151450.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770960213115-604515728.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770975665747-364252331.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770976005241-929873808.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1771070079182-876649214.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1771222502099-382134786.jpg']`
 
 
 ### 🔍 Sample Data (First 3 rows):
-| id | created_at | user_name | password | email_id | number | department | given_by | role | status | user_access | leave_date | remark | leave_end_date | employee_id | last_punch_time | last_punch_device | page_access | system_access | subscription_access_system | user_access1 | store_access | emp_image | verify_access | verify_access_dept |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 767 | 2026-01-18 05:39:28.544410+00:00 | Shrikant Yadav | 9669 | shrikantyadav@gmail.com | 9875136297 | PIPE MILL MAINTENANCE | None | user | active | PIPE MILL MAINTENANCE | None | None | None | S09669 | None | None | dashboard,all-task | Checklist | None | None | None | None | None | None |
-| 814 | 2026-01-25 05:03:57.943824+00:00 | Anand Kumar Kushwaha | 1234 | anandkumar123@gmail.com | 9109314548 | PIPE MILL ELECTRICAL | None | user | active | PIPE MILL ELECTRICAL | None | None | None | S9248 | None | None | dashboard,all-task | CHECKLIST | None | None | None | None | None | None |
-| 768 | 2026-01-18 06:51:58.841718+00:00 | Ravi Patle | 123 | ss3552630@gmail.com | None | PIPE MILL MAINTENANCE | None | user | active | PIPE MILL MAINTENANCE | None | None | None | None | None | None | all-task,assign-task | Checklist | None | None | None | https://emp-profiles-dashboard.s3.amazonaws.com/em | None | None |
+| id | created_at | user_name | password | email_id | number | department | given_by | role | status | user_access | leave_date | remark | leave_end_date | employee_id | last_punch_time | last_punch_device | page_access | system_access | subscription_access_system | user_access1 | store_access | emp_image | verify_access | verify_access_dept | store_role_access | designation | profile_img | document_img |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 452 | 2025-09-27 11:27:51.805913+00:00 | Amit Pandey | a1981 | mkt@sagartmt.com | 7999645505 | MARKETING | None | user | active | MARKETING | None | None | None | S00206 | 2026-01-15 10:11:24 | E03C1CB36042AA02 | dashboard,assign-task,delegation,all-task ,/dashbo | CHECKLIST,SALES MODULE,STORE AND PURCHASE,HRMS | None | None | None | None | None | None | None | None | None | None |
+| 455 | 2025-09-27 12:09:25.008122+00:00 | Jai Nirmal | 9485 | jainirmalkar@gmail.com | 7067132776 | MARKETING | None | user | active | MARKETING | None | None | None | S09485 | 2026-01-15 19:19:31 | E03C1CB34D83AA02 | dashboard,assign-task,delegation,all-task ,/dashbo | CHECKLIST,SALES MODULE,STORE AND PURCHASE,HRMS | None | None | None | https://emp-profiles-dashboard.s3.amazonaws.com/em | None | None | None | None | None | None |
+| 583 | 2025-11-27 11:46:18.011547+00:00 | Process Co-Ordinator | 123456 | pc@sagartmt.com | 9770909919 | ADMIN | None | admin | active | PC | None | None | None | S99999 | None | None | dashboard,assign-task,delegation,all-task  | None | None | None | None | None | None | None | None | None | None | None |
+
+---
+
+## 📋 Table: `sms_register`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **sample_timestamp** | `TIMESTAMP` | False |
+| **sequence_number** | `VARCHAR(10)` | False |
+| **laddle_number** | `SMALLINT` | False |
+| **sms_head** | `VARCHAR(60)` | True |
+| **furnace_number** | `VARCHAR(20)` | True |
+| **remarks** | `TEXT` | True |
+| **picture** | `TEXT` | True |
+| **shift_incharge** | `VARCHAR(60)` | True |
+| **temperature** | `VARCHAR(50)` | True |
+| **unique_code** | `VARCHAR(10)` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **prefilled_link** | `TEXT` | True |
+| **update_link** | `TEXT` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
 
 ---
 
@@ -268,6 +381,38 @@ _No data_
 
 ---
 
+## 📋 Table: `ticket_book`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **status** | `VARCHAR(50)` | True |
+| **type_of_bill** | `VARCHAR(50)` | True |
+| **bill_number** | `VARCHAR(50)` | True |
+| **travels_name** | `VARCHAR(100)` | True |
+| **per_ticket_amount** | `NUMERIC` | True |
+| **upload_bill_image** | `VARCHAR(255)` | True |
+| **total_amount** | `NUMERIC` | True |
+| **charges** | `NUMERIC` | True |
+| **person_name** | `VARCHAR(255)` | True |
+| **booked_name** | `VARCHAR(255)` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **updated_at** | `TIMESTAMP` | True |
+| **request_employee_code** | `VARCHAR(100)` | True |
+| **booked_employee_code** | `VARCHAR(100)` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
 ## 📋 Table: `systems`
 ### Columns:
 | Name | Type | Nullable |
@@ -281,7 +426,7 @@ _No data_
 
 ### 🏷️ Categorical / Allowed Values:
 - **`systems`** (7 values): `['CHECKLIST COMBINED', 'HRMS', 'LOGISTIC', 'SALES MODULE', 'STORE AND PURCHASE', 'SUBSCRIPTION', 'VISITOR GATE PASS']`
-- **`link`** (7 values): `['https://checklist-frontend-aws.vercel.app/', 'https://doc-sub-frontend.vercel.app', 'https://gate-pass-srmpl.vercel.app/dashboard/quick-task', 'https://hr.sagargroup.co/', 'https://new-store-repair-frontend.vercel.app/', 'https://o2d-lead-batchcode-frontend-aws.vercel.app/login', 'https://triofleet.trieon.in/']`
+- **`link`** (7 values): `['https://checklist-frontend-aws.vercel.app/', 'https://doc-sub-frontend.vercel.app', 'https://gate-pass-srmpl.vercel.app/dashboard/quick-task', 'https://hrfms-frontend-aws.vercel.app/', 'https://new-store-repair-frontend.vercel.app/', 'https://o2d-lead-batchcode-frontend-aws.vercel.app/login', 'https://triofleet.trieon.in/']`
 
 
 ### 🔍 Sample Data (First 3 rows):
@@ -333,12 +478,27 @@ _No data_
 
 ---
 
-## 📋 Table: `departments`
+## 📋 Table: `hot_coil`
 ### Columns:
 | Name | Type | Nullable |
 | :--- | :--- | :--- |
 | **id** | `INTEGER` | False |
-| **department** | `VARCHAR(100)` | False |
+| **sample_timestamp** | `TIMESTAMP` | True |
+| **sms_short_code** | `TEXT` | True |
+| **submission_type** | `TEXT` | True |
+| **size** | `TEXT` | True |
+| **mill_incharge** | `TEXT` | True |
+| **quality_supervisor** | `TEXT` | True |
+| **picture** | `TEXT` | True |
+| **electrical_dc_operator** | `TEXT` | True |
+| **remarks** | `TEXT` | True |
+| **strand1_temperature** | `TEXT` | True |
+| **strand2_temperature** | `TEXT` | True |
+| **shift_supervisor** | `TEXT` | True |
+| **unique_code** | `TEXT` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **updated_at** | `TIMESTAMP` | True |
+| **update_link** | `TEXT` | True |
 
 
 
@@ -348,11 +508,399 @@ _No categorical columns detected_
 
 
 ### 🔍 Sample Data (First 3 rows):
-| id | department |
-| --- | --- |
-| 1 | ACCOUNTS |
-| 2 | ADMIN |
-| 3 | AUTOMATION |
+_No data_
+
+---
+
+## 📋 Table: `tundish_checklist`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **sample_timestamp** | `TIMESTAMP` | True |
+| **sms_short_code** | `TEXT` | True |
+| **submission_type** | `TEXT` | True |
+| **shift** | `TEXT` | True |
+| **heat_no** | `TEXT` | True |
+| **tundish_no** | `TEXT` | True |
+| **sequence_no** | `TEXT` | True |
+| **grade** | `TEXT` | True |
+| **casting_speed** | `TEXT` | True |
+| **super_heat** | `TEXT` | True |
+| **stopper_rod_condition** | `TEXT` | True |
+| **ladle_condition** | `TEXT` | True |
+| **tundish_temperature** | `TEXT` | True |
+| **remarks** | `TEXT` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **updated_at** | `TIMESTAMP` | True |
+| **unique_code** | `TEXT` | False |
+| **update_link** | `TEXT` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `re_coile`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **sample_timestamp** | `TIMESTAMP` | False |
+| **hot_coiler_short_code** | `VARCHAR(10)` | True |
+| **size** | `VARCHAR(30)` | True |
+| **supervisor** | `VARCHAR(60)` | True |
+| **incharge** | `VARCHAR(60)` | True |
+| **contractor** | `VARCHAR(60)` | True |
+| **machine_number** | `VARCHAR(20)` | True |
+| **welder_name** | `VARCHAR(60)` | True |
+| **unique_code** | `VARCHAR(50)` | False |
+| **created_at** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `qc_lab_samples`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **sample_timestamp** | `TIMESTAMP` | False |
+| **sms_batch_code** | `VARCHAR(20)` | True |
+| **furnace_number** | `VARCHAR(20)` | True |
+| **sequence_code** | `VARCHAR(5)` | True |
+| **laddle_number** | `SMALLINT` | True |
+| **shift_type** | `VARCHAR(20)` | True |
+| **final_c** | `NUMERIC` | True |
+| **final_mn** | `NUMERIC` | True |
+| **final_s** | `NUMERIC` | True |
+| **final_p** | `NUMERIC` | True |
+| **tested_by** | `VARCHAR(60)` | True |
+| **remarks** | `TEXT` | True |
+| **report_picture** | `TEXT` | True |
+| **unique_code** | `VARCHAR(30)` | True |
+| **created_at** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `pipe_mill`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **sample_timestamp** | `TIMESTAMP` | False |
+| **size** | `VARCHAR(20)` | True |
+| **shift** | `VARCHAR(20)` | True |
+| **pipe_mill** | `VARCHAR(30)` | True |
+| **turbuse_name** | `VARCHAR(60)` | True |
+| **turbine_is_ok** | `VARCHAR(10)` | True |
+| **gas_flow_reading** | `VARCHAR(20)` | True |
+| **blower_name** | `VARCHAR(60)` | True |
+| **blower_is_ok** | `VARCHAR(10)` | True |
+| **helper** | `VARCHAR(60)` | True |
+| **unique_code** | `VARCHAR(40)` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **jobtime** | `VARCHAR(20)` | True |
+| **production** | `INTEGER` | True |
+| **time_start** | `VARCHAR(20)` | True |
+| **time_end** | `VARCHAR(20)` | True |
+| **section** | `VARCHAR(50)` | True |
+| **item_type** | `VARCHAR(50)` | True |
+| **thickness** | `VARCHAR(30)` | True |
+| **picture** | `TEXT` | True |
+| **recoiler_short_code** | `VARCHAR(50)` | True |
+| **mill_number** | `VARCHAR(100)` | True |
+| **quality_supervisor** | `VARCHAR(100)` | True |
+| **mill_incharge** | `VARCHAR(100)` | True |
+| **forman_name** | `VARCHAR(100)` | True |
+| **fitter_name** | `VARCHAR(100)` | True |
+| **remarks** | `TEXT` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `laddle_return`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **sample_timestamp** | `TIMESTAMP` | False |
+| **laddle_return_date** | `DATE` | False |
+| **laddle_return_time** | `TIME` | False |
+| **poring_temperature** | `VARCHAR(100)` | True |
+| **poring_temperature_photo** | `TEXT` | True |
+| **furnace_shift_incharge** | `VARCHAR(60)` | True |
+| **furnace_crane_driver** | `VARCHAR(60)` | True |
+| **ccm_temperature_before_pursing** | `VARCHAR(100)` | True |
+| **ccm_temp_before_pursing_photo** | `TEXT` | True |
+| **ccm_temp_after_pursing_photo** | `TEXT` | True |
+| **ccm_crane_driver** | `VARCHAR(60)` | True |
+| **stand1_mould_operator** | `VARCHAR(60)` | True |
+| **stand2_mould_operator** | `VARCHAR(60)` | True |
+| **shift_incharge** | `VARCHAR(60)` | True |
+| **timber_man** | `VARCHAR(60)` | True |
+| **operation_incharge** | `VARCHAR(60)` | True |
+| **laddle_return_reason** | `TEXT` | True |
+| **unique_code** | `VARCHAR(20)` | False |
+| **created_at** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `laddle_checklist`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | True |
+| **sample_timestamp** | `TIMESTAMP` | True |
+| **sample_date** | `DATE` | False |
+| **laddle_number** | `INTEGER` | False |
+| **slag_cleaning_top** | `TEXT` | True |
+| **slag_cleaning_bottom** | `TEXT` | True |
+| **nozzle_proper_lancing** | `TEXT` | True |
+| **pursing_plug_cleaning** | `TEXT` | True |
+| **sly_gate_check** | `TEXT` | True |
+| **nozzle_check_cleaning** | `TEXT` | True |
+| **sly_gate_operate** | `TEXT` | True |
+| **nfc_proper_heat** | `TEXT` | True |
+| **nfc_filling_nozzle** | `TEXT` | True |
+| **plate_life** | `INTEGER` | True |
+| **timber_man_name** | `TEXT` | True |
+| **laddle_man_name** | `TEXT` | True |
+| **laddle_foreman_name** | `TEXT` | True |
+| **supervisor_name** | `TEXT` | True |
+| **unique_code** | `TEXT` | False |
+| **created_at** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `clients`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **client_id** | `INTEGER` | False |
+| **client_name** | `VARCHAR(150)` | False |
+| **city** | `VARCHAR(100)` | True |
+| **contact_person** | `VARCHAR(150)` | True |
+| **contact_details** | `VARCHAR(200)` | True |
+| **sales_person_id** | `INTEGER` | True |
+| **client_type** | `VARCHAR(50)` | True |
+| **status** | `VARCHAR(20)` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **updated_at** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`client_type`** (3 values): `['CRR', 'NBD', 'PCRR']`
+- **`status`** (2 values): `['active', 'Active']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| client_id | client_name | city | contact_person | contact_details | sales_person_id | client_type | status | created_at | updated_at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2 | AAKASH INFRATECH,MUNGELI | MUNGELI | AKASH JI | 8103622228 | 322 | CRR | active | 2026-01-30 07:50:35.922719 | 2026-01-30 07:50:35.922719 |
+| 3 | AARADHYA STEEL | MAIHAR | GANESH JI | 8962109701 | 26 | CRR | active | 2026-01-30 07:50:35.922719 | 2026-01-30 07:50:35.922719 |
+| 4 | AARADHYA STEEL HYD | HYDERABAD | PRASAD REDDY | 8106886732 | 10 | NBD | active | 2026-01-30 07:50:35.922719 | 2026-01-30 07:50:35.922719 |
+
+---
+
+## 📋 Table: `make_quotation`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | True |
+| **timestamp** | `TIMESTAMP` | True |
+| **quotation_no** | `VARCHAR(100)` | True |
+| **quotation_date** | `DATE` | True |
+| **prepared_by** | `VARCHAR(255)` | True |
+| **consigner_state** | `VARCHAR(150)` | True |
+| **reference_name** | `VARCHAR(255)` | True |
+| **consigner_address** | `TEXT` | True |
+| **consigner_mobile** | `VARCHAR(20)` | True |
+| **consigner_phone** | `VARCHAR(20)` | True |
+| **consigner_gstin** | `VARCHAR(50)` | True |
+| **consigner_state_code** | `VARCHAR(10)` | True |
+| **company_name** | `VARCHAR(255)` | True |
+| **consignee_address** | `TEXT` | True |
+| **ship_to** | `TEXT` | True |
+| **consignee_state** | `VARCHAR(150)` | True |
+| **contact_name** | `VARCHAR(255)` | True |
+| **contact_no** | `VARCHAR(20)` | True |
+| **consignee_gstin** | `VARCHAR(50)` | True |
+| **consignee_state_code** | `VARCHAR(10)` | True |
+| **msme_no** | `VARCHAR(100)` | True |
+| **validity** | `VARCHAR(100)` | True |
+| **payment_terms** | `VARCHAR(255)` | True |
+| **delivery** | `VARCHAR(255)` | True |
+| **freight** | `VARCHAR(255)` | True |
+| **insurance** | `VARCHAR(255)` | True |
+| **taxes** | `VARCHAR(255)` | True |
+| **notes** | `TEXT` | True |
+| **account_no** | `VARCHAR(100)` | True |
+| **bank_name** | `VARCHAR(255)` | True |
+| **bank_address** | `TEXT` | True |
+| **ifsc_code** | `VARCHAR(50)` | True |
+| **email** | `VARCHAR(255)` | True |
+| **website** | `VARCHAR(255)` | True |
+| **pan** | `VARCHAR(20)` | True |
+| **items** | `JSONB` | True |
+| **pdf_url** | `TEXT` | True |
+| **grand_total** | `NUMERIC` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`quotation_no`** (5 values): `['QN-003', 'QN-004', 'QN-005', 'QN-006', 'QN-007']`
+- **`prepared_by`** (2 values): `['Aakash', 'SHEETAL PATEL']`
+- **`consigner_state`** (2 values): `['Andhra Pradesh', 'Chhattisgarh']`
+- **`reference_name`** (3 values): `['Rohit', 'SOURABH ROLLING MILLS PVT LTD', 'Vipul']`
+- **`consigner_address`** (2 values): `['', 'VILLAGE KANHERA, ACHHOLI ROAD, URLA, RAIPUR, CHHATTISHGARH , 492003, INDIA']`
+- **`consigner_mobile`** (3 values): `['6266919126', '9000011111', '9876501234']`
+- **`consigner_phone`** (3 values): `['7723020095', '9000022222', '9811167788']`
+- **`consigner_gstin`** (3 values): `['22AAICS2367M1Z3', '23AACCR1111R1Z2', '27ABCDE1234F1Z5']`
+- **`consigner_state_code`** (3 values): `['22', '23', '27']`
+- **`company_name`** (2 values): `['ABC Steels Pvt Ltd', 'Select Company']`
+- **`consignee_address`** (2 values): `['Industrial Area, Raipur', 'safsaf']`
+- **`ship_to`** (2 values): `['NULL', 'safdsaf']`
+- **`consignee_state`** (2 values): `['Chhattisgarh', 'sadfsaf']`
+- **`contact_name`** (2 values): `['Manoj Singh', 'safas']`
+- **`contact_no`** (2 values): `['1212121212', '9033442211']`
+- **`consignee_gstin`** (2 values): `['221312', '22AABCH1234Q1Z5']`
+- **`consignee_state_code`** (2 values): `['121', '22']`
+- **`msme_no`** (3 values): `['', 'MSME123456', 'MSME908776']`
+- **`validity`** (1 values): `['The above quoted prices are valid up to 5 days from date of offer.']`
+- **`payment_terms`** (1 values): `['100% advance payment in the mode of NEFT, RTGS & DD']`
+- **`delivery`** (1 values): `['Material is ready in our stock']`
+- **`freight`** (1 values): `['Extra as per actual.']`
+- **`insurance`** (1 values): `["Transit insurance for all shipment is at Buyer's risk."]`
+- **`taxes`** (1 values): `['Extra as per actual.']`
+- **`notes`** (1 values): `['']`
+- **`account_no`** (1 values): `['733605010000120']`
+- **`bank_name`** (1 values): `['Union Bank of India']`
+- **`bank_address`** (1 values): `['MID CORP BR']`
+- **`ifsc_code`** (1 values): `['UBIN0573361']`
+- **`email`** (1 values): `['marketing@sagartmt.com']`
+- **`website`** (2 values): `['www.pankajgroup.in', 'www.pankajgroup.in']`
+- **`pan`** (3 values): `['AAICS2367M', 'ABCDE1234F', 'ABCDE4455Z']`
+- **`pdf_url`** (3 values): `['', 'https://quotation-pdf-bucket.s3.amazonaws.com/uploads/1764517756541_Quotation_QN-006.pdf', 'https://quotation-pdf-bucket.s3.amazonaws.com/uploads/1764566844736_Quotation_QN-007.pdf']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | timestamp | quotation_no | quotation_date | prepared_by | consigner_state | reference_name | consigner_address | consigner_mobile | consigner_phone | consigner_gstin | consigner_state_code | company_name | consignee_address | ship_to | consignee_state | contact_name | contact_no | consignee_gstin | consignee_state_code | msme_no | validity | payment_terms | delivery | freight | insurance | taxes | notes | account_no | bank_name | bank_address | ifsc_code | email | website | pan | items | pdf_url | grand_total |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 2025-11-29 08:45:48.625935+00:00 | QN-003 | 2025-11-29 | SHEETAL PATEL | Chhattisgarh | SOURABH ROLLING MILLS PVT LTD | VILLAGE KANHERA, ACHHOLI ROAD, URLA, RAIPUR, CHHAT | 6266919126 | 7723020095 | 22AAICS2367M1Z3 | 22 | Select Company | safsaf | safdsaf | sadfsaf | safas | 1212121212 | 221312 | 121 |  | The above quoted prices are valid up to 5 days fro | 100% advance payment in the mode of NEFT, RTGS & D | Material is ready in our stock | Extra as per actual. | Transit insurance for all shipment is at Buyer's r | Extra as per actual. |  | 733605010000120 | Union Bank of India | MID CORP BR | UBIN0573361 | marketing@sagartmt.com | www.pankajgroup.in  | AAICS2367M | [{'gst': 18, 'qty': 1, 'code': 'F01010000', 'name' |  | 0.00 |
+| 2 | 2025-11-29 11:45:15.119642+00:00 | QN-004 | 2025-11-29 | Aakash | Chhattisgarh | Vipul |  | 9876501234 | 9811167788 | 27ABCDE1234F1Z5 | 27 | ABC Steels Pvt Ltd | Industrial Area, Raipur | NULL | Chhattisgarh | Manoj Singh | 9033442211 | 22AABCH1234Q1Z5 | 22 | MSME123456 | The above quoted prices are valid up to 5 days fro | 100% advance payment in the mode of NEFT, RTGS & D | Material is ready in our stock | Extra as per actual. | Transit insurance for all shipment is at Buyer's r | Extra as per actual. |  | 733605010000120 | Union Bank of India | MID CORP BR | UBIN0573361 | marketing@sagartmt.com | www.pankajgroup.in | ABCDE1234F | [{'gst': 18, 'qty': 1, 'code': 'ITM-1001', 'name': |  | 0.00 |
+| 4 | 2025-11-29 11:47:07.550123+00:00 | QN-005 | 2025-11-29 | Aakash | Andhra Pradesh | Vipul |  | 9876501234 | 9811167788 | 27ABCDE1234F1Z5 | 27 | ABC Steels Pvt Ltd | Industrial Area, Raipur | NULL | Chhattisgarh | Manoj Singh | 9033442211 | 22AABCH1234Q1Z5 | 22 | MSME908776 | The above quoted prices are valid up to 5 days fro | 100% advance payment in the mode of NEFT, RTGS & D | Material is ready in our stock | Extra as per actual. | Transit insurance for all shipment is at Buyer's r | Extra as per actual. |  | 733605010000120 | Union Bank of India | MID CORP BR | UBIN0573361 | marketing@sagartmt.com | www.pankajgroup.in | ABCDE4455Z | [{'gst': 18, 'qty': 1, 'code': 'ITM-1001', 'name': |  | 0.00 |
+
+---
+
+## 📋 Table: `leave_request`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **employee_id** | `VARCHAR(100)` | True |
+| **employee_name** | `VARCHAR(100)` | True |
+| **designation** | `VARCHAR(100)` | True |
+| **department** | `VARCHAR(100)` | True |
+| **from_date** | `DATE` | True |
+| **to_date** | `DATE` | True |
+| **reason** | `TEXT` | True |
+| **request_status** | `VARCHAR(50)` | True |
+| **approved_by** | `VARCHAR(100)` | True |
+| **hr_approval** | `VARCHAR(100)` | True |
+| **approval_hr** | `VARCHAR(100)` | True |
+| **approved_by_status** | `VARCHAR(50)` | True |
+| **mobilenumber** | `VARCHAR(20)` | True |
+| **urgent_mobilenumber** | `VARCHAR(20)` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **updated_at** | `TIMESTAMP` | True |
+| **commercial_head_status** | `VARCHAR(50)` | True |
+| **approve_dates** | `DATE` | True |
+| **user_id** | `INTEGER` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`employee_id`** (3 values): `['100', 'S09203', 'S09630']`
+- **`employee_name`** (3 values): `['Danveer Singh', 'Hem Kumar Jagat', 'Manoj Nishad']`
+- **`designation`** (2 values): `['', 'MIS EXECUTIVE']`
+- **`department`** (3 values): `['AUTOMATION', 'PC', 'STRIP MILL ELECTRICAL']`
+- **`reason`** (3 values): `['asdfsfa', 'Family problem going to Village', 'Health problem']`
+- **`request_status`** (2 values): `['Approved', 'Pending']`
+- **`approved_by`** (1 values): `['Amit Tiwari']`
+- **`hr_approval`** (1 values): `['Approved']`
+- **`approval_hr`** (1 values): `['S09103']`
+- **`approved_by_status`** (1 values): `['Approved']`
+- **`mobilenumber`** (3 values): `['234234', '7999747599', '8602714849']`
+- **`urgent_mobilenumber`** (3 values): `['12312312', '6266919117', '7999747599']`
+- **`commercial_head_status`** (1 values): `['Approved']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | employee_id | employee_name | designation | department | from_date | to_date | reason | request_status | approved_by | hr_approval | approval_hr | approved_by_status | mobilenumber | urgent_mobilenumber | created_at | updated_at | commercial_head_status | approve_dates | user_id |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2 | 100 | Danveer Singh |  | STRIP MILL ELECTRICAL | 2026-03-14 | 2026-03-28 | Family problem going to Village  | Pending | None | None | None | None | 7999747599 | 7999747599 | 2026-02-13 13:03:50.273317 | 2026-02-13 13:03:50.273317 | None | None | None |
+| 3 | S09203 | Hem Kumar Jagat | MIS EXECUTIVE | AUTOMATION | 2026-02-16 | 2026-02-19 | asdfsfa | Approved | Amit Tiwari | Approved | S09103 | Approved | 234234 | 12312312 | 2026-02-16 11:43:05.380296 | 2026-02-16 11:46:22.963762 | Approved | 2026-02-16 | 35 |
+| 4 | S09630 | Manoj Nishad |  | PC | 2026-02-17 | 2026-02-17 | Health problem | Pending | None | None | None | None | 8602714849 | 6266919117 | 2026-02-17 01:35:45.200309 | 2026-02-17 01:35:45.200309 | None | None | 601 |
 
 ---
 
@@ -382,7 +930,7 @@ _No categorical columns detected_
 
 ### 🏷️ Categorical / Allowed Values:
 - **`approval_status`** (2 values): `['approved', 'pending']`
-- **`approved_by`** (13 values): `['Deepak Bhalla', 'Hem Kumar Jagat', 'K Ramesh Kumar', 'Mukesh Patle', 'Pawan Kumar Parganiha', 'Rahul Sharma', 'Rinku Singh', 'Sandeep Kumar Dubey', 'Saroj Kumar Choudhary', 'Shailesh Chitre', 'Sheelesh Marele', 'Sheetal Patel', 'Shivraj Sharma']`
+- **`approved_by`** (18 values): `['Ambika Pandey', 'Amit Tiwari', 'Bikash Kumar Ojha', 'Deepak Bhalla', 'Hem Kumar Jagat', 'K Ramesh Kumar', 'Manoj Ojha', 'Mukesh Patle', 'Pawan Kumar Parganiha', 'Rahul Sharma', 'Rinku Singh', 'Sandeep Kumar Dubey', 'Saroj Kumar Choudhary', 'Shailesh Chitre', 'Sheelesh Marele', 'Sheetal Patel', 'Shivraj Sharma', 'Tripati Rana']`
 - **`status`** (2 values): `['IN', 'OUT']`
 - **`gate_pass_closed`** (2 values): `['False', 'True']`
 
@@ -392,7 +940,7 @@ _No categorical columns detected_
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 302 | Durgesh  | 9827492062 | None | Shiv om refrigeration  | Ac repairing  | Sandeep Kumar Dubey | 2026-01-28 | 12:23:00 | 13:05:14.791079 | approved | Sandeep Kumar Dubey | 2026-01-28 07:05:56.916325 | OUT | True | 2026-01-28 06:55:08.991007 |
 | 296 | M Maity  | 7566098396 | https://srmpl-visitor-gatepass.s3.amazonaws.com/vi | Metaflux bhilai | Official  | Saroj Kumar Choudhary | 2026-01-26 | 12:17:00 | 13:38:53.156284 | approved | Saroj Kumar Choudhary | 2026-01-28 08:07:42.420309 | OUT | True | 2026-01-26 06:48:44.428295 |
-| 308 | Hem Kumar | 7723020093 | None | Flat 302, Shanti Apartments, MG Road, Pune | testing by developer | Amit Tiwari | 2026-01-28 | 10:30:00 | None | pending | None | None | IN | False | 2026-01-28 10:07:56.692281 |
+| 371 | Vijay Kumar ji  | 9329013215 | https://srmpl-visitor-gatepass.s3.amazonaws.com/vi | Neeraj industries Bhilai  | None | Pawan Kumar Parganiha | 2026-02-12 | 13:30:00 | 15:50:08.132116 | approved | Pawan Kumar Parganiha | 2026-02-12 08:03:48.426482 | OUT | True | 2026-02-12 08:02:52.532539 |
 
 ---
 
@@ -418,68 +966,6 @@ _No categorical columns detected_
 | 1 | Aakash Agrawal | 9329149382 | 2026-01-13 06:43:37.496570 |
 | 2 | Sheelesh Marele | 8839494655 | 2026-01-13 06:43:37.496570 |
 | 3 | Ajit Kumar Gupta | 9584556480 | 2026-01-13 06:43:37.496570 |
-
----
-
-## 📋 Table: `indent`
-### Columns:
-| Name | Type | Nullable |
-| :--- | :--- | :--- |
-| **id** | `BIGINT` | False |
-| **sample_timestamp** | `TIMESTAMP` | False |
-| **form_type** | `VARCHAR(50)` | True |
-| **request_number** | `VARCHAR(50)` | True |
-| **indent_series** | `VARCHAR(50)` | True |
-| **requester_name** | `VARCHAR(100)` | True |
-| **department** | `VARCHAR(100)` | True |
-| **division** | `VARCHAR(100)` | True |
-| **item_code** | `VARCHAR(30)` | True |
-| **product_name** | `VARCHAR(255)` | True |
-| **request_qty** | `NUMERIC` | True |
-| **uom** | `VARCHAR(20)` | True |
-| **specification** | `TEXT` | True |
-| **make** | `VARCHAR(100)` | True |
-| **purpose** | `TEXT` | True |
-| **cost_location** | `VARCHAR(255)` | True |
-| **planned_1** | `TIMESTAMP` | True |
-| **actual_1** | `TIMESTAMP` | True |
-| **time_delay_1** | `VARCHAR(50)` | True |
-| **request_status** | `VARCHAR(50)` | True |
-| **approved_quantity** | `NUMERIC` | True |
-| **created_at** | `TIMESTAMP` | True |
-| **updated_at** | `TIMESTAMP` | True |
-| **group_name** | `VARCHAR(100)` | True |
-| **indent_number** | `VARCHAR(50)` | True |
-
-
-
-
-### 🏷️ Categorical / Allowed Values:
-- **`form_type`** (2 values): `['INDENT', 'REQUISITION']`
-- **`request_number`** (6 values): `['IND01', 'IND02', 'IND03', 'IND04', 'IND05', 'REQ01']`
-- **`indent_series`** (4 values): `['I1', 'I5', 'R1', 'R4']`
-- **`requester_name`** (2 values): `['Hem Kumar Jagat', 'Shravan Nirmalkar']`
-- **`department`** (2 values): `['AUTOMATION', 'PC']`
-- **`division`** (3 values): `['CO', 'PM', 'SM']`
-- **`item_code`** (6 values): `['F05010018', 'S01020002', 'S01060008', 'S01070009', 'S01070014', 'S01160007']`
-- **`product_name`** (6 values): `['ABSORPTION VESSEL FOR C&C APPARATUS', 'BEARING V22.40.006.0', 'CYL DIA 50 M/C TS02/03-TS', 'KEYBOARD', 'MOUSE PAD', 'SILICOMANGANESE']`
-- **`uom`** (5 values): `['LTR', 'MT', 'MTR', 'NOS', 'SET']`
-- **`specification`** (6 values): `['', 'asdfsdfsd', 'CDP model with digital board', 'qawsedf', 'sdsfsdf', 'WIRE LESS USB 3.0']`
-- **`make`** (7 values): `['121', '20', 'Dell', 'dgfdg', 'HP', 'logitech', 'LOGITECH']`
-- **`purpose`** (6 values): `['', 'edrftgyhuji', 'FOR DEVELOPER', 'sdfsdfsdf', 'sdfsdfsdfsdfsdfsd', 'USE FOR OFFICE']`
-- **`cost_location`** (4 values): `['ADMINISTRATION OFFICE', 'CENTRAL WORKSHOP', 'CIVIL WORK', 'GENERAL/COMMON']`
-- **`time_delay_1`** (5 values): `['00:00:26.511', '00:00:26.512', '00:00:44.197', '00:01:52.098', '00:04:21.3']`
-- **`request_status`** (2 values): `['APPROVED', 'PENDING']`
-- **`group_name`** (4 values): `['AUTOMOBILE', 'BY PRODUCTS', 'COMPRESSOR SPARES', 'COMPUTER']`
-- **`indent_number`** (3 values): `['srm0002', 'srm001', 'srm004']`
-
-
-### 🔍 Sample Data (First 3 rows):
-| id | sample_timestamp | form_type | request_number | indent_series | requester_name | department | division | item_code | product_name | request_qty | uom | specification | make | purpose | cost_location | planned_1 | actual_1 | time_delay_1 | request_status | approved_quantity | created_at | updated_at | group_name | indent_number |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 3 | 2026-01-16 10:07:38.085000+00:00 | INDENT | IND03 | I1 | Hem Kumar Jagat | AUTOMATION | SM | F05010018 | SILICOMANGANESE | 12 | MT | sdsfsdf | 121 | sdfsdfsdf | CENTRAL WORKSHOP | 2026-01-16 10:07:38.085000+00:00 | 2026-01-16 10:08:04.596000+00:00 | 00:00:26.511 | APPROVED | 123 | 2026-01-16 10:07:38.935000+00:00 | 2026-01-16 10:08:04.595533+00:00 | BY PRODUCTS | None |
-| 4 | 2026-01-16 10:07:38.087000+00:00 | INDENT | IND03 | I1 | Hem Kumar Jagat | AUTOMATION | SM | S01020002 | BEARING V22.40.006.0 | 3 | MTR | asdfsdfsd | dgfdg | sdfsdfsdfsdfsdfsd | CENTRAL WORKSHOP | 2026-01-16 10:07:38.087000+00:00 | 2026-01-16 10:08:04.599000+00:00 | 00:00:26.512 | APPROVED | 33 | 2026-01-16 10:07:38.935000+00:00 | 2026-01-16 10:08:04.595533+00:00 | AUTOMOBILE | None |
-| 1 | 2026-01-14 12:17:31.811000+00:00 | INDENT | IND01 | R1 | Shravan Nirmalkar | PC | SM | S01160007 | ABSORPTION VESSEL FOR C&C APPARATUS | 2 | LTR | CDP model with digital board | HP | USE FOR OFFICE  | ADMINISTRATION OFFICE | 2026-01-14 12:17:31.811000+00:00 | None | None | PENDING | None | 2026-01-14 12:17:32.516000+00:00 | 2026-01-19 07:25:13.661123+00:00 | None | srm001 |
 
 ---
 
@@ -514,6 +1000,127 @@ _No categorical columns detected_
 | 2026-01-13 05:16:31 | G325Y-04410 | 2026-01-10 | SHREE SAWARIYA SALES | SSS/25-26/1226 | 17606.00 | True | False | False | False |
 | 2026-01-17 04:53:07 | G325Y-04501 | 2026-01-14 | SHREE SAWARIYA SALES | SSS/25-26/1245 | 41.00 | True | False | False | False |
 | 2026-01-17 04:57:00 | G325Y-04502 | 2026-01-14 | SHREE SAWARIYA SALES | SSS/25-26/1244 | 5906.00 | True | False | False | False |
+
+---
+
+## 📋 Table: `plant_visitor`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **person_name** | `VARCHAR(150)` | True |
+| **employee_code** | `VARCHAR(50)` | True |
+| **reason_for_visit** | `TEXT` | True |
+| **no_of_person** | `INTEGER` | True |
+| **from_date** | `DATE` | True |
+| **to_date** | `DATE` | True |
+| **requester_name** | `VARCHAR(150)` | True |
+| **request_for** | `VARCHAR(150)` | True |
+| **remarks** | `TEXT` | True |
+| **request_status** | `VARCHAR(50)` | True |
+| **approv_employee_code** | `VARCHAR(50)` | True |
+| **approve_by_name** | `VARCHAR(150)` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **updated_at** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `indent`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **sample_timestamp** | `TIMESTAMP` | False |
+| **form_type** | `VARCHAR(50)` | True |
+| **request_number** | `VARCHAR(50)` | True |
+| **indent_series** | `VARCHAR(50)` | True |
+| **requester_name** | `VARCHAR(100)` | True |
+| **department** | `VARCHAR(100)` | True |
+| **division** | `VARCHAR(100)` | True |
+| **item_code** | `VARCHAR(30)` | True |
+| **product_name** | `VARCHAR(255)` | True |
+| **request_qty** | `NUMERIC` | True |
+| **uom** | `VARCHAR(20)` | True |
+| **specification** | `TEXT` | True |
+| **make** | `VARCHAR(100)` | True |
+| **purpose** | `TEXT` | True |
+| **cost_location** | `VARCHAR(255)` | True |
+| **planned_1** | `TIMESTAMP` | True |
+| **actual_1** | `TIMESTAMP` | True |
+| **time_delay_1** | `VARCHAR(50)` | True |
+| **request_status** | `VARCHAR(50)` | True |
+| **approved_quantity** | `NUMERIC` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **updated_at** | `TIMESTAMP` | True |
+| **group_name** | `VARCHAR(100)` | True |
+| **indent_number** | `VARCHAR(50)` | True |
+| **gm_approval** | `VARCHAR(20)` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`form_type`** (2 values): `['INDENT', 'REQUISITION']`
+- **`request_number`** (5 values): `['IND09', 'IND10', 'IND11', 'IND12', 'REQ01']`
+- **`indent_series`** (3 values): `['I3', 'I4', 'R4']`
+- **`requester_name`** (2 values): `['Anup Kumar Bopche', 'Shailesh Chitre']`
+- **`department`** (2 values): `['PIPE MILL MAINTENANCE', 'STRIP MILL PRODUCTION']`
+- **`division`** (2 values): `['PM', 'RP']`
+- **`item_code`** (7 values): `['S01030249', 'S01031407', 'S01150203', 'S01150347', 'S01180007', 'S01195981', 'S01330293']`
+- **`product_name`** (7 values): `['BEARING 22252(URB)', 'BEARING 24052 (ARB)', 'COLD SAW CUTTER SHAFT (ALUMINIUM BODY)', 'ENGINE OIL 15W40', 'GRINDING STONE 300X40 50.8 CGC60 (GREEN)', 'HT SPRING WASHER 14MM', 'VERNIER CALLIPER 12"']`
+- **`uom`** (3 values): `['LTR', 'NOS', 'PCS']`
+- **`specification`** (4 values): `['', '1.1/2"x12"', '1/2"', 'Type - SPL-HG/B S.NO. TH/03434']`
+- **`make`** (5 values): `['', 'Corborandaum', 'Mitutoya', 'Shanthi gears(gmt)', 'URB']`
+- **`purpose`** (7 values): `['', 'Coc lubrication', 'Gear box ,spair part', 'Grinding machine', 'Mill carden safe', 'Patra Patra mill fly weel', 'Siez cheking strips']`
+- **`cost_location`** (4 values): `['', 'MACHINE 2  (PIPE MILL)', 'PATRA MILL WORKSHOP', 'PIPE MILL']`
+- **`time_delay_1`** (3 values): `['00:01:05.183', '00:08:18.076', '00:22:31.637']`
+- **`request_status`** (2 values): `['APPROVED', 'PENDING']`
+- **`group_name`** (4 values): `['BEARING', 'LUBRICANT & OIL', 'MECHANICAL', 'TOOLS']`
+- **`gm_approval`** (1 values): `['APPROVED']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | sample_timestamp | form_type | request_number | indent_series | requester_name | department | division | item_code | product_name | request_qty | uom | specification | make | purpose | cost_location | planned_1 | actual_1 | time_delay_1 | request_status | approved_quantity | created_at | updated_at | group_name | indent_number | gm_approval |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 15 | 2026-02-11 07:59:04.005000+00:00 | INDENT | IND11 | I3 | Shailesh Chitre | STRIP MILL PRODUCTION | RP | S01330293 | VERNIER CALLIPER 12" | 2 | NOS |  | Mitutoya | Siez cheking strips |  | 2026-02-11 07:59:04.005000+00:00 | 2026-02-11 08:21:35.642000+00:00 | 00:22:31.637 | APPROVED | 2 | 2026-02-11 07:59:02.947000+00:00 | 2026-02-11 08:21:34.894542+00:00 | TOOLS | None | None |
+| 16 | 2026-02-12 09:30:38.164000+00:00 | INDENT | IND12 | I4 | Anup Kumar Bopche | PIPE MILL MAINTENANCE | PM | S01150203 | HT SPRING WASHER 14MM | 250 | PCS | 1/2" |  | Mill carden safe  | MACHINE 2  (PIPE MILL) | 2026-02-12 09:30:38.164000+00:00 | None | None | PENDING | None | 2026-02-12 09:30:36.900000+00:00 | 2026-02-12 09:30:36.900000+00:00 | MECHANICAL | None | None |
+| 17 | 2026-02-12 09:30:38.198000+00:00 | INDENT | IND12 | I4 | Anup Kumar Bopche | PIPE MILL MAINTENANCE | PM | S01150347 | GRINDING STONE 300X40 50.8 CGC60 (GREEN) | 2 | PCS | 1.1/2"x12" | Corborandaum  | Grinding machine  | PIPE MILL | 2026-02-12 09:30:38.198000+00:00 | None | None | PENDING | None | 2026-02-12 09:30:36.900000+00:00 | 2026-02-12 09:30:36.900000+00:00 | MECHANICAL | None | None |
+
+---
+
+## 📋 Table: `departments`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **department** | `VARCHAR(100)` | False |
+| **hod** | `TEXT` | True |
+| **mobile_number** | `VARCHAR(15)` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`hod`** (1 values): `['Sandeep Kumar Dubey']`
+- **`mobile_number`** (1 values): `['9407916514']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | department | hod | mobile_number |
+| --- | --- | --- | --- |
+| 1 | ACCOUNTS | None | None |
+| 2 | ADMIN | None | None |
+| 4 | CCM | None | None |
 
 ---
 
@@ -552,6 +1159,600 @@ _No data_
 | **item_name** | `VARCHAR(255)` | False |
 | **quantity** | `INTEGER` | False |
 | **available_stock** | `INTEGER` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `enquiry_tracker`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | True |
+| **timestamp** | `TIMESTAMP` | True |
+| **enquiry_no** | `TEXT` | True |
+| **enquiry_status** | `TEXT` | True |
+| **what_did_customer_say** | `TEXT` | True |
+| **current_stage** | `TEXT` | True |
+| **followup_status** | `TEXT` | True |
+| **next_call_date** | `TEXT` | True |
+| **next_call_time** | `TEXT` | True |
+| **is_order_received_status** | `TEXT` | True |
+| **acceptance_via** | `TEXT` | True |
+| **payment_mode** | `TEXT` | True |
+| **payment_terms_in_days** | `INTEGER` | True |
+| **transport_mode** | `TEXT` | True |
+| **remark** | `TEXT` | True |
+| **if_no_relevant_reason_status** | `TEXT` | True |
+| **if_no_relevant_reason_remark** | `TEXT` | True |
+| **customer_order_hold_reason_category** | `TEXT` | True |
+| **holding_date** | `TEXT` | True |
+| **hold_remark** | `TEXT` | True |
+| **sales_cordinator** | `TEXT` | True |
+| **calling_days** | `INTEGER` | True |
+| **order_no** | `TEXT` | True |
+| **party_name** | `TEXT` | True |
+| **sales_person_name** | `TEXT` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`enquiry_no`** (4 values): `['ARUN YADAV', 'EN-01', 'LD-003', 'LD-004']`
+- **`enquiry_status`** (3 values): `['hot', 'open', 'warm']`
+- **`what_did_customer_say`** (4 values): `['Customer said quotation under review', 'Reviewing Quote', 'sadfdsaf', 'sdfds']`
+- **`current_stage`** (2 values): `['order-expected', 'order-status']`
+- **`followup_status`** (1 values): `['Reviewing Quote']`
+- **`next_call_date`** (2 values): `['2025-11-26', '2025-11-29']`
+- **`next_call_time`** (4 values): `['11:01:00', '13:07:00', '13:12:00', '17:24:00']`
+- **`is_order_received_status`** (3 values): `['hold', 'no', 'yes']`
+- **`acceptance_via`** (2 values): `['email', 'whatsapp']`
+- **`payment_mode`** (2 values): `['neft', 'rtgs']`
+- **`transport_mode`** (2 values): `['by road', 'road transport']`
+- **`remark`** (8 values): `['afdasfas', 'asdfas', 'asdfasfsa', 'asdfasfsadf', 'asfasfas', 'cdsFSA', 'demoo', 'sadfasfda']`
+- **`if_no_relevant_reason_status`** (1 values): `['project on hold']`
+- **`if_no_relevant_reason_remark`** (1 values): `['asdfsadf']`
+- **`customer_order_hold_reason_category`** (1 values): `['customer documentation pending']`
+- **`holding_date`** (1 values): `['2025-11-29']`
+- **`hold_remark`** (1 values): `['wafasd']`
+- **`order_no`** (7 values): `['DO-01', 'DO-02', 'DO-03', 'DO-04', 'DO-05', 'DO-06', 'DO-07']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | timestamp | enquiry_no | enquiry_status | what_did_customer_say | current_stage | followup_status | next_call_date | next_call_time | is_order_received_status | acceptance_via | payment_mode | payment_terms_in_days | transport_mode | remark | if_no_relevant_reason_status | if_no_relevant_reason_remark | customer_order_hold_reason_category | holding_date | hold_remark | sales_cordinator | calling_days | order_no | party_name | sales_person_name |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 2025-11-26 11:54:48.644062+00:00 | LD-003 | hot | Reviewing Quote | order-expected | Reviewing Quote | 2025-11-26 | 17:24:00 | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None | None |
+| 2 | 2025-11-26 11:58:04.590322+00:00 | LD-003 | hot | Reviewing Quote | order-status | None | None | None | yes | email | rtgs | 1 | by road | asdfas | None | None | None | None | None | None | None | DO-01 | None | None |
+| 4 | 2025-11-28 06:25:11.773008+00:00 | LD-003 | warm | Reviewing Quote | order-status | None | None | None | no | None | None | None | None | None | project on hold | asdfsadf | None | None | None | None | None | None | None | None |
+
+---
+
+## 📋 Table: `size_master`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **item_type** | `VARCHAR(100)` | False |
+| **size** | `VARCHAR(50)` | False |
+| **thickness** | `VARCHAR(50)` | False |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`item_type`** (3 values): `['rectangular', 'round', 'square']`
+- **`size`** (20 values): `['19X19', '20X40', '25 OD', '25X25', '25X50', '25X68', '31X31', '32 OD', '37X56', '38X38', '42 OD', '47X47', '48 OD', '60 OD', '62X62', '72X72', '76 OD', '80X40', '88 OD', '96X48']`
+- **`thickness`** (11 values): `['1.2', '1.5', '1.6', '1.9', '2', '2.2', '2.5', '2.7', '2.9', '3', '3.2']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | item_type | size | thickness |
+| --- | --- | --- | --- |
+| 1 | round | 25 OD | 1.2 |
+| 2 | round | 25 OD | 1.5 |
+| 3 | round | 25 OD | 1.9 |
+
+---
+
+## 📋 Table: `fms_leads`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `TEXT` | True |
+| **created_at** | `TEXT` | True |
+| **updated_at** | `TEXT` | True |
+| **lead_no** | `TEXT` | True |
+| **lead_receiver_name** | `TEXT` | True |
+| **lead_source** | `TEXT` | True |
+| **company_name** | `TEXT` | True |
+| **phone_number** | `TEXT` | True |
+| **salesperson_name** | `TEXT` | True |
+| **location** | `TEXT` | True |
+| **email_address** | `TEXT` | True |
+| **state** | `TEXT` | True |
+| **address** | `TEXT` | True |
+| **nob** | `TEXT` | True |
+| **additional_notes** | `TEXT` | True |
+| **planned** | `TEXT` | True |
+| **actual** | `TEXT` | True |
+| **delay** | `TEXT` | True |
+| **status** | `TEXT` | True |
+| **customer_feedback** | `TEXT` | True |
+| **enquiry_received_status** | `TEXT` | True |
+| **enquiry_received_date** | `TEXT` | True |
+| **enquiry_approach** | `TEXT` | True |
+| **project_approx_value** | `TEXT` | True |
+| **item_qty** | `TEXT` | True |
+| **total_qty** | `TEXT` | True |
+| **next_action** | `TEXT` | True |
+| **next_call_date** | `TEXT` | True |
+| **next_call_time** | `TEXT` | True |
+| **planned1** | `TEXT` | True |
+| **actual1** | `TEXT` | True |
+| **delay1** | `TEXT` | True |
+| **enquiry_status** | `TEXT` | True |
+| **customer_say** | `TEXT` | True |
+| **current_stage** | `TEXT` | True |
+| **followup_status** | `TEXT` | True |
+| **followup_next_call_date** | `TEXT` | True |
+| **followup_next_call_time** | `TEXT` | True |
+| **is_order_received** | `TEXT` | True |
+| **acceptance_via** | `TEXT` | True |
+| **payment_mode** | `TEXT` | True |
+| **payment_terms_days** | `TEXT` | True |
+| **transport_mode** | `TEXT` | True |
+| **remark** | `TEXT` | True |
+| **not_received_reason_status** | `TEXT` | True |
+| **not_received_reason_remark** | `TEXT` | True |
+| **customer_order_hold_category** | `TEXT` | True |
+| **hold_date** | `TEXT` | True |
+| **hold_remark** | `TEXT` | True |
+| **sc_name** | `TEXT` | True |
+| **planned_days** | `TEXT` | True |
+| **leadscallingdays** | `TEXT` | True |
+| **enquirycallingdays** | `TEXT` | True |
+| **orderno** | `TEXT` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`id`** (2 values): `['3', '4']`
+- **`created_at`** (2 values): `['2025-11-25 10:08:09.30877+00', '2025-11-25 10:45:44.990059+00']`
+- **`updated_at`** (2 values): `['2025-11-25 11:17:37.644367+00', '2025-11-28 06:43:38.412729+00']`
+- **`lead_no`** (2 values): `['LD-003', 'LD-004']`
+- **`lead_receiver_name`** (2 values): `['Aakash Agrawal', 'TRIPATI RANA']`
+- **`lead_source`** (2 values): `['Indiamart', 'WHATSAPP']`
+- **`company_name`** (2 values): `['RBP Energy', 'Sourabh Rolling MIlls']`
+- **`phone_number`** (2 values): `['9022331100', '9827164305']`
+- **`salesperson_name`** (2 values): `['Rakesh Verma', 'sadfsadf']`
+- **`location`** (2 values): `['asfasfasf', 'Bilaspur, CG']`
+- **`email_address`** (2 values): `['asdfsd@email.com', 'rbp@gmail.com']`
+- **`state`** (2 values): `['Arunachal Pradesh', 'Chhattisgarh']`
+- **`address`** (2 values): `['asdfasfsa', 'asfdas']`
+- **`nob`** (2 values): `['Manufacturing', 'safasd']`
+- **`additional_notes`** (2 values): `['asdfdasf', 'fasfasfd']`
+- **`planned`** (1 values): `['2025-11-26']`
+- **`actual`** (1 values): `['2025-11-25']`
+- **`status`** (1 values): `['Hot']`
+- **`enquiry_received_status`** (1 values): `['yes']`
+- **`enquiry_received_date`** (2 values): `['2025-11-24', '2025-11-27']`
+- **`enquiry_approach`** (2 values): `['INWARD', 'Phone Call']`
+- **`project_approx_value`** (2 values): `['21121.00', '231232.00']`
+- **`item_qty`** (2 values): `['[{"name":"HR STRIP","quantity":"1212"}]', '[{"name":"HR STRIP","quantity":"12121"},{"name":"Fe500D TMT Bar","quantity":"121212"}]']`
+- **`total_qty`** (2 values): `['1212', '133333']`
+- **`next_action`** (1 values): `['awfasdfas']`
+- **`next_call_date`** (2 values): `['2025-11-24', '2025-12-02']`
+- **`next_call_time`** (2 values): `['16:33', '16:34']`
+- **`planned1`** (2 values): `['2025-11-26', '2025-11-29']`
+- **`actual1`** (2 values): `['2025-11-28', '2025-11-29']`
+- **`enquiry_status`** (2 values): `['hot', 'open']`
+- **`customer_say`** (2 values): `['Customer said quotation under review', 'Reviewing Quote']`
+- **`current_stage`** (1 values): `['order-status']`
+- **`is_order_received`** (1 values): `['yes']`
+- **`acceptance_via`** (1 values): `['email']`
+- **`payment_mode`** (2 values): `['neft', 'rtgs']`
+- **`payment_terms_days`** (2 values): `['30', '7']`
+- **`transport_mode`** (2 values): `['by road', 'road transport']`
+- **`remark`** (2 values): `['asfasfas', 'sadfasfda']`
+- **`not_received_reason_status`** (1 values): `['project on hold']`
+- **`not_received_reason_remark`** (1 values): `['asdfsadf']`
+- **`sc_name`** (2 values): `['Amit Pandey', 'ARUN YADAV']`
+- **`planned_days`** (1 values): `['1']`
+- **`orderno`** (1 values): `['DO-05']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | created_at | updated_at | lead_no | lead_receiver_name | lead_source | company_name | phone_number | salesperson_name | location | email_address | state | address | nob | additional_notes | planned | actual | delay | status | customer_feedback | enquiry_received_status | enquiry_received_date | enquiry_approach | project_approx_value | item_qty | total_qty | next_action | next_call_date | next_call_time | planned1 | actual1 | delay1 | enquiry_status | customer_say | current_stage | followup_status | followup_next_call_date | followup_next_call_time | is_order_received | acceptance_via | payment_mode | payment_terms_days | transport_mode | remark | not_received_reason_status | not_received_reason_remark | customer_order_hold_category | hold_date | hold_remark | sc_name | planned_days | leadscallingdays | enquirycallingdays | orderno |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 3 | 2025-11-25 10:08:09.30877+00 | 2025-11-25 11:17:37.644367+00 | LD-003 | TRIPATI RANA | WHATSAPP | Sourabh Rolling MIlls | 9827164305 | sadfsadf | asfasfasf | asdfsd@email.com | Arunachal Pradesh | asdfasfsa | safasd | fasfasfd | 2025-11-26 | 2025-11-25 | None | Hot | None | yes | 2025-11-24 | INWARD | 231232.00 | [{"name":"HR STRIP","quantity":"1212"}] | 1212 | awfasdfas | 2025-12-02 | 16:34 | 2025-11-26 | 2025-11-28 | None | hot | Reviewing Quote | order-status | None | None | None | yes | email | rtgs | 7 | by road | sadfasfda | project on hold | asdfsadf | None | None | None | ARUN YADAV | 1 | None | None | None |
+| 4 | 2025-11-25 10:45:44.990059+00 | 2025-11-28 06:43:38.412729+00 | LD-004 | Aakash Agrawal | Indiamart | RBP Energy | 9022331100 | Rakesh Verma | Bilaspur, CG | rbp@gmail.com | Chhattisgarh | asfdas | Manufacturing | asdfdasf | 2025-11-26 | None | None | Hot | None | yes | 2025-11-27 | Phone Call | 21121.00 | [{"name":"HR STRIP","quantity":"12121"},{"name":"F | 133333 | awfasdfas | 2025-11-24 | 16:33 | 2025-11-29 | 2025-11-29 | None | open | Customer said quotation under review | order-status | None | None | None | yes | email | neft | 30 | road transport | asfasfas | None | None | None | None | None | Amit Pandey | 1 | None | None | DO-05 |
+
+---
+
+## 📋 Table: `leads_tracker`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `TEXT` | True |
+| **created_at** | `TEXT` | True |
+| **updated_at** | `TEXT` | True |
+| **lead_no** | `TEXT` | True |
+| **lead_source** | `TEXT` | True |
+| **company_name** | `TEXT` | True |
+| **phone_number** | `TEXT` | True |
+| **sales_person_name** | `TEXT` | True |
+| **location** | `TEXT` | True |
+| **email_address** | `TEXT` | True |
+| **status** | `TEXT` | True |
+| **current_stage** | `TEXT` | True |
+| **followup_status** | `TEXT` | True |
+| **next_call_date** | `TEXT` | True |
+| **remark** | `TEXT` | True |
+| **calling_days** | `TEXT` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`id`** (9 values): `['1', '2', '3', '4', '5', '6', '7', '8', '9']`
+- **`created_at`** (9 values): `['2025-11-25 10:57:54.431151+00', '2025-11-25 10:58:25.812082+00', '2025-11-25 11:01:15.234733+00', '2025-11-25 11:03:36.617871+00', '2025-11-25 11:04:59.934056+00', '2025-11-25 11:06:41.442301+00', '2025-11-25 11:07:44.223505+00', '2025-11-25 11:17:37.61827+00', '2025-11-28 06:43:38.379908+00']`
+- **`updated_at`** (2 values): `['LD-003', 'LD-004']`
+- **`lead_no`** (2 values): `['Customer said quotation under review', 'Reviewing Quote']`
+- **`lead_source`** (1 values): `['Hot']`
+- **`company_name`** (2 values): `['expected', 'yes']`
+- **`phone_number`** (4 values): `['2025-11-24', '2025-11-25', '2025-11-26', '2025-11-27']`
+- **`sales_person_name`** (2 values): `['INWARD', 'Phone Call']`
+- **`location`** (7 values): `['[]', '[{"name": "HR STRIP", "quantity": "1212"}]', '[{"name": "HR STRIP", "quantity": "1212121"}]', '[{"name": "HR STRIP", "quantity": "12121"}, {"name": "Fe500D TMT Bar", "quantity": "121212"}]', '[{"name": "MS BILLET", "quantity": "1212"}]', '[{"name": "MS BILLET", "quantity": "12121"}]', '[{"name": "MS PIPE1", "quantity": "212"}]']`
+- **`email_address`** (6 values): `['0', '1212', '12121', '1212121', '133333', '212']`
+- **`status`** (1 values): `['awfasdfas']`
+- **`current_stage`** (2 values): `['2025-11-24', '2025-12-02']`
+- **`followup_status`** (2 values): `['16:33', '16:34']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | created_at | updated_at | lead_no | lead_source | company_name | phone_number | sales_person_name | location | email_address | status | current_stage | followup_status | next_call_date | remark | calling_days |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 2025-11-25 10:57:54.431151+00 | LD-003 | Reviewing Quote | Hot | yes | 2025-11-26 | INWARD | [{"name": "MS BILLET", "quantity": "1212"}] | 1212 | None | None | None | None | None | None |
+| 2 | 2025-11-25 10:58:25.812082+00 | LD-003 | Reviewing Quote | Hot | yes | 2025-11-25 | INWARD | [{"name": "MS PIPE1", "quantity": "212"}] | 212 | None | None | None | None | None | None |
+| 3 | 2025-11-25 11:01:15.234733+00 | LD-003 | Reviewing Quote | Hot | yes | 2025-11-24 | INWARD | [{"name": "HR STRIP", "quantity": "1212121"}] | 1212121 | None | None | None | None | None | None |
+
+---
+
+## 📋 Table: `dropdown`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **created_at** | `TIMESTAMP` | True |
+| **lead_receiver_name** | `TEXT` | True |
+| **lead_source** | `TEXT` | True |
+| **state** | `TEXT` | True |
+| **quotation_shared_by** | `TEXT` | True |
+| **enquiry_status** | `TEXT` | True |
+| **acceptance_via** | `TEXT` | True |
+| **payment_mode** | `TEXT` | True |
+| **not_received_reason_status** | `TEXT` | True |
+| **hold_reason_category** | `TEXT` | True |
+| **consignee_company_name** | `TEXT` | True |
+| **consignee_client_name** | `TEXT` | True |
+| **consignee_client_contact_no** | `TEXT` | True |
+| **consignee_billing_address** | `TEXT` | True |
+| **consignee_state** | `TEXT` | True |
+| **consignee_gstin_uin** | `TEXT` | True |
+| **consignee_state_code** | `TEXT` | True |
+| **sp_name** | `TEXT` | True |
+| **reference_contact_no1** | `TEXT` | True |
+| **sp_state** | `TEXT` | True |
+| **sp_state_code** | `TEXT` | True |
+| **sp_pan** | `TEXT` | True |
+| **consignor_bank_details** | `TEXT` | True |
+| **consignor_state_code** | `TEXT` | True |
+| **consignor_gstin** | `TEXT` | True |
+| **consignor_msme_no** | `TEXT` | True |
+| **lead_assign_to** | `TEXT` | True |
+| **requirement_product_category** | `TEXT` | True |
+| **sales_coordinator_name** | `TEXT` | True |
+| **nob** | `TEXT` | True |
+| **enquiry_approach** | `TEXT` | True |
+| **requirement_product_category_codes** | `TEXT` | True |
+| **live_company_name** | `TEXT` | True |
+| **live_person_name** | `TEXT` | True |
+| **live_mobile** | `TEXT` | True |
+| **live_email_address** | `TEXT` | True |
+| **live_address** | `TEXT` | True |
+| **live_sc_name** | `TEXT` | True |
+| **live_source** | `TEXT` | True |
+| **direct_company_name** | `TEXT` | True |
+| **direct_client_name** | `TEXT` | True |
+| **direct_client_contact_no** | `TEXT` | True |
+| **direct_state** | `TEXT` | True |
+| **direct_billing_address** | `TEXT` | True |
+| **item_code** | `TEXT` | True |
+| **item_category** | `TEXT` | True |
+| **item_name** | `TEXT` | True |
+| **payment_terms_days** | `TEXT` | True |
+| **transport_mode** | `TEXT` | True |
+| **freight_type** | `TEXT` | True |
+| **payment_terms** | `TEXT` | True |
+| **enquiry_receiver_name** | `TEXT` | True |
+| **enquiry_assign_to** | `TEXT` | True |
+| **item_list** | `TEXT` | True |
+| **rate** | `NUMERIC` | True |
+| **description** | `TEXT` | True |
+| **prepared_by** | `TEXT` | True |
+| **followup_status** | `TEXT` | True |
+| **reference_phone_no_2** | `TEXT` | True |
+| **what_did_customer_say** | `TEXT` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`lead_receiver_name`** (6 values): `['Amit Pandey', 'Anil Kumar Mishra', 'NULL', 'Rahul Sharma', 'Sheetal Patel', 'Tripati Rana']`
+- **`lead_source`** (6 values): `['Direct Visit', 'Email', 'Indiamart', 'Referral', 'Telephonic', 'Whatsapp']`
+- **`state`** (2 values): `['Chhattisgarh', 'NULL']`
+- **`quotation_shared_by`** (2 values): `['NULL', 'Rahul Sharma']`
+- **`enquiry_status`** (4 values): `['Followup', 'Hot', 'Open', 'Quotation Sent']`
+- **`acceptance_via`** (2 values): `['Email', 'NULL']`
+- **`payment_mode`** (4 values): `['Cash', 'NEFT', 'RTGS', 'UPI']`
+- **`not_received_reason_status`** (5 values): `['Budget Constraints', 'Customer Busy', 'High Price', 'Low Budget', 'Need more time']`
+- **`hold_reason_category`** (4 values): `['Budget Issue', 'Customer Documentation Pending', 'Not Interested', 'Project on hold']`
+- **`consignee_company_name`** (2 values): `['Hamar Energy Pvt Ltd', 'NULL']`
+- **`consignee_client_name`** (2 values): `['NULL', 'Prakash Sharma']`
+- **`consignee_client_contact_no`** (2 values): `['9876543210', 'NULL']`
+- **`consignee_billing_address`** (2 values): `['NULL', 'Raipur, Chhattisgarh - 492001']`
+- **`consignee_state`** (2 values): `['Chhattisgarh', 'NULL']`
+- **`consignee_gstin_uin`** (2 values): `['22AABCH1234Q1Z5', 'NULL']`
+- **`consignee_state_code`** (2 values): `['22', 'NULL']`
+- **`sp_name`** (6 values): `['Aakash', 'Harish', 'Rohit', 'S K Nayak', 'Tarun', 'Vipul']`
+- **`reference_contact_no1`** (6 values): `['7723020095', '9000011111', '9876501234', '9898989898', '9993322110', '9999933333']`
+- **`sp_state`** (6 values): `['Andhra Pradesh', 'Chhattisgarh', 'demo', 'Madhya Pradesh', 'Maharashtra', 'Odisha']`
+- **`sp_state_code`** (5 values): `['21', '22', '23', '27', '36']`
+- **`sp_pan`** (5 values): `['ABCDE1234F', 'ABCDE4455Z', 'FGHJK1234X', 'JKLPM9987D', 'MIJLP8877A']`
+- **`consignor_bank_details`** (6 values): `['Account No.: 123456789012, HDFC Bank, Raipur', 'Account No.: 733605010000120 Bank Name: Union Bank of India Bank Address: MID CORP BR IFSC CODE: UBIN0573361 Email: marketing@sagartmt.com Website: www.pankajgroup.in', 'Axis Bank, Rourkela', 'Bank of Baroda, Indore', 'ICICI Bank, Nagpur Branch, A/C: 121212121212', 'Union Bank, MID CORP BR, A/C: 733605010000120']`
+- **`consignor_state_code`** (5 values): `['21', '22', '23', '27', '36']`
+- **`consignor_gstin`** (6 values): `['21ABCDE1111F1Z3', '22AABCH1234Q1Z5', '22AABCT1234E1Z2', '23AACCR1111R1Z2', '27ABCDE1234F1Z5', '36AAICS2367M1Z3']`
+- **`consignor_msme_no`** (5 values): `['MSME123456', 'MSME1299', 'MSME55678', 'MSME908776', 'MSME9988']`
+- **`lead_assign_to`** (2 values): `['Aakash Agrawal', 'NULL']`
+- **`requirement_product_category`** (4 values): `['Angles', 'MS BILLET', 'Rod', 'TMT Bars']`
+- **`sales_coordinator_name`** (6 values): `['Arun Yadav', 'Dayanand Kaiwartya', 'Jay Nirmal', 'Mohit Sinha', 'NULL', 'Shubham Pandey']`
+- **`nob`** (5 values): `['Construction', 'Fabrication', 'Industrial', 'Manufacturing', 'Rolling']`
+- **`enquiry_approach`** (3 values): `['Email', 'Phone', 'Phone Call']`
+- **`requirement_product_category_codes`** (5 values): `['ANG-009', 'BLT-002', 'RBT-007', 'TMT-001', 'TMT-016']`
+- **`live_company_name`** (6 values): `['Hamar Energy Pvt Ltd', 'MetalWorks India', 'Navkar Metals', 'RBP Energy', 'SRM Mining Pvt Ltd', 'Sunrise Casting']`
+- **`live_person_name`** (6 values): `['Devendra Rao', 'Kaushal', 'Niraj', 'Prakash Sharma', 'Rakesh Verma', 'Santosh']`
+- **`live_mobile`** (6 values): `['8888888888', '9022331100', '9090909090', '9123456780', '9876543210', '9988776655']`
+- **`live_email_address`** (5 values): `['metalworks@gmail.com', 'navkar@gmail.com', 'rbp@gmail.com', 'srm@gmail.com', 'sunrise@gmail.com']`
+- **`live_address`** (6 values): `['Bilaspur, CG', 'Indore, MP', 'Nagpur MIDC', 'Raipur, Chhattisgarh - 492001', 'Rourkela', 'Visakhapatnam, AP']`
+- **`live_sc_name`** (6 values): `['Arun Yadav', 'Dayanand Kaiwartya', 'Jay Nirmal', 'Mohit Sinha', 'NULL', 'Shubham Pandey']`
+- **`live_source`** (5 values): `['Email', 'Exhibition', 'Google Ads', 'Social Media', 'Whatsapp']`
+- **`direct_company_name`** (5 values): `['3M Projects Pvt Ltd', 'ABC Steels Pvt Ltd', 'PQR Engineering Ltd', 'Royal Steel Traders', 'Shree Metals Pvt Ltd']`
+- **`direct_client_name`** (5 values): `['Ajay Gupta', 'Dharmendra', 'Irfan Khan', 'Manoj Singh', 'Rajesh Verma']`
+- **`direct_client_contact_no`** (5 values): `['9001122334', '9033442211', '9765432100', '9823111000', '9988771122']`
+- **`direct_state`** (5 values): `['Andhra Pradesh', 'Chhattisgarh', 'Madhya Pradesh', 'Maharashtra', 'Odisha']`
+- **`direct_billing_address`** (5 values): `['IDA Plot 4/A, Visakhapatnam', 'Indore Industrial Belt', 'Industrial Area, Raipur', 'MIDC Industrial Area, Nagpur', 'Rourkela Steel Zone']`
+- **`item_code`** (6 values): `['ANG-009', 'BLT-002', 'ITM-1001', 'RBT-007', 'TMT-001', 'TMT-016']`
+- **`item_category`** (5 values): `['Angles', 'MS Billet', 'Rod', 'Steel Bars', 'TMT Bars']`
+- **`item_name`** (5 values): `['8mm Rod', 'Angle 65x65', 'Fe500D TMT Bar', 'Fe550 TMT Bar', 'MS Billet 100mm']`
+- **`payment_terms_days`** (6 values): `['0', '1', '15', '30', '30days', '7']`
+- **`transport_mode`** (4 values): `['BY ROAD', 'Road Transport', 'Self Pickup', 'Transport']`
+- **`freight_type`** (3 values): `['FOR', 'NA', 'Paid']`
+- **`payment_terms`** (5 values): `['100% ADVANCE', '50% Advance', 'Advance', 'Advance Payment', 'Immediate']`
+- **`enquiry_receiver_name`** (6 values): `['Amit Pandey', 'Anil Kumar Mishra', 'NULL', 'Rahul Sharma', 'Sheetal Patel', 'Tripati Rana']`
+- **`enquiry_assign_to`** (6 values): `['Abhishek', 'Akhil', 'Anshul', 'Rahul Sharma', 'Sagar TMT Sales Team', 'Vikas']`
+- **`item_list`** (5 values): `['8mm Rod Qty 150', 'Angle 65x65 Qty 50', 'Fe500D TMT BAR - 12mm - Qty 500KG', 'Fe550D TMT - Qty 300KG', 'MS BILLET - 100mm']`
+- **`description`** (5 values): `['High quality TMT bars suitable for construction', 'Premium grade TMT for high load', 'Standard billet for rolling mills', 'Standard rod for fabrication', 'Standard steel angle']`
+- **`prepared_by`** (2 values): `['Aakash', 'NULL']`
+- **`followup_status`** (3 values): `['Followup', 'Pending', 'Reviewing']`
+- **`reference_phone_no_2`** (6 values): `['8888811111', '9000022222', '9811167788', '9898989898', '9900990099', '9998877665']`
+- **`what_did_customer_say`** (5 values): `['Customer said quotation under review', 'Req: Send revised value', 'Reviewing Quote', 'Wants to negotiate', 'Will revert soon']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | created_at | lead_receiver_name | lead_source | state | quotation_shared_by | enquiry_status | acceptance_via | payment_mode | not_received_reason_status | hold_reason_category | consignee_company_name | consignee_client_name | consignee_client_contact_no | consignee_billing_address | consignee_state | consignee_gstin_uin | consignee_state_code | sp_name | reference_contact_no1 | sp_state | sp_state_code | sp_pan | consignor_bank_details | consignor_state_code | consignor_gstin | consignor_msme_no | lead_assign_to | requirement_product_category | sales_coordinator_name | nob | enquiry_approach | requirement_product_category_codes | live_company_name | live_person_name | live_mobile | live_email_address | live_address | live_sc_name | live_source | direct_company_name | direct_client_name | direct_client_contact_no | direct_state | direct_billing_address | item_code | item_category | item_name | payment_terms_days | transport_mode | freight_type | payment_terms | enquiry_receiver_name | enquiry_assign_to | item_list | rate | description | prepared_by | followup_status | reference_phone_no_2 | what_did_customer_say |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 3 | 2025-11-29 10:19:59.898706+00:00 | Rahul Sharma | Email | NULL | NULL | Hot | NULL | RTGS | Budget Constraints | Project on hold | NULL | NULL | NULL | NULL | NULL | NULL | NULL | Harish | 7723020095 | Andhra Pradesh | 36 | ABCDE4455Z | Union Bank, MID CORP BR, A/C: 733605010000120 | 36 | 36AAICS2367M1Z3 | MSME908776 | NULL | MS BILLET | Dayanand Kaiwartya | Rolling | Email | BLT-002 | SRM Mining Pvt Ltd | Devendra Rao | 9988776655 | srm@gmail.com | Visakhapatnam, AP | Dayanand Kaiwartya | Whatsapp | 3M Projects Pvt Ltd | Rajesh Verma | 9823111000 | Andhra Pradesh | IDA Plot 4/A, Visakhapatnam | BLT-002 | MS Billet | MS Billet 100mm | 1 | BY ROAD | FOR | 100% ADVANCE | Anil Kumar Mishra | Akhil | MS BILLET - 100mm | 42000.00 | Standard billet for rolling mills | NULL | Reviewing | 9900990099 | Reviewing Quote |
+| 4 | 2025-11-29 10:19:59.898706+00:00 | Tripati Rana | Referral | NULL | NULL | Followup | NULL | UPI | Customer Busy | Customer Documentation Pending | NULL | NULL | NULL | NULL | NULL | NULL | NULL | Vipul | 9876501234 | Maharashtra | 27 | FGHJK1234X | ICICI Bank, Nagpur Branch, A/C: 121212121212 | 27 | 27ABCDE1234F1Z5 | MSME1299 | NULL | TMT Bars | Jay Nirmal | Industrial | Email | TMT-016 | Navkar Metals | Santosh | 8888888888 | navkar@gmail.com | Nagpur MIDC | Jay Nirmal | Exhibition | PQR Engineering Ltd | Ajay Gupta | 9001122334 | Maharashtra | MIDC Industrial Area, Nagpur | TMT-016 | TMT Bars | Fe550 TMT Bar | 15 | Transport | Paid | Advance | Rahul Sharma | Vikas | Fe550D TMT - Qty 300KG | 62000.00 | Premium grade TMT for high load | NULL | Pending | 9811167788 | Req: Send revised value |
+| 5 | 2025-11-29 10:19:59.898706+00:00 | Amit Pandey | Direct Visit | NULL | NULL | Open | NULL | Cash | Low Budget | Not Interested | NULL | NULL | NULL | NULL | NULL | NULL | NULL | Rohit | 9000011111 | Madhya Pradesh | 23 | JKLPM9987D | Bank of Baroda, Indore | 23 | 23AACCR1111R1Z2 | MSME55678 | NULL | Angles | Mohit Sinha | Construction | Phone | ANG-009 | Sunrise Casting | Kaushal | 9123456780 | sunrise@gmail.com | Indore, MP | Mohit Sinha | Email | Royal Steel Traders | Irfan Khan | 9988771122 | Madhya Pradesh | Indore Industrial Belt | ANG-009 | Angles | Angle 65x65 | 0 | Self Pickup | NA | Immediate | Tripati Rana | Anshul | Angle 65x65 Qty 50 | 52000.00 | Standard steel angle | NULL | Pending | 9000022222 | Wants to negotiate |
+
+---
+
+## 📋 Table: `enq_erp`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **item_type** | `VARCHAR(100)` | True |
+| **size** | `VARCHAR(100)` | True |
+| **thickness** | `NUMERIC` | True |
+| **enquiry_date** | `DATE` | True |
+| **customer** | `VARCHAR(200)` | True |
+| **quantity** | `INTEGER` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **sales_executive** | `VARCHAR(300)` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`item_type`** (3 values): `['rectangular', 'round', 'square']`
+- **`size`** (19 values): `['19X19', '20X40', '25 OD', '25X25', '25X50', '25X68', '31X31', '32 OD', '37X56', '38X38', '42 OD', '47X47', '48 OD', '60 OD', '62X62', '72X72', '80X40', '88 OD', '96X48']`
+- **`sales_executive`** (3 values): `['Dayanand Kaiwartya', 'Jai Nirmal', 'Mohit Sinha']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | item_type | size | thickness | enquiry_date | customer | quantity | created_at | sales_executive |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 131 | round | 48 OD | 3.20 | 2026-02-05 | Mega iran  | 27 | 2026-02-05 10:43:48.745835 | Dayanand Kaiwartya |
+| 112 | square | 19X19 | 1.50 | 2026-02-05 | Mega iron  | 10 | 2026-02-05 10:26:58.778717 | Dayanand Kaiwartya |
+| 113 | square | 47X47 | 1.50 | 2026-02-05 | Mega iron  | 5 | 2026-02-05 10:26:58.783082 | Dayanand Kaiwartya |
+
+---
+
+## 📋 Table: `re_coiler`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **sample_timestamp** | `TIMESTAMP` | True |
+| **hot_coiler_short_code** | `VARCHAR(50)` | False |
+| **size** | `VARCHAR(50)` | True |
+| **supervisor** | `VARCHAR(100)` | True |
+| **incharge** | `VARCHAR(100)` | True |
+| **contractor** | `VARCHAR(100)` | True |
+| **machine_number** | `VARCHAR(50)` | True |
+| **welder_name** | `VARCHAR(100)` | True |
+| **unique_code** | `VARCHAR(50)` | False |
+| **created_at** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `client_followups`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **followup_id** | `INTEGER` | False |
+| **client_name** | `VARCHAR(150)` | False |
+| **sales_person** | `VARCHAR(150)` | False |
+| **actual_order** | `NUMERIC` | True |
+| **actual_order_date** | `DATE` | True |
+| **date_of_calling** | `DATE` | False |
+| **next_calling_date** | `DATE` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **updated_at** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`sales_person`** (5 values): `['Amit Pandey', 'Anil Kumar Mishra', 'Rahul Sharma', 'Sheetal Patel', 'Tripati Rana']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| followup_id | client_name | sales_person | actual_order | actual_order_date | date_of_calling | next_calling_date | created_at | updated_at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | AA GOLEWALE | Anil Kumar Mishra | None | None | 2026-02-02 | None | 2026-02-17 08:15:55.138164 | 2026-02-17 08:15:55.138164 |
+| 2 | AAKASH INFRATECH,MUNGELI | Amit Pandey | None | None | 2026-02-02 | None | 2026-02-17 08:15:55.138164 | 2026-02-17 08:15:55.138164 |
+| 3 | AAKASH INFRATECH,MUNGELI | Amit Pandey | None | None | 2026-02-04 | None | 2026-02-17 08:15:55.138164 | 2026-02-17 08:15:55.138164 |
+
+---
+
+## 📋 Table: `request`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **person_name** | `VARCHAR(100)` | False |
+| **no_of_person** | `INTEGER` | True |
+| **from_date** | `DATE` | True |
+| **to_date** | `DATE` | True |
+| **type_of_travel** | `VARCHAR(50)` | True |
+| **departure_date** | `DATE` | True |
+| **reason_for_travel** | `VARCHAR(255)` | True |
+| **request_no** | `VARCHAR(50)` | True |
+| **requester_name** | `VARCHAR(255)` | True |
+| **requester_designation** | `VARCHAR(255)` | True |
+| **requester_department** | `VARCHAR(255)` | True |
+| **request_for** | `VARCHAR(255)` | True |
+| **request_quantity** | `INTEGER` | True |
+| **experience** | `VARCHAR(100)` | True |
+| **education** | `VARCHAR(255)` | True |
+| **remarks** | `TEXT` | True |
+| **request_status** | `VARCHAR(50)` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **updated_at** | `TIMESTAMP` | True |
+| **employee_code** | `VARCHAR(100)` | True |
+| **from_city** | `VARCHAR(100)` | True |
+| **to_city** | `VARCHAR(100)` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `login`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **create_at** | `TIMESTAMP` | True |
+| **user_name** | `VARCHAR(150)` | False |
+| **password** | `TEXT` | False |
+| **role** | `VARCHAR(50)` | True |
+| **user_id** | `VARCHAR(50)` | True |
+| **email** | `VARCHAR(200)` | True |
+| **number** | `VARCHAR(20)` | True |
+| **department** | `VARCHAR(100)` | True |
+| **give_by** | `VARCHAR(150)` | True |
+| **status** | `VARCHAR(20)` | True |
+| **user_acess** | `VARCHAR(200)` | True |
+| **employee_id** | `VARCHAR(50)` | True |
+| **createdate** | `TIMESTAMP` | True |
+| **updatedate** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `resume_request`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **candidate_name** | `VARCHAR(255)` | False |
+| **candidate_email** | `VARCHAR(255)` | True |
+| **candidate_mobile** | `VARCHAR(20)` | True |
+| **applied_for_designation** | `VARCHAR(255)` | True |
+| **req_id** | `VARCHAR(100)` | True |
+| **experience** | `NUMERIC(4, 1)` | True |
+| **previous_company** | `VARCHAR(255)` | True |
+| **previous_salary** | `NUMERIC(12, 2)` | True |
+| **reason_for_changing** | `TEXT` | True |
+| **marital_status** | `VARCHAR(50)` | True |
+| **reference** | `VARCHAR(255)` | True |
+| **address_present** | `TEXT` | True |
+| **resume** | `TEXT` | True |
+| **interviewer_planned** | `TIMESTAMP` | True |
+| **interviewer_actual** | `TIMESTAMP` | True |
+| **interviewer_status** | `VARCHAR(100)` | True |
+| **candidate_status** | `VARCHAR(50)` | True |
+| **joined_status** | `VARCHAR(10)` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **updated_at** | `TIMESTAMP` | True |
 
 
 

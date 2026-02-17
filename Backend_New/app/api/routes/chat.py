@@ -254,7 +254,7 @@ async def stream_agent_response(question: str, session_id: str) -> AsyncGenerato
                         print(f"[DEBUG] No messages in run_query state!")
         
         # Now stream the answer generation with typing effect
-        if final_result:
+        if final_result is not None:
             # Check if result is an error
             is_error = any([
                 "Error:" in str(final_result),
@@ -270,10 +270,27 @@ async def stream_agent_response(question: str, session_id: str) -> AsyncGenerato
                 # DON'T cache failed queries!
                 return
             
+            # Check if result is empty (valid SQL, no matching rows)
+            is_empty_result = False
+            try:
+                result_stripped = final_result.strip()
+                if result_stripped in ("", "[]", "()", "None", "none"):
+                    is_empty_result = True
+                elif result_stripped.startswith("[") and result_stripped.endswith("]"):
+                    parsed = eval(result_stripped)
+                    if isinstance(parsed, list) and (len(parsed) == 0 or parsed == [()]):
+                        is_empty_result = True
+            except:
+                pass
+            
+            if is_empty_result:
+                print(f"[DEBUG] Query returned empty results — generating friendly response...")
+                # Pass empty result to the answer generator for a user-friendly message
+                final_result = "[]  (No matching records found)"
+            
             print(f"[DEBUG] Generating natural language answer with streaming...")
             yield f"data: {json.dumps({'type': 'status', 'message': '💬 Generating answer...'})}\n\n"
             
-            # Use Dynamic Answer Generator (Blocking for now, simulated streaming)
             # Use Dynamic Answer Generator (Real Streaming)
             answer_func = get_answer_generator(db_name)
             answer_gen = answer_func(question, final_result, generated_sql or "")
@@ -286,16 +303,16 @@ async def stream_agent_response(question: str, session_id: str) -> AsyncGenerato
             
             # Cache ONLY successful queries (Scoped)
             
-            # Cache ONLY successful queries (Scoped)
-            if generated_sql:
+            # Cache ONLY successful, non-empty queries (Scoped)
+            if generated_sql and not is_empty_result:
                 query_cache.cache_query(question, generated_sql, db_name=db_name)
             
             # Store context for follow-ups
             if generated_sql:
                 context_manager.extract_and_store(session_id, question, generated_sql)
         else:
-            print(f"[DEBUG] ERROR: No result captured!")
-            yield f"data: {json.dumps({'type': 'error', 'message': 'No result returned'})}\n\n"
+            print(f"[DEBUG] ERROR: No result captured from agent graph!")
+            yield f"data: {json.dumps({'type': 'error', 'message': 'The system could not process your query. Please try rephrasing your question.'})}\n\n"
         
         # Send completion
         yield f"data: {json.dumps({'type': 'done'})}\n\n"

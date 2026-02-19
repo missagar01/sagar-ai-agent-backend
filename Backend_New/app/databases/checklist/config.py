@@ -7,7 +7,7 @@ Defines schema, allowed columns, and business rules.
 # Router Metadata (Used for Auto-Discovery)
 ROUTER_METADATA = {
     "name": "checklist",
-    "description": "A comprehensive Task, Employee, HR, Admin, Finance & Subscription Operations System. It tracks recurring daily/weekly routines (checklist), one-time assigned duties (delegation), employee leave requests (leave_request), travel/ticket bookings (ticket_book, request), plant visitor approvals (plant_visitor), candidate/resume intake for hiring (resume_request), company subscriptions & renewals (subscription, subscription_renewals, approval_history, payment_history), company/personal document management (documents, sharedocuments), loan & finance tracking (all_loans, request_forclosure, collect_noc), payment processing (payment_fms), and maintenance task master data (master). Use this database for queries related to employee task completion, delegation, leave, travel, visitor passes, hiring, subscription status, renewal tracking, approval history, payment records, loan details, EMI, NOC collection, document management, and maintenance task priorities.",
+    "description": "A comprehensive Task, Employee, HR, Admin, Finance & Subscription Operations System. It tracks recurring daily/weekly routines (checklist), one-time assigned duties (delegation), employee leave requests (leave_request), travel/ticket bookings (ticket_book, request), plant visitor approvals (plant_visitor), travel/hiring requests (request), and candidate resume intake for HR (resume_request), company subscriptions & renewals (subscription, subscription_renewals, approval_history, payment_history), company/personal document management (documents, sharedocuments), loan & finance tracking (all_loans, request_forclosure, collect_noc), payment processing (payment_fms), and maintenance task master data (master). Use this database for queries related to employee task completion, delegation, leave, travel, visitor passes, hiring, subscription status, renewal tracking, approval history, payment records, loan details, EMI, NOC collection, document management, and maintenance task priorities.",
     "keywords": [
         "task", "pending", "completed", "late", "given by", "department", 
         "users", "report", "summary", "checklist system", "task db", 
@@ -627,7 +627,8 @@ resume intake for HR (`resume_request`).
       * `company_department` (TEXT): Owning department.
       * `tags` (ARRAY): Array of tags. Use 'value' = ANY(tags) for filtering.
       * `person_name` (TEXT): Associated person/entity.
-      * `need_renewal` (VARCHAR(3)): 'yes' or 'no'. Use LOWER().
+      * `need_renewal` (ENUM): 'yes' or 'no'.
+          - ⚠️ CRITICAL: This is an ENUM type. DO NOT use LOWER() function on this column. Use direct comparison: `need_renewal = 'yes'`.
       * `renewal_date` (DATE): Renewal/expiry date.
       * `image` (TEXT): Document file URL.
       * `email` (TEXT): Associated email.
@@ -636,8 +637,8 @@ resume intake for HR (`resume_request`).
     - **❌ FORBIDDEN COLUMNS:** None.
     - **LOGIC:**
       * Active: is_deleted = false OR is_deleted IS NULL
-      * Needs renewal: LOWER(need_renewal) = 'yes' AND renewal_date IS NOT NULL
-      * Expired: renewal_date < CURRENT_DATE AND LOWER(need_renewal) = 'yes'
+      * Needs renewal: need_renewal = 'yes' AND renewal_date IS NOT NULL
+      * Expired: renewal_date < CURRENT_DATE AND need_renewal = 'yes'
 
 18. **TABLE: `sharedocuments`** (Document Sharing Log)
     - **Working:** Outbound document sharing audit log.
@@ -707,9 +708,11 @@ resume intake for HR (`resume_request`).
    - Metrics: Total, Completed, Pending, Overdue (Delegation only), On-time.
 
 4. **STRING COMPARISON (CRITICAL FOR ALL TABLES):**
-   - ⚠️ ALWAYS use `LOWER(column) = LOWER('Value')` for any TEXT/VARCHAR comparisons.
-   - Names, statuses, and categorical values have inconsistent casing across all tables.
-   - Example: `LOWER(person_name) = LOWER('Hem Kumar')`, `LOWER(request_status) = LOWER('pending')`
+    - ⚠️ ALWAYS use `LOWER(column) = LOWER('Value')` for any TEXT/VARCHAR comparisons.
+    - 🛑 **EXCEPTION**: DO NOT use `LOWER()` on columns defined as **ENUM**, **BOOLEAN**, **UUID**, or **DATE/TIMESTAMP**.
+    - Example (TEXT): `LOWER(person_name) = LOWER('Hem Kumar')`
+    - Example (ENUM/BOOL): `need_renewal = 'yes'`, `collect_noc = true`
+    - Names, statuses, and categorical values have inconsistent casing across all tables.
 
 5. **ADMIN/HR TABLE STATES:**
    - **Leave Pending:** `LOWER(request_status) = 'pending'`
@@ -729,7 +732,7 @@ resume intake for HR (`resume_request`).
    - **NOC Collected:** `collect_noc = true` in collect_noc
    - **NOC Pending:** `collect_noc = false OR collect_noc IS NULL` in collect_noc
    - **Document Active:** `is_deleted = false OR is_deleted IS NULL` in documents
-   - **Document Needs Renewal:** `LOWER(need_renewal) = 'yes'` in documents
+   - **Document Needs Renewal:** `need_renewal = 'yes'` in documents
 
 7. **SUBSCRIPTION JOIN RULES:**
    - subscription.subscription_no = approval_history.subscription_no

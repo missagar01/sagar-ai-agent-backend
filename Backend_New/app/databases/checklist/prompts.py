@@ -127,7 +127,7 @@ using the following intent dimensions:
     • noc_collected → collect_noc = true (collect_noc)
     • noc_pending → collect_noc = false (collect_noc)
     • doc_active → is_deleted = false OR is_deleted IS NULL (documents)
-    • doc_needs_renewal → LOWER(need_renewal) = 'yes' (documents)
+    • doc_needs_renewal → need_renewal = 'yes' (documents)
     • all
 
 - filters:
@@ -156,13 +156,15 @@ SQL GENERATION RULES (STRICT)
 8. Cast TEXT dates explicitly when required.
 9. Output ONLY SQL. No markdown. No explanation.
 10. **CRITICAL:** Always use `LOWER(column) = LOWER('Value')` for ALL string comparisons across ALL tables.
+    🛑 **EXCEPTION**: DO NOT use `LOWER()` on columns defined as **ENUM**, **BOOLEAN**, **UUID**, or **DATE/TIMESTAMP**.
     Examples:
     - `LOWER(name) = LOWER('Hem Kumar Jagat')`
     - `LOWER(request_status) = LOWER('pending')`
-    - `LOWER(employee_name) = LOWER('Rajesh Kumar')`
-    - `LOWER(type_of_travel) = LOWER('flight')`
-    Never compare string literals directly without LOWER().
-11. **ENUM/CATEGORICAL VALUES:** When filtering on columns with known categorical values (e.g., status, type_of_bill, request_status), use the exact values from the schema with LOWER() normalization.
+    - `need_renewal = 'yes'` (ENUM)
+    - `collect_noc = true` (BOOLEAN)
+    - `id = '...'` (UUID)
+    Never compare string literals directly without LOWER() unless it's one of the exceptions above.
+11. **ENUM/CATEGORICAL VALUES:** When filtering on columns with known categorical values (e.g., status, type_of_bill, request_status), use the exact values from the schema with LOWER() normalization (unless it's an ENUM).
 12. **NUMERIC COLUMNS:** ticket_book amounts (per_ticket_amount, total_amount, charges), resume_request (experience, previous_salary) are NUMERIC. Use SUM/AVG/COUNT for aggregations.
 
 ────────────────────────────────────────────────────────────
@@ -297,7 +299,8 @@ VALIDATION CHECKS (IN ORDER)
 
 7. STRING COMPARISON
 - ALL text comparisons MUST use LOWER() on both sides.
-- If a query compares names or statuses without LOWER(), REJECT it.
+- 🛑 **EXCEPTION**: DO NOT use `LOWER()` on columns defined as **ENUM**, **BOOLEAN**, **UUID**, or **DATE/TIMESTAMP**.
+- If a query compares names or statuses WITHOUT LOWER() (and it's not an exception type), REJECT it.
 
 ────────────────────────────────────────────────────────────
 STRICT RULES (NON-NEGOTIABLE)

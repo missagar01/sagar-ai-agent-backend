@@ -147,7 +147,10 @@ def call_get_schema(state: EnhancedState):
     target_tables = [
         "checklist", "delegation", "users",
         "ticket_book", "leave_request", "plant_visitor",
-        "request", "resume_request"
+        "request", "resume_request",
+        "master", "all_loans", "request_forclosure", "collect_noc",
+        "subscription", "approval_history", "payment_history", "subscription_renewals",
+        "documents", "sharedocuments", "payment_fms"
     ]
     
     tables_str = ", ".join(target_tables)
@@ -162,6 +165,17 @@ def call_get_schema(state: EnhancedState):
     desc_plant_visitor = config.get_columns_description('plant_visitor')
     desc_request = config.get_columns_description('request')
     desc_resume_request = config.get_columns_description('resume_request')
+    desc_master = config.get_columns_description('master')
+    desc_all_loans = config.get_columns_description('all_loans')
+    desc_request_forclosure = config.get_columns_description('request_forclosure')
+    desc_collect_noc = config.get_columns_description('collect_noc')
+    desc_subscription = config.get_columns_description('subscription')
+    desc_approval_history = config.get_columns_description('approval_history')
+    desc_payment_history = config.get_columns_description('payment_history')
+    desc_subscription_renewals = config.get_columns_description('subscription_renewals')
+    desc_documents = config.get_columns_description('documents')
+    desc_sharedocuments = config.get_columns_description('sharedocuments')
+    desc_payment_fms = config.get_columns_description('payment_fms')
 
     column_restrictions = f"""
 🔒 COLUMN RESTRICTIONS (Client Requirement):
@@ -176,6 +190,17 @@ ONLY use these columns in your queries:
 🏭 PLANT_VISITOR table: {desc_plant_visitor}
 ✈️ REQUEST table: {desc_request}
 📄 RESUME_REQUEST table: {desc_resume_request}
+🔧 MASTER table: {desc_master}
+🏦 ALL_LOANS table: {desc_all_loans}
+📝 REQUEST_FORCLOSURE table: {desc_request_forclosure}
+📜 COLLECT_NOC table: {desc_collect_noc}
+📑 SUBSCRIPTION table: {desc_subscription}
+✅ APPROVAL_HISTORY table: {desc_approval_history}
+💳 PAYMENT_HISTORY table: {desc_payment_history}
+🔄 SUBSCRIPTION_RENEWALS table: {desc_subscription_renewals}
+📂 DOCUMENTS table: {desc_documents}
+📤 SHAREDOCUMENTS table: {desc_sharedocuments}
+💰 PAYMENT_FMS table: {desc_payment_fms}
 
 ❌ DO NOT query or SELECT any other columns from these tables.
 ═══════════════════════════════════════════════════════════════════════════════

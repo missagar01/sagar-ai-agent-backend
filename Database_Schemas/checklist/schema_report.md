@@ -1,5 +1,5 @@
 # 🗄️ Schema Report: Checklist & Delegation System
-**Generated:** 2026-02-17 15:37
+**Generated:** 2026-02-19 16:14
 
 ---
 
@@ -265,7 +265,7 @@
 
 
 ### 🏷️ Categorical / Allowed Values:
-- **`given_by`** (20 values): `['', 'AK GUPTA', 'ANIL KUMAR MISHRA', 'ANUP KUMAR BOPCHE', 'DEEPAK BHALLA', 'G RAM MOHAN RAO', 'GUNJAN TIWARI', 'HULLAS PASWAN', 'MANTU ANAND GHOSE', 'MRIGENDRA NARAYAN BEPARI', 'MUKESH PATLE', 'RAJNISH BHARDWAJ', 'RAVI KUMAR SINGH', 'RINKU GAUTAM', 'RINKU SINGH', 'ROSHAN RAJAK', 'SANDEEP DUBEY', 'SHAILESH CHITRE', 'SHEELESH MARELE', 'SUMAN JHA']`
+- **`given_by`** (21 values): `['', 'AAKASH AGRAWAL', 'AK GUPTA', 'ANIL KUMAR MISHRA', 'ANUP KUMAR BOPCHE', 'DEEPAK BHALLA', 'G RAM MOHAN RAO', 'GUNJAN TIWARI', 'HULLAS PASWAN', 'MANTU ANAND GHOSE', 'MRIGENDRA NARAYAN BEPARI', 'MUKESH PATLE', 'RAJNISH BHARDWAJ', 'RAVI KUMAR SINGH', 'RINKU GAUTAM', 'RINKU SINGH', 'ROSHAN RAJAK', 'SANDEEP DUBEY', 'SHAILESH CHITRE', 'SHEELESH MARELE', 'SUMAN JHA']`
 - **`role`** (2 values): `['admin', 'user']`
 - **`status`** (1 values): `['active']`
 - **`remark`** (1 values): `['']`
@@ -275,8 +275,7 @@
 - **`store_access`** (9 values): `['APPROVE INDENT DATA', 'APPROVE INDENT DATA,APPROVE INDENT GM', 'APPROVE INDENT DATA,COMPLETED ITEMS,STORE OUT APPROVAL', 'APPROVE INDENT HOD', 'INDENT,PURCHASE ORDER,INVENTORY,REPAIR GATE PASS,REPAIR FOLLOW UP', 'INDENT,PURCHASE ORDER,INVENTORY,REPAIR GATE PASS,REPAIR FOLLOW UP,STORE GRN,GRN & PO,COMPLETED ITEMS,RETURNABLE', 'PURCHASE ORDER', 'STORE GRN ADMIN APPROVAL', 'STORE GRN,COMPLETED ITEMS']`
 - **`verify_access`** (2 values): `['hod', 'manager']`
 - **`store_role_access`** (1 values): `['hod']`
-- **`designation`** (23 values): `['', 'AGM PIPE MILL', 'CCM MANAGER', 'CRANE OPT.', 'CRUSHER INCHARGE', 'CYBER SECURITY MANAGER', 'ELECTRICAL SRPECIALIST', 'EMPLOYEE RELATION MANAGER', 'GENERAL TECHNICIAN', 'LEAD TECHNICIAN', 'LOGISTICS MANAGER', 'LOGISTICS OFFICER', 'MARKETING', 'MIS EXECUTIVE', 'OPERATION CONTROLLER', 'OPERATION CONTROLLER (COIL)', 'OPERATION MANAGER', 'PC', 'QUALITY CONTROLLER', 'QUALITY HEAD', 'QUALITY INCHARGE', 'TURNER', 'WEARHOUSE MANAGER']`
-- **`profile_img`** (1 values): `['https://hrfms.sagartmt.com/uploads/employees/employee-profile-1770636453037-205113536.png']`
+- **`profile_img`** (2 values): `['https://hrfms.sagartmt.com/uploads/employees/employee-profile-1770636453037-205113536.png', 'https://hrfms.sagartmt.com/uploads/employees/employee-profile-1771381828203-514717180.jpg']`
 - **`document_img`** (11 values): `['https://hrfms.sagartmt.com/uploads/employees/employee-document-1770636467725-440891120.png', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770715518431-721651306.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770716088427-871000712.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770721468023-934165423.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770722904493-512390339.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770958621497-182151450.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770960213115-604515728.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770975665747-364252331.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1770976005241-929873808.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1771070079182-876649214.jpg', 'https://hrfms.sagartmt.com/uploads/employees/employee-document-1771222502099-382134786.jpg']`
 
 
@@ -284,8 +283,8 @@
 | id | created_at | user_name | password | email_id | number | department | given_by | role | status | user_access | leave_date | remark | leave_end_date | employee_id | last_punch_time | last_punch_device | page_access | system_access | subscription_access_system | user_access1 | store_access | emp_image | verify_access | verify_access_dept | store_role_access | designation | profile_img | document_img |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 452 | 2025-09-27 11:27:51.805913+00:00 | Amit Pandey | a1981 | mkt@sagartmt.com | 7999645505 | MARKETING | None | user | active | MARKETING | None | None | None | S00206 | 2026-01-15 10:11:24 | E03C1CB36042AA02 | dashboard,assign-task,delegation,all-task ,/dashbo | CHECKLIST,SALES MODULE,STORE AND PURCHASE,HRMS | None | None | None | None | None | None | None | None | None | None |
-| 455 | 2025-09-27 12:09:25.008122+00:00 | Jai Nirmal | 9485 | jainirmalkar@gmail.com | 7067132776 | MARKETING | None | user | active | MARKETING | None | None | None | S09485 | 2026-01-15 19:19:31 | E03C1CB34D83AA02 | dashboard,assign-task,delegation,all-task ,/dashbo | CHECKLIST,SALES MODULE,STORE AND PURCHASE,HRMS | None | None | None | https://emp-profiles-dashboard.s3.amazonaws.com/em | None | None | None | None | None | None |
 | 583 | 2025-11-27 11:46:18.011547+00:00 | Process Co-Ordinator | 123456 | pc@sagartmt.com | 9770909919 | ADMIN | None | admin | active | PC | None | None | None | S99999 | None | None | dashboard,assign-task,delegation,all-task  | None | None | None | None | None | None | None | None | None | None | None |
+| 767 | 2026-01-18 05:39:28.544410+00:00 | Shrikant Yadav | 9669 | shrikantyadav@gmail.com | 9875136297 | PIPE MILL MAINTENANCE | None | user | active | PIPE MILL MAINTENANCE | None | None | None | S09669 | None | None | dashboard,all-task,/dashboard,/my-profile,/resume- | Checklist | None | None | None | None | None | None | None | None | None | None |
 
 ---
 
@@ -754,9 +753,9 @@ _No data_
 ### 🔍 Sample Data (First 3 rows):
 | client_id | client_name | city | contact_person | contact_details | sales_person_id | client_type | status | created_at | updated_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2 | AAKASH INFRATECH,MUNGELI | MUNGELI | AKASH JI | 8103622228 | 322 | CRR | active | 2026-01-30 07:50:35.922719 | 2026-01-30 07:50:35.922719 |
-| 3 | AARADHYA STEEL | MAIHAR | GANESH JI | 8962109701 | 26 | CRR | active | 2026-01-30 07:50:35.922719 | 2026-01-30 07:50:35.922719 |
-| 4 | AARADHYA STEEL HYD | HYDERABAD | PRASAD REDDY | 8106886732 | 10 | NBD | active | 2026-01-30 07:50:35.922719 | 2026-01-30 07:50:35.922719 |
+| 8 | ABDULLAH TRADERS | NASHIK | AMIRULLAH CHAUDHARY | 9423478771 | 34 | CRR | active | 2026-01-30 07:50:35.922719 | 2026-01-30 07:50:35.922719 |
+| 19 | ADVAIT STEEL MART | NULL | RAHUL JI | 9096722089 | 34 | NBD | active | 2026-01-30 07:50:35.922719 | 2026-01-30 07:50:35.922719 |
+| 3 | AARADHYA STEEL | MAIHAR | GANESH JI | 8962109701 | 32 | CRR | active | 2026-01-30 07:50:35.922719 | 2026-01-30 07:50:35.922719 |
 
 ---
 
@@ -880,18 +879,18 @@ _No data_
 
 
 ### 🏷️ Categorical / Allowed Values:
-- **`employee_id`** (3 values): `['100', 'S09203', 'S09630']`
-- **`employee_name`** (3 values): `['Danveer Singh', 'Hem Kumar Jagat', 'Manoj Nishad']`
+- **`employee_id`** (4 values): `['100', 'S00039', 'S09203', 'S09630']`
+- **`employee_name`** (4 values): `['Danveer Singh', 'Hem Kumar Jagat', 'Manoj Nishad', 'Vipin Pandey']`
 - **`designation`** (2 values): `['', 'MIS EXECUTIVE']`
-- **`department`** (3 values): `['AUTOMATION', 'PC', 'STRIP MILL ELECTRICAL']`
-- **`reason`** (3 values): `['asdfsfa', 'Family problem going to Village', 'Health problem']`
+- **`department`** (4 values): `['AUTOMATION', 'PC', 'STRIP MILL ELECTRICAL', 'WB']`
+- **`reason`** (4 values): `['asdfsfa', 'Family problem going to Village', 'Health problem', 'personnel work']`
 - **`request_status`** (2 values): `['Approved', 'Pending']`
 - **`approved_by`** (1 values): `['Amit Tiwari']`
 - **`hr_approval`** (1 values): `['Approved']`
 - **`approval_hr`** (1 values): `['S09103']`
 - **`approved_by_status`** (1 values): `['Approved']`
-- **`mobilenumber`** (3 values): `['234234', '7999747599', '8602714849']`
-- **`urgent_mobilenumber`** (3 values): `['12312312', '6266919117', '7999747599']`
+- **`mobilenumber`** (4 values): `['234234', '7999747599', '8602003474', '8602714849']`
+- **`urgent_mobilenumber`** (4 values): `['', '12312312', '6266919117', '7999747599']`
 - **`commercial_head_status`** (1 values): `['Approved']`
 
 
@@ -899,8 +898,8 @@ _No data_
 | id | employee_id | employee_name | designation | department | from_date | to_date | reason | request_status | approved_by | hr_approval | approval_hr | approved_by_status | mobilenumber | urgent_mobilenumber | created_at | updated_at | commercial_head_status | approve_dates | user_id |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2 | 100 | Danveer Singh |  | STRIP MILL ELECTRICAL | 2026-03-14 | 2026-03-28 | Family problem going to Village  | Pending | None | None | None | None | 7999747599 | 7999747599 | 2026-02-13 13:03:50.273317 | 2026-02-13 13:03:50.273317 | None | None | None |
-| 3 | S09203 | Hem Kumar Jagat | MIS EXECUTIVE | AUTOMATION | 2026-02-16 | 2026-02-19 | asdfsfa | Approved | Amit Tiwari | Approved | S09103 | Approved | 234234 | 12312312 | 2026-02-16 11:43:05.380296 | 2026-02-16 11:46:22.963762 | Approved | 2026-02-16 | 35 |
 | 4 | S09630 | Manoj Nishad |  | PC | 2026-02-17 | 2026-02-17 | Health problem | Pending | None | None | None | None | 8602714849 | 6266919117 | 2026-02-17 01:35:45.200309 | 2026-02-17 01:35:45.200309 | None | None | 601 |
+| 5 | S00039 | Vipin Pandey |  | WB | 2026-03-17 | 2026-03-21 | personnel work | Pending | None | None | None | None | 8602003474 |  | 2026-02-19 06:27:46.742622 | 2026-02-19 06:27:46.742622 | None | None | 119 |
 
 ---
 
@@ -930,7 +929,7 @@ _No data_
 
 ### 🏷️ Categorical / Allowed Values:
 - **`approval_status`** (2 values): `['approved', 'pending']`
-- **`approved_by`** (18 values): `['Ambika Pandey', 'Amit Tiwari', 'Bikash Kumar Ojha', 'Deepak Bhalla', 'Hem Kumar Jagat', 'K Ramesh Kumar', 'Manoj Ojha', 'Mukesh Patle', 'Pawan Kumar Parganiha', 'Rahul Sharma', 'Rinku Singh', 'Sandeep Kumar Dubey', 'Saroj Kumar Choudhary', 'Shailesh Chitre', 'Sheelesh Marele', 'Sheetal Patel', 'Shivraj Sharma', 'Tripati Rana']`
+- **`approved_by`** (19 values): `['Ajay Saini', 'Ambika Pandey', 'Amit Tiwari', 'Bikash Kumar Ojha', 'Deepak Bhalla', 'Hem Kumar Jagat', 'K Ramesh Kumar', 'Manoj Ojha', 'Mukesh Patle', 'Pawan Kumar Parganiha', 'Rahul Sharma', 'Rinku Singh', 'Sandeep Kumar Dubey', 'Saroj Kumar Choudhary', 'Shailesh Chitre', 'Sheelesh Marele', 'Sheetal Patel', 'Shivraj Sharma', 'Tripati Rana']`
 - **`status`** (2 values): `['IN', 'OUT']`
 - **`gate_pass_closed`** (2 values): `['False', 'True']`
 
@@ -1585,7 +1584,7 @@ _No data_
 
 ### 🏷️ Categorical / Allowed Values:
 - **`item_type`** (3 values): `['rectangular', 'round', 'square']`
-- **`size`** (19 values): `['19X19', '20X40', '25 OD', '25X25', '25X50', '25X68', '31X31', '32 OD', '37X56', '38X38', '42 OD', '47X47', '48 OD', '60 OD', '62X62', '72X72', '80X40', '88 OD', '96X48']`
+- **`size`** (20 values): `['19X19', '20X40', '25 OD', '25X25', '25X50', '25X68', '31X31', '32 OD', '37X56', '38X38', '42 OD', '47X47', '48 OD', '60 OD', '62X62', '72X72', '76 OD', '80X40', '88 OD', '96X48']`
 - **`sales_executive`** (3 values): `['Dayanand Kaiwartya', 'Jai Nirmal', 'Mohit Sinha']`
 
 
@@ -1623,36 +1622,6 @@ _No categorical columns detected_
 
 ### 🔍 Sample Data (First 3 rows):
 _No data_
-
----
-
-## 📋 Table: `client_followups`
-### Columns:
-| Name | Type | Nullable |
-| :--- | :--- | :--- |
-| **followup_id** | `INTEGER` | False |
-| **client_name** | `VARCHAR(150)` | False |
-| **sales_person** | `VARCHAR(150)` | False |
-| **actual_order** | `NUMERIC` | True |
-| **actual_order_date** | `DATE` | True |
-| **date_of_calling** | `DATE` | False |
-| **next_calling_date** | `DATE` | True |
-| **created_at** | `TIMESTAMP` | True |
-| **updated_at** | `TIMESTAMP` | True |
-
-
-
-
-### 🏷️ Categorical / Allowed Values:
-- **`sales_person`** (5 values): `['Amit Pandey', 'Anil Kumar Mishra', 'Rahul Sharma', 'Sheetal Patel', 'Tripati Rana']`
-
-
-### 🔍 Sample Data (First 3 rows):
-| followup_id | client_name | sales_person | actual_order | actual_order_date | date_of_calling | next_calling_date | created_at | updated_at |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | AA GOLEWALE | Anil Kumar Mishra | None | None | 2026-02-02 | None | 2026-02-17 08:15:55.138164 | 2026-02-17 08:15:55.138164 |
-| 2 | AAKASH INFRATECH,MUNGELI | Amit Pandey | None | None | 2026-02-02 | None | 2026-02-17 08:15:55.138164 | 2026-02-17 08:15:55.138164 |
-| 3 | AAKASH INFRATECH,MUNGELI | Amit Pandey | None | None | 2026-02-04 | None | 2026-02-17 08:15:55.138164 | 2026-02-17 08:15:55.138164 |
 
 ---
 
@@ -1696,6 +1665,36 @@ _No data_
 
 ---
 
+## 📋 Table: `client_followups`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **followup_id** | `INTEGER` | False |
+| **client_name** | `VARCHAR(150)` | False |
+| **sales_person** | `VARCHAR(150)` | False |
+| **actual_order** | `NUMERIC` | True |
+| **actual_order_date** | `DATE` | True |
+| **date_of_calling** | `DATE` | False |
+| **next_calling_date** | `DATE` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **updated_at** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`sales_person`** (5 values): `['Amit Pandey', 'Anil Kumar Mishra', 'Rahul Sharma', 'Sheetal Patel', 'Tripati Rana']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| followup_id | client_name | sales_person | actual_order | actual_order_date | date_of_calling | next_calling_date | created_at | updated_at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | AA GOLEWALE | Anil Kumar Mishra | None | None | 2026-02-02 | None | 2026-02-17 08:15:55.138164 | 2026-02-17 08:15:55.138164 |
+| 2 | AAKASH INFRATECH,MUNGELI | Amit Pandey | None | None | 2026-02-02 | None | 2026-02-17 08:15:55.138164 | 2026-02-17 08:15:55.138164 |
+| 3 | AAKASH INFRATECH,MUNGELI | Amit Pandey | None | None | 2026-02-04 | None | 2026-02-17 08:15:55.138164 | 2026-02-17 08:15:55.138164 |
+
+---
+
 ## 📋 Table: `login`
 ### Columns:
 | Name | Type | Nullable |
@@ -1725,6 +1724,276 @@ _No categorical columns detected_
 
 ### 🔍 Sample Data (First 3 rows):
 _No data_
+
+---
+
+## 📋 Table: `assign_task`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **task_id** | `VARCHAR(50)` | False |
+| **department** | `VARCHAR(100)` | True |
+| **given_by** | `VARCHAR(100)` | True |
+| **name** | `VARCHAR(100)` | True |
+| **task_description** | `TEXT` | True |
+| **remark** | `TEXT` | True |
+| **status** | `VARCHAR(50)` | True |
+| **image** | `TEXT` | True |
+| **attachment** | `TEXT` | True |
+| **frequency** | `VARCHAR(50)` | True |
+| **task_start_date** | `TIMESTAMP` | True |
+| **submission_date** | `TIMESTAMP` | True |
+| **delay** | `INTEGER` | True |
+| **remainder** | `VARCHAR(100)` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **hod** | `VARCHAR(255)` | True |
+| **doer_name2** | `VARCHAR(255)` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`department`** (25 values): `['Admin Office - First Floor', 'Admin Office - Ground Floor', 'Back Office', 'Canteen Area 1 & 2', 'Car Parking Area', 'CCM PLC Panel Room', 'CCM SBO Panel Room', 'Container Office', 'Labour Colony', 'Main Gate', 'Mandir', 'New Lab', 'Patra Mill AC Panel Room', 'Patra Mill DC Panel Room', 'Patra Mill Foreman Office', 'Patra Mill SBO Panel', 'Pipe Mill', 'Plant Area', 'SMS Electrical Store Room', 'SMS Office', 'SMS Panel Room', 'Store Office', 'TMT Foreman Office', 'Weight Office & Kata In/Out', 'Workshop']`
+- **`given_by`** (3 values): `['AAKASH AGRAWAL', 'AJIT KUMAR GUPTA', 'SHEELESH MARELE']`
+- **`name`** (2 values): `['Company Reja', 'Housekeeping Staff']`
+- **`status`** (2 values): `['no', 'Yes']`
+- **`attachment`** (1 values): `['confirmed']`
+- **`frequency`** (3 values): `['daily', 'monthly', 'weekly']`
+- **`hod`** (14 values): `['Baldev Singh', 'Danveer Singh Chauhan', 'Deepak Bhalla', 'Deepak Bhalla, Biyash Kumar', 'Komal Sahu and Rinku Gautam', 'Makhan', 'Moradhwaj Verma and Shivraj Sharma', 'Mukesh Patle & Sushil', 'Pramod and Suraj', 'Rinku Singh,Ravi Kumar', 'SK Nayak', 'Sparsh Jha', 'Sparsh Jha and Toman Sahu', 'Vipin Pandey & Rajendra Tiwari']`
+- **`doer_name2`** (4 values): `['Makhan Lal', 'Sarad Behera', 'Tikeshwar Chakradhari(Hk)', 'Tikeshware Chakradhari(KH)']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | task_id | department | given_by | name | task_description | remark | status | image | attachment | frequency | task_start_date | submission_date | delay | remainder | created_at | hod | doer_name2 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 45304 | 45304 | Admin Office - Ground Floor | SHEELESH MARELE | Housekeeping Staff | किचन की खिड़की का  सफाई किया गया l | None | None | None | None | daily | 2026-03-12 00:00:00+00:00 | None | None | None | 2026-02-18 11:07:00 | Moradhwaj Verma and Shivraj Sharma | None |
+| 124465 | 124465 | Admin Office - Ground Floor | SHEELESH MARELE | Housekeeping Staff | एमडी सर का बाथरूम का सावर सही से कम कर रहा है चेक  | OK | Yes | None | confirmed | daily | 2026-02-15 00:00:00+00:00 | 2026-02-15 07:56:44.830000+00:00 | None | None | 2026-02-18 11:07:00 | Moradhwaj Verma and Shivraj Sharma | Makhan Lal |
+| 124114 | 124114 | Admin Office - Ground Floor | SHEELESH MARELE | Housekeeping Staff | एमडी सर के बाथरूम का सभी बिजली स्विच सही से काम कर | OK | Yes | None | confirmed | daily | 2026-02-15 00:00:00+00:00 | 2026-02-15 07:56:44.830000+00:00 | None | None | 2026-02-18 11:07:00 | Moradhwaj Verma and Shivraj Sharma | Makhan Lal |
+
+---
+
+## 📋 Table: `locations`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **location_id** | `INTEGER` | False |
+| **location** | `TEXT` | False |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+| location_id | location |
+| --- | --- |
+| 2 | Admin Office - First Floor |
+| 3 | Admin Office - Ground Floor |
+| 4 | Back Office |
+
+---
+
+## 📋 Table: `maintenance_task_assign`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **created_at** | `TIMESTAMP` | True |
+| **time_stamp** | `TIMESTAMP` | True |
+| **task_no** | `VARCHAR(50)` | True |
+| **serial_no** | `VARCHAR(100)` | True |
+| **machine_name** | `VARCHAR(255)` | True |
+| **given_by** | `VARCHAR(255)` | True |
+| **doer_name** | `VARCHAR(255)` | True |
+| **task_type** | `VARCHAR(100)` | True |
+| **machine_area** | `VARCHAR(255)` | True |
+| **part_name** | `VARCHAR(255)` | True |
+| **need_sound_test** | `BOOLEAN` | True |
+| **temperature** | `VARCHAR(50)` | True |
+| **enable_reminders** | `BOOLEAN` | True |
+| **require_attachment** | `BOOLEAN` | True |
+| **task_start_date** | `DATE` | True |
+| **frequency** | `VARCHAR(50)` | True |
+| **description** | `TEXT` | True |
+| **priority** | `VARCHAR(50)` | True |
+| **machine_department** | `VARCHAR(100)` | True |
+| **actual_date** | `DATE` | True |
+| **delay** | `VARCHAR(50)` | True |
+| **task_status** | `VARCHAR(50)` | True |
+| **remarks** | `TEXT` | True |
+| **sound_status** | `VARCHAR(50)` | True |
+| **temperature_status** | `VARCHAR(50)` | True |
+| **image_link** | `TEXT` | True |
+| **file_name** | `VARCHAR(255)` | True |
+| **file_type** | `VARCHAR(100)` | True |
+| **maintenance_cost** | `NUMERIC` | True |
+| **doer_department** | `VARCHAR(255)` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`given_by`** (18 values): `['ANIL KUMAR MISHRA', 'ANUP KUMAR BOPCHE', 'BALDEV SINGH SAINI', 'DANVEER SINGH', 'DEEPAK BHALLA', 'DHANJI', 'G RAM MOHAN RAO', 'GUNJAN TIWARI', 'HULLAS PASWAN', 'RAJNISH BHARDWAJ', 'RINKU GAUTAM', 'ROSHAN RAJAK', 'SACHIN SAXENA', 'SANDEEP DUBEY', 'SHAILESH CHITRE', 'SHREE RAM PATLE', 'SUMAN JHA', 'TEJ BAHADUR YADAV']`
+- **`task_type`** (1 values): `['Maintenance']`
+- **`machine_area`** (25 values): `['', 'Continues mill', 'Finish mill', 'I', 'Mill', 'Patra mill workshop', 'PIPE MILL', 's', 'S', 'Sms crene', 'Strip mill', 'Strip Mill', 'U', 'uint-1', 'unit-1', 'Unit 1', 'Unit-1', 'UNIT-1', 'UNIT- 1', 'unit-2', 'UNIT-2', 'UNIT- 2', 'Workshop', 'यूनिट 1', 'यूनिट 2']`
+- **`part_name`** (24 values): `['', '`', 'Carbon brush', 'Carbon brush and clean', 'Carbon brush and clean motor', 'Check all motor and check carbon brush.', 'Check and clean', 'Check carbon', 'Check connection clean motor', 'Check feeder and contractor kit', 'Check kit and clean panel', 'Check kit and loose connection clean panel', 'Clean and change carbon brush', 'Contractor kit', 'Lt motor', 'Lub oil and coolant water', 'Lub oil cleaning', 'Motor', 'Motor and blower', 'n', 'No', 'PIPE MILL', 'UNIT-1', 'UNIT- 1']`
+- **`need_sound_test`** (2 values): `['False', 'True']`
+- **`temperature`** (2 values): `['No', 'Yes']`
+- **`enable_reminders`** (2 values): `['False', 'True']`
+- **`require_attachment`** (2 values): `['False', 'True']`
+- **`frequency`** (4 values): `['daily', 'monthly', 'one-time', 'weekly']`
+- **`priority`** (10 values): `['15 DAY', '15 DAYS', '1 MONTH', 'DAILY', 'High', 'Low', 'Medium', 'MONTHLY', 'Urgent', 'WEEKLY']`
+- **`machine_department`** (8 values): `['CCM', 'PIPE MILL ELECTRICAL', 'PIPE MILL MAINTENANCE', 'SMS ELECTRICAL', 'SMS MAINTENANCE', 'STRIP MILL ELECTRICAL', 'STRIP MILL PRODUCTION', 'WORKSHOP']`
+- **`task_status`** (4 values): `['no', 'No', 'yes', 'Yes']`
+- **`remarks`** (1 values): `['']`
+- **`sound_status`** (4 values): `['Bad', 'Good', 'Need Repair', 'OK']`
+- **`temperature_status`** (8 values): `['', '31', '32', 'Leave', 'Liive', 'Live', 'Live', 'लिव']`
+- **`doer_department`** (10 values): `['CCM', 'PIPE MILL ELECTRICAL', 'PIPE MILL MAINTENANCE', 'PIPE MILL PRODUCTION', 'SMS ELECTRICAL', 'SMS MAINTENANCE', 'STRIP MILL ELECTRICAL', 'STRIP MILL MAINTENANCE', 'STRIP MILL PRODUCTION', 'WORKSHOP']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | created_at | time_stamp | task_no | serial_no | machine_name | given_by | doer_name | task_type | machine_area | part_name | need_sound_test | temperature | enable_reminders | require_attachment | task_start_date | frequency | description | priority | machine_department | actual_date | delay | task_status | remarks | sound_status | temperature_status | image_link | file_name | file_type | maintenance_cost | doer_department |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2680 | 2025-12-22 09:50:28.971971+00:00 | 2025-12-03 15:29:00 | TM-2672 | SM/WS/LTSF-12 | SHAPER MACHINE 2 | DHANJI | Rakesh Kumar | Maintenance | Workshop | None | False | No | True | False | 2026-01-10 | daily | गेयर चेक, बेल्ट चेक, ऑयलिंग और ग्रीसिंग | Medium | WORKSHOP | 2026-01-20 | None | Yes | None | Good | None | None | None | None | None | WORKSHOP |
+| 1111153 | 2026-01-03 07:13:42.938947+00:00 | 2026-01-03 12:43:00 | TM-1107435 | SRM/PM/M2/GBX/23 | GEAR BOX 23 | HULLAS PASWAN | Mukesh Kumar | Maintenance | PIPE MILL | None | False | No | True | False | 2026-01-16 | daily | आयल लेवल चेक करना. | Low | PIPE MILL MAINTENANCE | None | None | No | None | None | None | None | None | None | None | PIPE MILL PRODUCTION |
+| 1111154 | 2026-01-03 07:13:42.938947+00:00 | 2026-01-03 12:43:00 | TM-1107436 | SRM/PM/M2/GBX/23 | GEAR BOX 23 | HULLAS PASWAN | Mukesh Kumar | Maintenance | PIPE MILL | None | False | No | True | False | 2026-01-17 | daily | आयल लेवल चेक करना. | Low | PIPE MILL MAINTENANCE | None | None | No | None | None | None | None | None | None | None | PIPE MILL PRODUCTION |
+
+---
+
+## 📋 Table: `form_responses`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **serial_no** | `VARCHAR(100)` | True |
+| **machine_name** | `VARCHAR(255)` | True |
+| **purchase_date** | `DATE` | True |
+| **purchase_price** | `NUMERIC` | True |
+| **vendor** | `VARCHAR(255)` | True |
+| **model_no** | `VARCHAR(100)` | True |
+| **warranty_expiration** | `DATE` | True |
+| **manufacturer** | `VARCHAR(255)` | True |
+| **maintenance_schedule** | `VARCHAR(255)` | True |
+| **department** | `VARCHAR(255)` | True |
+| **location** | `VARCHAR(255)` | True |
+| **initial_maintenance_date** | `DATE` | True |
+| **user_manual** | `TEXT` | True |
+| **purchase_bill** | `TEXT` | True |
+| **notes** | `TEXT` | True |
+| **tag_no** | `VARCHAR(100)` | True |
+| **user_allot** | `VARCHAR(255)` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`maintenance_schedule`** (14 values): `['15 DAY', '15 DAYS', '1 MONTH', '30 DAYS', '7 DAY', '7DAYS', '7 DAYS', '8 MONTH', 'Daily', 'DAILY', 'Daily, Weekly', 'Half-Yearly', 'MONTHLY', 'Weekly']`
+- **`department`** (14 values): `['ALL ELECTRICAL', 'CCM', 'CCM MAINTENANCE', 'IT', 'LAB AND QUALITY CONTROL', 'PIPE MILL ELECTRICAL', 'PIPE MILL MAINTENANCE', 'SMS ELECTRICAL', 'SMS MAINTENANCE', 'STORE', 'STRIP MILL ELECTRICAL', 'STRIP MILL PRODUCTION', 'TRANSPORT', 'WORKSHOP']`
+- **`user_allot`** (5 values): `['30:01:00', '40:01:00', '80:01:00', 'SPECTRO', 'user']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | serial_no | machine_name | purchase_date | purchase_price | vendor | model_no | warranty_expiration | manufacturer | maintenance_schedule | department | location | initial_maintenance_date | user_manual | purchase_bill | notes | tag_no | user_allot |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | SRMPL\ALL IN ONE\01 | ALL IN ONE PC | None | None | None | None | None | None | None | IT | None | None | None | None | None | SRMPL\ALL IN ONE\01 | None |
+| 2 | SRMPL\KEYBOARD\01 | KEYBOARD | None | None | None | None | None | None | None | IT | None | None | None | None | None | SRMPL\KEYBOARD\01 | None |
+| 3 | SRMPL\MOUSE\01 | MOUSE | None | None | None | None | None | None | None | IT | None | None | None | None | None | SRMPL\MOUSE\01 | None |
+
+---
+
+## 📋 Table: `master`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **doer_name** | `TEXT` | True |
+| **department1** | `TEXT` | True |
+| **given_by** | `TEXT` | True |
+| **task_status** | `TEXT` | True |
+| **task_type** | `TEXT` | True |
+| **priority** | `TEXT` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **department** | `TEXT` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`given_by`** (24 values): `['AAKASH AGRAWAL', 'AK GUPTA', 'ANIL KUMAR MISHRA', 'ANUP KUMAR BOPCHE', 'BALDEV SINGH SAINI', 'DANVEER SINGH', 'DEEPAK BHALLA', 'DHANJI', 'G RAM MOHAN RAO', 'GUNJAN TIWARI', 'HULLAS PASWAN', 'MANTU ANAND GHOSE', 'MRIGENDRA NARAYAN BEPARI', 'RAJNISH BHARDWAJ', 'RAVI KUMAR SINGH', 'RINKU GAUTAM', 'RINKU SINGH', 'ROSHAN RAJAK', 'SACHIN SAXENA', 'SANDEEP DUBEY', 'SHAILESH CHITRE', 'SHREE RAM PATLE', 'SUMAN JHA', 'TEJ BAHADUR YADAV']`
+- **`task_status`** (1 values): `['In House']`
+- **`task_type`** (1 values): `['Maintence']`
+- **`priority`** (3 values): `['High', 'Low', 'Urgent']`
+- **`department`** (14 values): `['ALL ELECTRICAL', 'CCM', 'CCM MAINTENANCE', 'LAB AND QUALITY CONTROL', 'PIPE MILL ELECTRICAL', 'PIPE MILL MAINTENANCE', 'PIPE MILL PRODUCTION', 'SMS ELECTRICAL', 'SMS MAINTENANCE', 'STORE', 'STRIP MILL ELECTRICAL', 'STRIP MILL MAINTENANCE', 'STRIP MILL PRODUCTION', 'TRANSPORT']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | doer_name | department1 | given_by | task_status | task_type | priority | created_at | department |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | SKNayak | ACCOUNTS | AAKASH AGRAWAL | In House | Maintence | Low | 2025-11-25 05:24:01.832024+00:00 | PIPE MILL ELECTRICAL |
+| 3 | Pintu Pandit | ADMIN | RINKU SINGH | None | None | High | 2025-11-25 05:24:01.832024+00:00 | LAB AND QUALITY CONTROL |
+| 4 | Rupesh Kumar Rawat | ADMIN | DANVEER SINGH | None | None | Urgent | 2025-11-25 05:24:01.832024+00:00 | SMS ELECTRICAL |
+
+---
+
+## 📋 Table: `all_loans`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **loan_name** | `VARCHAR(255)` | False |
+| **bank_name** | `VARCHAR(255)` | False |
+| **amount** | `NUMERIC(15, 2)` | False |
+| **emi** | `NUMERIC(12, 2)` | False |
+| **loan_start_date** | `DATE` | False |
+| **loan_end_date** | `DATE` | False |
+| **provided_document_name** | `VARCHAR(255)` | True |
+| **upload_document** | `TEXT` | True |
+| **remarks** | `TEXT` | True |
+| **created_at** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `approval_history`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **approval_no** | `VARCHAR(50)` | True |
+| **subscription_no** | `VARCHAR(50)` | True |
+| **approval_status** | `VARCHAR(50)` | True |
+| **note** | `TEXT` | True |
+| **approved_by** | `VARCHAR(255)` | True |
+| **requested_on** | `TIMESTAMP` | True |
+| **timestamp** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`approval_status`** (2 values): `['Approved', 'Rejected']`
+- **`note`** (3 values): `['', 'done', 'ok']`
+- **`approved_by`** (1 values): `['Admin']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | approval_no | subscription_no | approval_status | note | approved_by | requested_on | timestamp |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | APG-0001 | SUB-0013 | Approved | None | Admin | 2025-11-04 16:06:30+00:00 | 2025-11-04 18:02:30+00:00 |
+| 2 | APG-0002 | SUB-0014 | Approved | None | Admin | 2025-11-04 16:09:00+00:00 | 2025-11-04 18:03:13+00:00 |
+| 3 | APG-0003 | SUB-0014 | Approved | None | Admin | 2025-11-04 16:09:00+00:00 | 2025-11-04 18:05:09+00:00 |
 
 ---
 
@@ -1763,5 +2032,310 @@ _No categorical columns detected_
 
 ### 🔍 Sample Data (First 3 rows):
 _No data_
+
+---
+
+## 📋 Table: `collect_noc`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **serial_no** | `VARCHAR(50)` | False |
+| **loan_name** | `VARCHAR(255)` | False |
+| **bank_name** | `VARCHAR(255)` | False |
+| **loan_start_date** | `DATE` | False |
+| **loan_end_date** | `DATE` | False |
+| **closure_request_date** | `DATE` | False |
+| **collect_noc** | `BOOLEAN` | False |
+| **created_at** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `subscription`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **timestamp** | `TIMESTAMP` | True |
+| **subscription_no** | `VARCHAR(50)` | True |
+| **company_name** | `VARCHAR(255)` | True |
+| **subscriber_name** | `VARCHAR(255)` | True |
+| **subscription_name** | `VARCHAR(255)` | True |
+| **price** | `NUMERIC(12, 2)` | True |
+| **frequency** | `VARCHAR(50)` | True |
+| **purpose** | `TEXT` | True |
+| **planned_1** | `DATE` | True |
+| **actual_1** | `DATE` | True |
+| **time_delay_1** | `INTERVAL` | True |
+| **renewal_status** | `VARCHAR(50)` | True |
+| **renewal_count** | `INTEGER` | True |
+| **planned_2** | `DATE` | True |
+| **actual_2** | `DATE` | True |
+| **time_delay_2** | `INTERVAL` | True |
+| **approval_status** | `VARCHAR(50)` | True |
+| **planned_3** | `DATE` | True |
+| **actual_3** | `DATE` | True |
+| **time_delay_3** | `INTERVAL` | True |
+| **start_date** | `DATE` | True |
+| **end_date** | `DATE` | True |
+| **document_copy** | `TEXT` | True |
+| **updated_price** | `NUMERIC(12, 2)` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **updated_at** | `TIMESTAMP` | True |
+| **planned2_days** | `INTEGER` | True |
+| **planned3_days** | `INTEGER` | True |
+| **planned1_days** | `INTEGER` | True |
+| **reason_for_renewal** | `VARCHAR` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`company_name`** (6 values): `['Acme Corp', 'Alankar Alloys', 'Pankaj Ispat', 'Sourabh Rolling mill', 'Sourabh Rolling Mills', 'Sourabh Rolling MIlls']`
+- **`subscriber_name`** (3 values): `['audit', 'Priyanshuu', 'Prrrriyanshu']`
+- **`subscription_name`** (23 values): `['AIRTEL BROADBAND (BABU JI OFFICE)', 'AIRTEL BROADBAND (SIGNATURE HOME)', 'AIRTEL-FIXEDLINE AND BROADBAND SERVICES', 'Alpna Creation', 'Biomax HR Software Subscription', 'Demo', 'Demo1', 'HEMANT JOSHI EXPENSES', 'IDEA MOBILE BILL PAYMENT (AAPL)', 'IDEA MOBILE BILL PAYMENT (PIL)', 'Infiflex-gsute', 'JIO 9399726038 AAKASH BHAIYA', 'JIO-Account ID 900010301917', 'LIGHTHOUSE INFO SYSTEMS PVT. LTD', 'OPEN AI LLC (CHATGPT SRMPL)', 'PAWAN SAHU EXPENSES', 'Reliance Jio leased line connection', 'Reliance Retail Limited (Jio Fiber bill)', 'ROOM RENT', 'ROOM RENT (AVINASH PRIDE)', 'ROOM RENT (ELECTRICITY BILL)', 'Sophos firewall', 'VI - IDEA POSTPAID BILL']`
+- **`frequency`** (4 values): `['Annually', 'Monthly', 'Quarterly', 'Yearly']`
+- **`renewal_status`** (1 values): `['Approved']`
+- **`approval_status`** (2 values): `['Approved', 'Rejected']`
+- **`reason_for_renewal`** (1 values): `['Renewal purpose']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | timestamp | subscription_no | company_name | subscriber_name | subscription_name | price | frequency | purpose | planned_1 | actual_1 | time_delay_1 | renewal_status | renewal_count | planned_2 | actual_2 | time_delay_2 | approval_status | planned_3 | actual_3 | time_delay_3 | start_date | end_date | document_copy | updated_price | created_at | updated_at | planned2_days | planned3_days | planned1_days | reason_for_renewal |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 33 | 2025-12-08 09:16:11.165000+00:00 | SUB-0031 | Sourabh Rolling Mills | audit | Alpna Creation | 1420.00 | Annually | doman renewal :- sagartmt.com | 2026-12-06 | None | None | None | 0 | 2025-12-17 | 2025-12-08 | -1 day, 23:59:51 | Approved | 2025-12-17 | 2025-12-08 | -1 day, 23:59:51 | 2025-12-06 | 2026-12-06 | None | None | 2025-12-08 09:16:11.241576+00:00 | 2025-12-08 09:20:39.066444+00:00 | 7 | 7 | 7 | None |
+| 3 | 2025-11-03 18:22:48+00:00 | SUB-0003 | Sourabh Rolling MIlls | audit | LIGHTHOUSE INFO SYSTEMS PVT. LTD | 363428.00 | Annually | Software Maintenance Charges @19% of Rs.16.21 Lacs | 2026-06-01 | None | None | None | None | 2025-11-12 | 2025-11-06 | -1 day, 23:59:54 | Approved | 2025-11-17 | 2025-11-07 | -1 day, 23:59:50 | 2025-06-01 | 2026-06-01 | None | None | 2025-12-05 07:32:11.514434+00:00 | 2025-12-05 07:32:11.514434+00:00 | 7 | 7 | 7 | None |
+| 38 | 2026-02-03 05:17:58.427000+00:00 | SUB-0032 | Sourabh Rolling Mills | audit | Biomax HR Software Subscription | 2000.00 | Yearly | Database service for hr software valid till 20/03/ | None | None | None | None | 0 | 2026-02-12 | None | None | None | None | None | None | None | None | None | None | 2026-02-03 05:17:58.402530+00:00 | 2026-02-03 05:17:58.402530+00:00 | 7 | 7 | 7 | None |
+
+---
+
+## 📋 Table: `payment_history`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **subscription_no** | `VARCHAR(50)` | True |
+| **payment_mode** | `VARCHAR(50)` | True |
+| **transaction_id** | `VARCHAR(255)` | True |
+| **start_date** | `DATE` | True |
+| **insurance_document** | `TEXT` | True |
+| **timestamp** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`payment_mode`** (3 values): `['Bank Transfer', 'Credit Card', 'UPI']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | subscription_no | payment_mode | transaction_id | start_date | insurance_document | timestamp |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | SUB-0013 | UPI | 530702054215 | 2025-11-03 | https://drive.google.com/file/d/1zhpIOPEQPAEjhXbRh | 2025-11-05 16:35:23+00:00 |
+| 2 | SUB-0014 | UPI | 739704644198 | 2025-11-03 | https://drive.google.com/file/d/1LkKbwTvvL-m9PEAa8 | 2025-11-05 16:41:19+00:00 |
+| 3 | SUB-0015 | UPI | 99953361035 | 2025-11-03 | https://drive.google.com/file/d/1u68MN7Z16Xk7A7RES | 2025-11-05 17:40:58+00:00 |
+
+---
+
+## 📋 Table: `request_forclosure`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **serial_no** | `VARCHAR(50)` | False |
+| **loan_name** | `VARCHAR(255)` | False |
+| **bank_name** | `VARCHAR(255)` | False |
+| **amount** | `NUMERIC(15, 2)` | False |
+| **emi** | `NUMERIC(12, 2)` | False |
+| **loan_start_date** | `DATE` | False |
+| **loan_end_date** | `DATE` | False |
+| **request_date** | `DATE` | False |
+| **requester_name** | `VARCHAR(255)` | False |
+| **created_at** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `sharedocuments`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `BIGINT` | False |
+| **timestamp** | `TIMESTAMP` | False |
+| **email** | `VARCHAR(255)` | False |
+| **name** | `VARCHAR(255)` | True |
+| **document_name** | `VARCHAR(255)` | True |
+| **document_type** | `VARCHAR(100)` | True |
+| **category** | `VARCHAR(100)` | True |
+| **serial_no** | `VARCHAR(100)` | True |
+| **image** | `TEXT` | True |
+| **source_sheet** | `VARCHAR(255)` | True |
+| **share_method** | `VARCHAR(100)` | True |
+| **number** | `BIGINT` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `subscription_renewals`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `INTEGER` | False |
+| **renewal_no** | `VARCHAR(50)` | True |
+| **subscription_no** | `VARCHAR(50)` | True |
+| **renewal_status** | `VARCHAR(50)` | True |
+| **approved_by** | `VARCHAR(255)` | True |
+| **price** | `NUMERIC(12, 2)` | True |
+| **timestamp** | `TIMESTAMP` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`subscription_no`** (25 values): `['SUB-0001', 'SUB-0002', 'SUB-0005', 'SUB-0006', 'SUB-0007', 'SUB-0008', 'SUB-0009', 'SUB-0010', 'SUB-0011', 'SUB-0012', 'SUB-0013', 'SUB-0014', 'SUB-0015', 'SUB-0016', 'SUB-0017', 'SUB-0019', 'SUB-0020', 'SUB-0021', 'SUB-0023', 'SUB-0024', 'SUB-0025', 'SUB-0026', 'SUB-0030', 'SUB-0032', 'SUB-0034']`
+- **`renewal_status`** (2 values): `['Approved', 'Renewed']`
+- **`approved_by`** (3 values): `['Admin', 'Pintu Pandit', 'Shravan Nirmalkar']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| id | renewal_no | subscription_no | renewal_status | approved_by | price | timestamp |
+| --- | --- | --- | --- | --- | --- | --- |
+| 6 | REN-0001 | SUB-0030 | Renewed | Admin | 123412.00 | 2025-11-21 17:40:46+00:00 |
+| 7 | REN-0002 | SUB-0024 | Renewed | Shravan Nirmalkar | 1178.82 | 2025-11-25 09:36:24+00:00 |
+| 8 | REN-0003 | SUB-0025 | Renewed | Admin | 1999.00 | 2025-12-03 17:46:29+00:00 |
+
+---
+
+## 📋 Table: `documents`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **document_id** | `BIGINT` | False |
+| **created_at** | `TIMESTAMP` | True |
+| **serial_no** | `BIGINT` | False |
+| **document_name** | `TEXT` | False |
+| **document_type** | `TEXT` | True |
+| **category** | `TEXT` | True |
+| **company_department** | `TEXT` | True |
+| **tags** | `ARRAY` | True |
+| **person_name** | `TEXT` | True |
+| **need_renewal** | `VARCHAR(3)` | True |
+| **renewal_date** | `DATE` | True |
+| **image** | `TEXT` | True |
+| **email** | `TEXT` | True |
+| **mobile** | `VARCHAR(15)` | True |
+| **is_deleted** | `BOOLEAN` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`document_type`** (3 values): `['Certificate', 'Other', 'Report']`
+- **`category`** (2 values): `['Company', 'Personal']`
+- **`person_name`** (8 values): `['Alankar Alloys Private Limited', 'GAURI GANESH ISPAT PRIVATE LIMITED', 'PANKAJ AGRAWAL', 'PANKAJ ISPAT PRIVATE LTD.', 'Pintu Pandit', 'sourabh rolling mills', 'SOURABH ROLLING MILLS PVT LTD', 'SOURABH ROLLING MILLS.PVT.LTD']`
+- **`need_renewal`** (2 values): `['yes', 'no']`
+- **`is_deleted`** (1 values): `['False']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| document_id | created_at | serial_no | document_name | document_type | category | company_department | tags | person_name | need_renewal | renewal_date | image | email | mobile | is_deleted |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 2025-08-20 12:16:00 | 1 | Company Logo | Other | Company | None | None | SOURABH ROLLING MILLS PVT LTD | no | None | https://drive.google.com/uc?export=view&id=115cCoW | None | None | False |
+| 2 | 2025-08-29 17:28:00 | 2 | PANCARD SOURABH | Other | Company | None | None | sourabh rolling mills | no | None | https://drive.google.com/uc?export=view&id=1qJUGR0 | None | None | False |
+| 3 | 2025-08-29 17:28:00 | 3 | Gst certificate | Certificate | Company | None | None | sourabh rolling mills | no | None | https://drive.google.com/uc?export=view&id=1uClHt1 | None | None | False |
+
+---
+
+## 📋 Table: `payment_fms`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **id** | `UUID` | False |
+| **unique_no** | `TEXT` | False |
+| **fms_name** | `TEXT` | False |
+| **pay_to** | `TEXT` | False |
+| **amount** | `NUMERIC(12, 2)` | False |
+| **remarks** | `TEXT` | True |
+| **attachment** | `TEXT` | True |
+| **created_at** | `TIMESTAMP` | True |
+| **planned1** | `DATE` | True |
+| **actual1** | `DATE` | True |
+| **status** | `TEXT` | True |
+| **stage_remarks** | `TEXT` | True |
+| **planned2** | `DATE` | True |
+| **actual2** | `DATE` | True |
+| **payment_type** | `TEXT` | True |
+| **planned3** | `DATE` | True |
+| **actual3** | `DATE` | True |
+| **delay1** | `INTERVAL` | True |
+| **delay2** | `INTERVAL` | True |
+| **delay3** | `INTERVAL` | True |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+_No categorical columns detected_
+
+
+### 🔍 Sample Data (First 3 rows):
+_No data_
+
+---
+
+## 📋 Table: `subscription_master`
+### Columns:
+| Name | Type | Nullable |
+| :--- | :--- | :--- |
+| **company_name** | `TEXT` | False |
+| **document_type** | `VARCHAR(255)` | True |
+| **category** | `VARCHAR(255)` | True |
+| **renewal_filter** | `BOOLEAN` | True |
+| **id** | `BIGINT` | False |
+
+
+
+
+### 🏷️ Categorical / Allowed Values:
+- **`company_name`** (5 values): `['', 'Acme Corp', 'Alankar Alloys', 'Pankaj Ispat', 'Sourabh Rolling Mills']`
+- **`document_type`** (9 values): `['Certificate', 'Contract', 'Invoice', 'Other', 'Praposal', 'Report', 'Resume', 'Service', 'Tax Document']`
+- **`category`** (4 values): `['', 'Company', 'Director', 'Personal']`
+- **`renewal_filter`** (1 values): `['False']`
+
+
+### 🔍 Sample Data (First 3 rows):
+| company_name | document_type | category | renewal_filter | id |
+| --- | --- | --- | --- | --- |
+| Sourabh Rolling Mills | None | None | None | 1 |
+| Pankaj Ispat | None | None | None | 2 |
+| Alankar Alloys | None | None | None | 3 |
 
 ---

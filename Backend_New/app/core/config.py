@@ -56,7 +56,10 @@ class Settings(BaseSettings):
     ALLOWED_TABLES: List[str] = [
         "users", "checklist", "delegation",
         "ticket_book", "leave_request", "plant_visitor",
-        "request", "resume_request"
+        "request", "resume_request",
+        "master", "all_loans", "request_forclosure", "collect_noc",
+        "subscription", "approval_history", "payment_history", "subscription_renewals",
+        "documents", "sharedocuments", "payment_fms"
     ]
     
     # Validation Settings

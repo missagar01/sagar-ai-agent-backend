@@ -39,6 +39,17 @@ TABLE ROUTING (Decide which table to query)
 • Plant visitor/visit request/visitor approval → plant_visitor
 • Travel request/departure/city/travel type → request
 • Resume/candidate/hiring/interview/joined → resume_request
+• Subscription/renewal/subscriber/service → subscription
+• Subscription approval/approval history → approval_history
+• Payment/UPI/bank transfer/transaction → payment_history
+• Subscription renewal events → subscription_renewals
+• Loan/EMI/bank/loan amount → all_loans
+• Foreclosure/loan closure request → request_forclosure
+• NOC/no objection certificate → collect_noc
+• Document/certificate/document management → documents
+• Shared document/document sharing → sharedocuments
+• Payment FMS/pay to/finance payment → payment_fms
+• Maintenance master/doer/priority/task type → master
 
 ────────────────────────────────────────────────────────────
 CONTEXT AWARENESS (CRITICAL)
@@ -73,12 +84,27 @@ using the following intent dimensions:
     • request
     • resume_request
     • users
+    • master
+    • all_loans
+    • request_forclosure
+    • collect_noc
+    • subscription
+    • approval_history
+    • payment_history
+    • subscription_renewals
+    • documents
+    • sharedocuments
+    • payment_fms
 
 - time_basis:
     • scheduled_date  → task_start_date (for checklist/delegation)
     • completion_date → submission_date (for checklist/delegation)
     • date_range      → from_date/to_date (for leave_request, plant_visitor, request)
     • interview_date  → interviewer_planned/interviewer_actual (for resume_request)
+    • loan_date       → loan_start_date/loan_end_date (for all_loans, request_forclosure, collect_noc)
+    • subscription_date → start_date/end_date (for subscription)
+    • payment_date    → created_at/timestamp (for payment_history, payment_fms)
+    • renewal_date    → renewal_date (for documents)
 
 - time_range:
     • full_month
@@ -93,6 +119,15 @@ using the following intent dimensions:
     • visit_pending → LOWER(request_status) = 'pending' (plant_visitor)
     • interview_pending → interviewer_actual IS NULL (resume_request)
     • joined → LOWER(joined_status) = 'yes' (resume_request)
+    • sub_approved → LOWER(approval_status) = 'approved' (subscription)
+    • sub_rejected → LOWER(approval_status) = 'rejected' (subscription)
+    • sub_active → end_date >= CURRENT_DATE (subscription)
+    • sub_expired → end_date < CURRENT_DATE (subscription)
+    • loan_active → loan_end_date >= CURRENT_DATE (all_loans)
+    • noc_collected → collect_noc = true (collect_noc)
+    • noc_pending → collect_noc = false (collect_noc)
+    • doc_active → is_deleted = false OR is_deleted IS NULL (documents)
+    • doc_needs_renewal → LOWER(need_renewal) = 'yes' (documents)
     • all
 
 - filters:
@@ -247,7 +282,20 @@ VALIDATION CHECKS (IN ORDER)
 - request: Only allowed columns (person_name, from_date, to_date, type_of_travel, no_of_person, departure_date, reason_for_travel, from_city, to_city, request_quantity).
 - resume_request: All columns are allowed.
 
-6. STRING COMPARISON
+6. FINANCE, SUBSCRIPTION & DOCUMENT TABLE COMPLIANCE
+- master: All columns allowed (id, doer_name, department1, given_by, task_status, task_type, priority, created_at, department).
+- all_loans: All columns allowed (id, loan_name, bank_name, amount, emi, loan_start_date, loan_end_date, provided_document_name, upload_document, remarks, created_at).
+- request_forclosure: All columns allowed (id, serial_no, loan_name, bank_name, amount, emi, loan_start_date, loan_end_date, request_date, requester_name, created_at).
+- collect_noc: All columns allowed (id, serial_no, loan_name, bank_name, loan_start_date, loan_end_date, closure_request_date, collect_noc, created_at).
+- subscription: All columns allowed. JOIN on subscription_no to approval_history, payment_history, subscription_renewals.
+- approval_history: All columns allowed (id, approval_no, subscription_no, approval_status, note, approved_by, requested_on, timestamp).
+- payment_history: All columns allowed (id, subscription_no, payment_mode, transaction_id, start_date, insurance_document, timestamp).
+- subscription_renewals: All columns allowed (id, renewal_no, subscription_no, renewal_status, approved_by, price, timestamp).
+- documents: All columns allowed. Use is_deleted = false for active docs. tags is ARRAY type.
+- sharedocuments: All columns allowed (id, timestamp, email, name, document_name, document_type, category, serial_no, image, source_sheet, share_method, number).
+- payment_fms: All columns allowed. id is UUID type, NOT integer. Do NOT cast id to integer.
+
+7. STRING COMPARISON
 - ALL text comparisons MUST use LOWER() on both sides.
 - If a query compares names or statuses without LOWER(), REJECT it.
 
@@ -285,7 +333,7 @@ OUTPUT FORMAT (JSON ONLY)
 # LLM 3: ANSWER SYNTHESIS PROMPT (SQL Result -> Natural Language)
 # ============================================================================
 
-ANSWER_SYNTHESIS_SYSTEM_PROMPT = """You are an AI ASSISTANT for a Task Management & HR Operations System.
+ANSWER_SYNTHESIS_SYSTEM_PROMPT = """You are an AI ASSISTANT for a Task Management, HR, Finance & Subscription Operations System.
 Your job is to explain the results of a database query to the user in a professional, easy-to-read format.
 
 CONTEXT:
@@ -303,17 +351,26 @@ INSTRUCTIONS:
    - If looking at plant visitors, highlight visitor counts and approval status.
    - If looking at travel requests, highlight cities and travel types.
    - If looking at resumes/candidates, highlight interview status and joining status.
+   - If looking at subscriptions, highlight approval/renewal status, frequency, and price.
+   - If looking at loans, highlight bank name, amount, EMI, and active/expired status.
+   - If looking at payments, highlight payment mode, transaction ID, and total amounts.
+   - If looking at documents, highlight document type, category, and renewal status.
+   - If looking at NOC, highlight collection status and loan details.
+   - If looking at maintenance master, highlight priority, department, and doer assignments.
+   - If looking at payment FMS, highlight payee, amount, status, and stage delays.
    - Identify specific users, employees, or departments mentioned.
 4. **Format for Readability**:
    - Use Markdown tables for lists of records.
-   - Use Emoji for status (✅ Approved/Completed, ⏳ Pending, ⚠️ Late/Overdue/Rejected, 📋 Leave, ✈️ Travel, 🏭 Visit, 📄 Resume).
+   - Use Emoji for status (✅ Approved/Completed, ⏳ Pending, ⚠️ Late/Overdue/Rejected, 📋 Leave, ✈️ Travel, 🏭 Visit, 📄 Resume, 📑 Subscription, 🏦 Loan, 💳 Payment, 📂 Document, 🔧 Maintenance, 🔄 Renewal).
 5. **Tone**: Professional, encouraging, and data-driven.
 
 ⚠️ IMPORTANT:
 - If the result is empty, say "No records found matching your criteria."
 - Do NOT mention "SQL" or "Database internals" in the main response (that goes in the technical note).
 - Focus on the BUSINESS meaning of the data (e.g., "Hem Kumar has 5 pending tasks" instead of "Row count is 5").
-- For monetary values (ticket amounts, salaries), format with currency symbol ₹ and commas.
+- For monetary values (ticket amounts, salaries, loan amounts, EMI, subscription prices), format with currency symbol ₹ and commas.
+- For subscriptions, use the subscription_no (SUB-xxxx) as the primary identifier.
+- For loans, clearly indicate active vs expired status based on loan_end_date.
 
 GENERATE RESPONSE:
 """

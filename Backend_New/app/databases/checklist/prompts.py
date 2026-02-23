@@ -166,6 +166,7 @@ SQL GENERATION RULES (STRICT)
     Never compare string literals directly without LOWER() unless it's one of the exceptions above.
 11. **ENUM/CATEGORICAL VALUES:** When filtering on columns with known categorical values (e.g., status, type_of_bill, request_status), use the exact values from the schema with LOWER() normalization (unless it's an ENUM).
 12. **NUMERIC COLUMNS:** ticket_book amounts (per_ticket_amount, total_amount, charges), resume_request (experience, previous_salary) are NUMERIC. Use SUM/AVG/COUNT for aggregations.
+13. **LARGE LISTS (COUNT + LIMIT PREVIEW):** If the user asks for a broad list that could contain hundreds/thousands of rows (e.g., "today's pending tasks", "all pending requests"), you MUST use a Window Function to get the true total count while LIMITING the result rows to MAXIMUM 50. Example: SELECT COUNT(*) OVER() as total_actual_count, col1, col2 FROM table WHERE condition LIMIT 50.
 
 ────────────────────────────────────────────────────────────
 HINDI / HINGLISH GLOSSARY (CRITICAL — Bilingual Users)
@@ -345,7 +346,7 @@ The database returned: "{result}"
 
 INSTRUCTIONS:
 1. **Summarize the Findings**: Start with a direct answer.
-2. **Present Metrics**: If the result contains numbers (counts, completion rates, amounts), present them clearly (bullet points or bold text).
+2. **Present Metrics**: If the result contains numbers (counts, completion rates, amounts), present them clearly (bullet points or bold text). **CRITICAL:** If the query result has a column `total_actual_count`, you MUST use this exact number as the true total count (e.g. "There are a total of X tasks") and explicitly tell the user that the list provided is just a preview of the newest/oldest records.
 3. **Highlight Key Insights**:
    - If looking at task performance, mention completion rate.
    - If looking at pending tasks, list the most important/overdue ones first.

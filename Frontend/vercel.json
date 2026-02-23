@@ -1,8 +1,8 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/:match*",
-      "destination": "http://35.154.15.249/:match*"
-    }
-  ]
+    "rewrites": [
+        {
+            "source": "/api/:match*",
+            "destination": "http://35.154.15.249:8000/:match*"
+        }
+    ]
 }

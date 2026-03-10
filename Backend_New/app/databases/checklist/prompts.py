@@ -36,7 +36,6 @@ TABLE ROUTING (Decide which table to query)
 • Employee info/users/login details → users
 • Ticket bookings/travel bills/ticket amount → ticket_book
 • Leave/absence/leave request/HR approval → leave_request
-• Plant visitor/visit request/visitor approval → plant_visitor
 • Travel request/departure/city/travel type → request
 • Resume/candidate/hiring/interview/joined → resume_request
 • Subscription/renewal/subscriber/service → subscription
@@ -50,6 +49,7 @@ TABLE ROUTING (Decide which table to query)
 • Shared document/document sharing → sharedocuments
 • Payment FMS/pay to/finance payment → payment_fms
 • Maintenance master/doer/priority/task type → master
+• Visitor gate pass/visitor entry/visitor exit/person to meet → visitors
 
 ────────────────────────────────────────────────────────────
 CONTEXT AWARENESS (CRITICAL)
@@ -80,7 +80,6 @@ using the following intent dimensions:
     • both (checklist + delegation)
     • ticket_book
     • leave_request
-    • plant_visitor
     • request
     • resume_request
     • users
@@ -95,16 +94,18 @@ using the following intent dimensions:
     • documents
     • sharedocuments
     • payment_fms
+    • visitors
 
 - time_basis:
     • scheduled_date  → task_start_date (for checklist/delegation)
     • completion_date → submission_date (for checklist/delegation)
-    • date_range      → from_date/to_date (for leave_request, plant_visitor, request)
+    • date_range      → from_date/to_date (for leave_request, request)
     • interview_date  → interviewer_planned/interviewer_actual (for resume_request)
     • loan_date       → loan_start_date/loan_end_date (for all_loans, request_forclosure, collect_noc)
     • subscription_date → start_date/end_date (for subscription)
     • payment_date    → created_at/timestamp (for payment_history, payment_fms)
     • renewal_date    → renewal_date (for documents)
+    • visit_date      → date_of_visit (for visitors)
 
 - time_range:
     • full_month
@@ -116,7 +117,6 @@ using the following intent dimensions:
     • completed  → submission_date IS NOT NULL (checklist/delegation)
     • leave_pending → LOWER(request_status) = 'pending' (leave_request)
     • leave_approved → LOWER(request_status) = 'approved' (leave_request)
-    • visit_pending → LOWER(request_status) = 'pending' (plant_visitor)
     • interview_pending → interviewer_actual IS NULL (resume_request)
     • joined → LOWER(joined_status) = 'yes' (resume_request)
     • sub_approved → LOWER(approval_status) = 'approved' (subscription)
@@ -128,6 +128,9 @@ using the following intent dimensions:
     • noc_pending → collect_noc = false (collect_noc)
     • doc_active → is_deleted = false OR is_deleted IS NULL (documents)
     • doc_needs_renewal → need_renewal = 'yes' (documents)
+    • visitor_inside → LOWER(status) = 'in' (visitors)
+    • visitor_left → LOWER(status) = 'out' (visitors)
+    • visit_approved → LOWER(approval_status) = 'approved' (visitors)
     • all
 
 - filters:
@@ -136,6 +139,8 @@ using the following intent dimensions:
     • person_name
     • employee_name
     • candidate_name
+    • visitor_name
+    • person_to_meet
     • none
 
 This intent object is ONLY for reasoning.
@@ -147,7 +152,7 @@ SQL GENERATION RULES (STRICT)
 1. Use ONLY allowed tables and columns from the SEMANTIC SCHEMA.
 2. NEVER use forbidden columns.
 3. For checklist/delegation: NEVER use `status` for task state. Pending vs Completed MUST rely on `submission_date`.
-4. For leave_request/plant_visitor: Use `request_status` for approval state.
+4. For leave_request: Use `request_status` for approval state.
 5. Date filters MUST follow semantic rules.
 6. If BOTH checklist and delegation are required:
    - Use UNION ALL
@@ -191,7 +196,7 @@ Common Hindi words (NEVER use as filter values):
   • "total" → "count" or "sum" depending on context
   • "approve" / "reject" → approval/rejection status
   • "chutti" / "chhutti" → "leave" (leave_request table)
-  • "visitor" / "mehman" → plant_visitor table
+  • "visitor" / "mehman" → visitors table
   • "ticket" → ticket_book table
 
 ⚠️ RULE: If a word like "datta", "sabka", "kitne", "dikhao"
@@ -281,7 +286,6 @@ VALIDATION CHECKS (IN ORDER)
 5. ADMIN/HR TABLE COMPLIANCE
 - ticket_book: Only allowed columns (person_name, type_of_bill, status, bill_number, per_ticket_amount, total_amount, charges).
 - leave_request: Only allowed columns (employee_name, from_date, to_date, reason, request_status, approved_by, hr_approval, mobilenumber, urgent_mobilenumber, commercial_head_status, approve_dates).
-- plant_visitor: Only allowed columns (person_name, reason_for_visit, no_of_person, from_date, to_date, requester_name, request_status, approve_by_name).
 - request: Only allowed columns (person_name, from_date, to_date, type_of_travel, no_of_person, departure_date, reason_for_travel, from_city, to_city, request_quantity).
 - resume_request: All columns are allowed.
 
@@ -297,6 +301,7 @@ VALIDATION CHECKS (IN ORDER)
 - documents: All columns allowed. Use is_deleted = false for active docs. tags is ARRAY type.
 - sharedocuments: All columns allowed (id, timestamp, email, name, document_name, document_type, category, serial_no, image, source_sheet, share_method, number).
 - payment_fms: All columns allowed. id is UUID type, NOT integer. Do NOT cast id to integer.
+- visitors: Allowed columns (visitor_name, mobile_number, visitor_photo, visitor_address, purpose_of_visit, person_to_meet, date_of_visit, time_of_entry, visitor_out_time, approval_status, approved_by, approved_at, status). FORBIDDEN: id, gate_pass_closed, created_at. status values are 'IN'/'OUT' (use LOWER()). approval_status is VARCHAR (use LOWER()).
 
 7. STRING COMPARISON
 - ALL text comparisons MUST use LOWER() on both sides.
@@ -352,7 +357,6 @@ INSTRUCTIONS:
    - If looking at pending tasks, list the most important/overdue ones first.
    - If looking at leave requests, highlight approval status and duration.
    - If looking at ticket bookings, highlight total amounts and bill details.
-   - If looking at plant visitors, highlight visitor counts and approval status.
    - If looking at travel requests, highlight cities and travel types.
    - If looking at resumes/candidates, highlight interview status and joining status.
    - If looking at subscriptions, highlight approval/renewal status, frequency, and price.
@@ -362,6 +366,7 @@ INSTRUCTIONS:
    - If looking at NOC, highlight collection status and loan details.
    - If looking at maintenance master, highlight priority, department, and doer assignments.
    - If looking at payment FMS, highlight payee, amount, status, and stage delays.
+   - If looking at visitors, highlight visitor name, purpose of visit, person to meet, entry/exit times, and approval status. Use 🚪 emoji for visitor entries. **CRITICAL**: If `visitor_photo` is present and contains a URL, you MUST format that specific cell in the markdown table to show both a link and the image itself, EXACTLY like this: `<a href="URL" target="_blank">View Image</a><br><img src="URL" style="width:100px; border-radius:8px; margin-top:5px;"/>`.
    - Identify specific users, employees, or departments mentioned.
 4. **Format for Readability**:
    - Use Markdown tables for lists of records.

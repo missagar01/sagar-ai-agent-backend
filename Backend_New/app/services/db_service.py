@@ -54,7 +54,7 @@ def get_table_metadata(table_name: str) -> Dict[str, Any]:
     Get metadata for a specific table
     
     Args:
-        table_name: Name of table (checklist, delegation, users, ticket_book, leave_request, plant_visitor, request, resume_request)
+        table_name: Name of table (checklist, delegation, users, ticket_book, leave_request, request, resume_request, visitors)
         
     Returns:
         Table metadata dictionary
@@ -97,9 +97,9 @@ def get_column_restrictions_summary() -> str:
         "users": "👤",
         "ticket_book": "🎫",
         "leave_request": "🏖️",
-        "plant_visitor": "🏭",
         "request": "✈️",
-        "resume_request": "📄"
+        "resume_request": "📄",
+        "visitors": "🚪"
     }
     
     lines = []

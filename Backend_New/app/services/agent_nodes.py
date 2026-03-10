@@ -145,7 +145,7 @@ ONLY use these columns in your queries:
 👤 USERS table: {get_columns_description('users')}
 🎫 TICKET_BOOK table: {get_columns_description('ticket_book')}
 🏖️ LEAVE_REQUEST table: {get_columns_description('leave_request')}
-🏭 PLANT_VISITOR table: {get_columns_description('plant_visitor')}
+🚪 VISITORS table: {get_columns_description('visitors')}
 ✈️ REQUEST table: {get_columns_description('request')}
 📄 RESUME_REQUEST table: {get_columns_description('resume_request')}
 

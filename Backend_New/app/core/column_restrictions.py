@@ -62,16 +62,6 @@ ALLOWED_COLUMNS = {
         "commercial_head_status",
         "approve_dates"
     ],
-    "plant_visitor": [
-        "person_name",
-        "reason_for_visit",
-        "no_of_person",
-        "from_date",
-        "to_date",
-        "requester_name",
-        "request_status",
-        "approve_by_name"
-    ],
     "request": [
         "person_name",
         "from_date",
@@ -106,6 +96,21 @@ ALLOWED_COLUMNS = {
         "joined_status",
         "created_at",
         "updated_at"
+    ],
+    "visitors": [
+        "visitor_name",
+        "mobile_number",
+        "visitor_photo",
+        "visitor_address",
+        "purpose_of_visit",
+        "person_to_meet",
+        "date_of_visit",
+        "time_of_entry",
+        "visitor_out_time",
+        "approval_status",
+        "approved_by",
+        "approved_at",
+        "status"
     ]
 }
 

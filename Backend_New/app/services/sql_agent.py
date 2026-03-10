@@ -77,8 +77,8 @@ SEMANTIC_SCHEMA = """
 ------------------------------------------------------------------------------------------------
 This database tracks employee tasks (`checklist`, `delegation`), user info (`users`),
 and administrative modules: ticket bookings (`ticket_book`), leave management (`leave_request`),
-plant visit approvals (`plant_visitor`), travel/hiring requests (`request`), and candidate
-resume intake for HR (`resume_request`).
+travel/hiring requests (`request`), candidate resume intake for HR (`resume_request`),
+and visitor gate pass tracking (`visitors`).
 
 --- TASK MANAGEMENT TABLES ---
 
@@ -159,18 +159,23 @@ resume intake for HR (`resume_request`).
      * `approve_dates` (TEXT): Dates approved for leave.
    - **❌ FORBIDDEN:** `id`, `user_id`, `created_at`, `updated_at`
 
-6. **TABLE: `plant_visitor`** (Plant Visit Approvals)
-   - **Working:** Tracks visitor requests to visit the plant/factory.
+6. **TABLE: `visitors`** (Visitor Gate Pass / Entry Log)
+   - **Working:** Tracks visitors entering the company premises, their gate pass approval, entry/exit times, and whom they visited.
    - **Allowed Columns:**
-     * `person_name` (TEXT): Visitor's name.
-     * `reason_for_visit` (TEXT): Purpose of visit.
-     * `no_of_person` (INTEGER): Number of visitors.
-     * `from_date` (DATE): Visit start date.
-     * `to_date` (DATE): Visit end date.
-     * `requester_name` (TEXT): Who requested the visit.
-     * `request_status` (TEXT): Values: 'pending', 'approved', 'rejected'. Use LOWER().
-     * `approve_by_name` (TEXT): Who approved.
-   - **❌ FORBIDDEN:** `id`, `user_id`, `created_at`, `updated_at`
+     * `visitor_name` (VARCHAR(100)): Full name of the visitor. Use LOWER() for comparisons.
+     * `mobile_number` (VARCHAR(15)): Visitor's mobile number.
+     * `visitor_photo` (TEXT): Photo URL of the visitor (Nullable).
+     * `visitor_address` (TEXT): Address/company of the visitor.
+     * `purpose_of_visit` (TEXT): Reason for visiting the premises.
+     * `person_to_meet` (VARCHAR(100)): Employee/person the visitor came to meet. Use LOWER() for comparisons.
+     * `date_of_visit` (DATE): Date when visitor arrived.
+     * `time_of_entry` (TIME): Clock time when visitor entered.
+     * `visitor_out_time` (TIME): Clock time when visitor exited (NULL if still inside).
+     * `approval_status` (VARCHAR(20)): Gate pass approval status. Known values: 'approved'. Use LOWER().
+     * `approved_by` (VARCHAR(100)): Name of person who approved the visit. Use LOWER().
+     * `approved_at` (TIMESTAMP): Timestamp when gate pass was approved.
+     * `status` (VARCHAR(10)): Current visitor status. Values: 'IN', 'OUT'. Use LOWER().
+   - **❌ FORBIDDEN:** `id`, `gate_pass_closed`, `created_at`
 
 7. **TABLE: `request`** (Travel Requests)
    - **Working:** Tracks employee travel requests with route and mode details.
@@ -221,10 +226,15 @@ resume intake for HR (`resume_request`).
    - **Not Done:** `submission_date IS NOT NULL` AND `LOWER(status) = 'no'` (checklist only)
    - Delegation does NOT use status; rely only on submission_date.
 
-2. **APPROVAL STATES (leave_request, plant_visitor):**
+2. **APPROVAL STATES (leave_request):**
    - **Pending:** `LOWER(request_status) = 'pending'`
    - **Approved:** `LOWER(request_status) = 'approved'`
    - **Rejected:** `LOWER(request_status) = 'rejected'`
+
+2b. **VISITOR STATES (visitors):**
+   - **Inside:** `LOWER(status) = 'in'`
+   - **Left:** `LOWER(status) = 'out'`
+   - **Approved:** `LOWER(approval_status) = 'approved'`
 
 3. **HIRING STATES (resume_request):**
    - **Interview Pending:** `interviewer_actual IS NULL`
@@ -272,9 +282,9 @@ TABLE ROUTING (Decide which table to query)
 • Employee info/users/login details → users
 • Ticket bookings/travel bills/ticket amount → ticket_book
 • Leave/absence/leave request/HR approval → leave_request
-• Plant visitor/visit request/visitor approval → plant_visitor
 • Travel request/departure/city/travel type → request
 • Resume/candidate/hiring/interview/joined → resume_request
+• Visitor gate pass/visitor entry/visitor exit/person to meet → visitors
 
 ────────────────────────────────────────────────────────────
 CONTEXT AWARENESS (CRITICAL)
@@ -305,15 +315,16 @@ using the following intent dimensions:
     • both (checklist + delegation)
     • ticket_book
     • leave_request
-    • plant_visitor
     • request
     • resume_request
     • users
+    • visitors
 
 - time_basis:
     • scheduled_date  → task_start_date (for checklist/delegation)
     • completion_date → submission_date (for checklist/delegation)
-    • date_range      → from_date/to_date (for leave_request, plant_visitor, request)
+    • date_range      → from_date/to_date (for leave_request, request)
+    • visit_date      → date_of_visit (for visitors)
     • interview_date  → interviewer_planned/interviewer_actual (for resume_request)
 
 - time_range:
@@ -326,7 +337,9 @@ using the following intent dimensions:
     • completed  → submission_date IS NOT NULL (checklist/delegation)
     • leave_pending → LOWER(request_status) = 'pending' (leave_request)
     • leave_approved → LOWER(request_status) = 'approved' (leave_request)
-    • visit_pending → LOWER(request_status) = 'pending' (plant_visitor)
+    • visitor_inside → LOWER(status) = 'in' (visitors)
+    • visitor_left → LOWER(status) = 'out' (visitors)
+    • visit_approved → LOWER(approval_status) = 'approved' (visitors)
     • interview_pending → interviewer_actual IS NULL (resume_request)
     • joined → LOWER(joined_status) = 'yes' (resume_request)
     • all
@@ -337,6 +350,8 @@ using the following intent dimensions:
     • person_name
     • employee_name
     • candidate_name
+    • visitor_name
+    • person_to_meet
     • none
 
 This intent object is ONLY for reasoning.
@@ -348,7 +363,8 @@ SQL GENERATION RULES (STRICT)
 1. Use ONLY allowed tables and columns from the SEMANTIC SCHEMA.
 2. NEVER use forbidden columns.
 3. For checklist/delegation: NEVER use `status` for task state. Pending vs Completed MUST rely on `submission_date`.
-4. For leave_request/plant_visitor: Use `request_status` for approval state.
+4. For leave_request: Use `request_status` for approval state.
+4b. For visitors: Use `status` for in/out state and `approval_status` for gate pass approval.
 5. Date filters MUST follow semantic rules.
 6. If BOTH checklist and delegation are required:
    - Use UNION ALL
@@ -384,7 +400,7 @@ Common Hindi words (NEVER use as filter values):
   • "total" → "count" or "sum" depending on context
   • "approve" / "reject" → approval/rejection status
   • "chutti" / "chhutti" → "leave" (leave_request table)
-  • "visitor" / "mehman" → plant_visitor table
+  • "visitor" / "mehman" → visitors table
   • "ticket" → ticket_book table
 
 ⚠️ RULE: If a word like "datta", "sabka", "kitne", "dikhao"

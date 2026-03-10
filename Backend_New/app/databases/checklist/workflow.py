@@ -146,11 +146,12 @@ def call_get_schema(state: EnhancedState):
     # All allowed tables in the checklist database
     target_tables = [
         "checklist", "delegation", "users",
-        "ticket_book", "leave_request", "plant_visitor",
+        "ticket_book", "leave_request",
         "request", "resume_request",
         "master", "all_loans", "request_forclosure", "collect_noc",
         "subscription", "approval_history", "payment_history", "subscription_renewals",
-        "documents", "sharedocuments", "payment_fms"
+        "documents", "sharedocuments", "payment_fms",
+        "visitors"
     ]
     
     tables_str = ", ".join(target_tables)
@@ -162,7 +163,6 @@ def call_get_schema(state: EnhancedState):
     desc_users = config.get_columns_description('users')
     desc_ticket_book = config.get_columns_description('ticket_book')
     desc_leave_request = config.get_columns_description('leave_request')
-    desc_plant_visitor = config.get_columns_description('plant_visitor')
     desc_request = config.get_columns_description('request')
     desc_resume_request = config.get_columns_description('resume_request')
     desc_master = config.get_columns_description('master')
@@ -176,6 +176,7 @@ def call_get_schema(state: EnhancedState):
     desc_documents = config.get_columns_description('documents')
     desc_sharedocuments = config.get_columns_description('sharedocuments')
     desc_payment_fms = config.get_columns_description('payment_fms')
+    desc_visitors = config.get_columns_description('visitors')
 
     column_restrictions = f"""
 🔒 COLUMN RESTRICTIONS (Client Requirement):
@@ -187,7 +188,6 @@ ONLY use these columns in your queries:
 👤 USERS table: {desc_users}
 🎫 TICKET_BOOK table: {desc_ticket_book}
 🏖️ LEAVE_REQUEST table: {desc_leave_request}
-🏭 PLANT_VISITOR table: {desc_plant_visitor}
 ✈️ REQUEST table: {desc_request}
 📄 RESUME_REQUEST table: {desc_resume_request}
 🔧 MASTER table: {desc_master}
@@ -201,6 +201,7 @@ ONLY use these columns in your queries:
 📂 DOCUMENTS table: {desc_documents}
 📤 SHAREDOCUMENTS table: {desc_sharedocuments}
 💰 PAYMENT_FMS table: {desc_payment_fms}
+🚪 VISITORS table: {desc_visitors}
 
 ❌ DO NOT query or SELECT any other columns from these tables.
 ═══════════════════════════════════════════════════════════════════════════════
@@ -220,7 +221,6 @@ ONLY use these columns in your queries:
    - checklist.task_start_date (TIMESTAMP)
    - checklist.submission_date (TIMESTAMP)
    - leave_request.from_date (DATE), leave_request.to_date (DATE)
-   - plant_visitor.from_date (DATE), plant_visitor.to_date (DATE)
    - request.from_date (DATE), request.to_date (DATE), request.departure_date (DATE)
    - ticket_book.created_at (TIMESTAMP)
    - resume_request.interviewer_planned (TIMESTAMP), resume_request.interviewer_actual (TIMESTAMP)

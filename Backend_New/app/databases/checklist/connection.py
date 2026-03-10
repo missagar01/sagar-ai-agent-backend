@@ -15,11 +15,12 @@ class RestrictedSQLDatabase(SQLDatabase):
         # Allowed tables: task management + admin/HR modules
         allowed = [
             "checklist", "delegation", "users",
-            "ticket_book", "leave_request", "plant_visitor",
+            "ticket_book", "leave_request",
             "request", "resume_request",
             "master", "all_loans", "request_forclosure", "collect_noc",
             "subscription", "approval_history", "payment_history", "subscription_renewals",
-            "documents", "sharedocuments", "payment_fms"
+            "documents", "sharedocuments", "payment_fms",
+            "visitors"
         ] 
         return [t for t in all_tables if t.lower() in allowed]
 

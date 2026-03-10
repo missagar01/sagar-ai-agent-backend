@@ -55,11 +55,12 @@ class Settings(BaseSettings):
     MAX_RESULT_ROWS: int = 200
     ALLOWED_TABLES: List[str] = [
         "users", "checklist", "delegation",
-        "ticket_book", "leave_request", "plant_visitor",
+        "ticket_book", "leave_request",
         "request", "resume_request",
         "master", "all_loans", "request_forclosure", "collect_noc",
         "subscription", "approval_history", "payment_history", "subscription_renewals",
-        "documents", "sharedocuments", "payment_fms"
+        "documents", "sharedocuments", "payment_fms",
+        "visitors"
     ]
     
     # Validation Settings

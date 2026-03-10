@@ -7,14 +7,14 @@ Defines schema, allowed columns, and business rules.
 # Router Metadata (Used for Auto-Discovery)
 ROUTER_METADATA = {
     "name": "checklist",
-    "description": "A comprehensive Task, Employee, HR, Admin, Finance & Subscription Operations System. It tracks recurring daily/weekly routines (checklist), one-time assigned duties (delegation), employee leave requests (leave_request), travel/ticket bookings (ticket_book, request), plant visitor approvals (plant_visitor), travel/hiring requests (request), and candidate resume intake for HR (resume_request), company subscriptions & renewals (subscription, subscription_renewals, approval_history, payment_history), company/personal document management (documents, sharedocuments), loan & finance tracking (all_loans, request_forclosure, collect_noc), payment processing (payment_fms), and maintenance task master data (master). Use this database for queries related to employee task completion, delegation, leave, travel, visitor passes, hiring, subscription status, renewal tracking, approval history, payment records, loan details, EMI, NOC collection, document management, and maintenance task priorities.",
+    "description": "A comprehensive Task, Employee, HR, Admin, Finance & Subscription Operations System. It tracks recurring daily/weekly routines (checklist), one-time assigned duties (delegation), employee leave requests (leave_request), travel/ticket bookings (ticket_book, request), travel/hiring requests (request), and candidate resume intake for HR (resume_request), company subscriptions & renewals (subscription, subscription_renewals, approval_history, payment_history), company/personal document management (documents, sharedocuments), loan & finance tracking (all_loans, request_forclosure, collect_noc), payment processing (payment_fms), maintenance task master data (master), and visitor gate pass entry/exit tracking (visitors). Use this database for queries related to employee task completion, delegation, leave, travel, hiring, subscription status, renewal tracking, approval history, payment records, loan details, EMI, NOC collection, document management, maintenance task priorities, and visitor gate pass details.",
     "keywords": [
         "task", "pending", "completed", "late", "given by", "department", 
         "users", "report", "summary", "checklist system", "task db", 
         "employee", "delegation", "performance", "attendance", "routine",
         "ticket", "booking", "travel", "bill", "ticket amount", "charges",
         "leave", "leave request", "hr approval", "approved", "absent",
-        "plant visitor", "visit", "visitor", "visitor approval",
+        "visit", "visitor", "visitor approval",
         "request", "travel request", "departure", "city",
         "resume", "candidate", "hiring", "interview", "joined", "designation",
         "subscription", "renewal", "subscriber", "company subscription", "approval history",
@@ -22,7 +22,9 @@ ROUTER_METADATA = {
         "loan", "EMI", "bank", "loan amount", "foreclosure", "NOC", "closure",
         "document", "certificate", "document type", "category", "shared document",
         "payment fms", "pay to", "fms", "payment type",
-        "master", "maintenance", "priority", "doer", "task type"
+        "master", "maintenance", "priority", "doer", "task type",
+        "visitor gate pass", "gate pass", "visitor entry", "visitor out", "person to meet",
+        "visitor name", "purpose of visit", "date of visit", "visitor approval status"
     ]
 }
 
@@ -83,16 +85,7 @@ ALLOWED_COLUMNS = {
         "commercial_head_status",
         "approve_dates"
     ],
-    "plant_visitor": [
-        "person_name",
-        "reason_for_visit",
-        "no_of_person",
-        "from_date",
-        "to_date",
-        "requester_name",
-        "request_status",
-        "approve_by_name"
-    ],
+
     "request": [
         "person_name",
         "from_date",
@@ -289,6 +282,21 @@ ALLOWED_COLUMNS = {
         "delay1",
         "delay2",
         "delay3"
+    ],
+    "visitors": [
+        "visitor_name",
+        "mobile_number",
+        "visitor_photo",
+        "visitor_address",
+        "purpose_of_visit",
+        "person_to_meet",
+        "date_of_visit",
+        "time_of_entry",
+        "visitor_out_time",
+        "approval_status",
+        "approved_by",
+        "approved_at",
+        "status"
     ]
 }
 
@@ -298,8 +306,8 @@ SEMANTIC_SCHEMA = """
 ------------------------------------------------------------------------------------------------
 This database tracks employee tasks (`checklist`, `delegation`), user info (`users`),
 and administrative modules: ticket bookings (`ticket_book`), leave management (`leave_request`),
-plant visit approvals (`plant_visitor`), travel/hiring requests (`request`), and candidate
-resume intake for HR (`resume_request`).
+travel/hiring requests (`request`), candidate resume intake for HR (`resume_request`),
+and visitor gate pass tracking (`visitors`).
 
 --- TASK MANAGEMENT TABLES ---
 
@@ -396,24 +404,6 @@ resume intake for HR (`resume_request`).
      * **Leave duration:** (to_date - from_date + 1) for number of days.
      * Always use LOWER() for status and name comparisons.
 
-6. **TABLE: `plant_visitor`** (Plant Visit Requests)
-   - **Working:** Tracks planned plant visit requests (different from visitor gate pass), including headcount and approval workflow.
-   - **Allowed Columns & Usage:**
-     * `person_name` (VARCHAR(150)): Name of the visitor/party.
-     * `reason_for_visit` (TEXT): Why the visit is needed.
-     * `no_of_person` (INTEGER): Number of visitors in the group.
-     * `from_date` (DATE): Visit start date.
-     * `to_date` (DATE): Visit end date.
-     * `requester_name` (VARCHAR(150)): Employee who requested the visit.
-     * `request_status` (VARCHAR(50)): Approval/workflow status.
-         - Possible values: 'Pending', 'Approved', 'Rejected', etc. Use LOWER() for comparisons.
-     * `approve_by_name` (VARCHAR(150)): Name of the person who approved the visit.
-   - **❌ FORBIDDEN COLUMNS (DO NOT USE):**
-     * `id`, `employee_code`, `request_for`, `remarks`, `approv_employee_code`, `created_at`, `updated_at`
-   - **LOGIC:**
-     * **Pending visits:** LOWER(request_status) = 'pending'
-     * **Approved visits:** LOWER(request_status) = 'approved'
-     * Use LOWER() for all name and status comparisons.
 
 7. **TABLE: `request`** (Travel & Generic Requests)
    - **Working:** Handles travel requests, manpower requests, and other generic requests with date ranges and travel details.
@@ -685,6 +675,37 @@ resume intake for HR (`resume_request`).
       * Use LOWER(pay_to), LOWER(status), LOWER(payment_type) for filtering.
       * Total payments: SUM(amount). ⚠️ id is UUID - do NOT cast to integer.
 
+20. **TABLE: `visitors`** (Visitor Gate Pass / Entry Log)
+    - **Working:** Tracks visitors entering the company premises, their gate pass approval, entry/exit times, and whom they visited. Each visitor record represents a single visit event.
+    - **Allowed Columns & Usage:**
+      * `visitor_name` (VARCHAR(100)): Full name of the visitor. Use LOWER() for comparisons.
+      * `mobile_number` (VARCHAR(15)): Visitor's mobile number.
+      * `visitor_photo` (TEXT): Photo URL of the visitor (Nullable).
+      * `visitor_address` (TEXT): Address/company of the visitor.
+      * `purpose_of_visit` (TEXT): Reason for visiting the premises.
+      * `person_to_meet` (VARCHAR(100)): Employee/person the visitor came to meet. Use LOWER() for comparisons.
+      * `date_of_visit` (DATE): Date when visitor arrived.
+      * `time_of_entry` (TIME): Clock time when visitor entered.
+      * `visitor_out_time` (TIME): Clock time when visitor exited (NULL if still inside).
+      * `approval_status` (VARCHAR(20)): Gate pass approval status.
+          - Known values: 'approved'. Use LOWER() for comparisons.
+      * `approved_by` (VARCHAR(100)): Name of person who approved the visit. Use LOWER() for comparisons.
+      * `approved_at` (TIMESTAMP): Timestamp when gate pass was approved.
+      * `status` (VARCHAR(10)): Current visitor status.
+          - Values: 'IN', 'OUT'. Use LOWER() for comparisons.
+          - 'IN' → Visitor is currently inside the premises.
+          - 'OUT' → Visitor has exited.
+    - **❌ FORBIDDEN COLUMNS (DO NOT USE):**
+      * `id`, `gate_pass_closed`, `created_at`
+    - **LOGIC:**
+      * Visitor currently inside: LOWER(status) = 'in' OR visitor_out_time IS NULL
+      * Visitor left: LOWER(status) = 'out' AND visitor_out_time IS NOT NULL
+      * Approved visits: LOWER(approval_status) = 'approved'
+      * Visits on a specific date: date_of_visit = 'YYYY-MM-DD'
+      * Duration of visit: visitor_out_time - time_of_entry (TIME arithmetic)
+      * Use LOWER() for all string comparisons (visitor_name, person_to_meet, approved_by, status, approval_status, purpose_of_visit).
+
+
 ------------------------------------------------------------------------------------------------
 🧠 **LOGIC & CALCULATIONS**
 ------------------------------------------------------------------------------------------------
@@ -699,9 +720,10 @@ resume intake for HR (`resume_request`).
      `task_start_date >= DATE_TRUNC('month', CURRENT_DATE) AND task_start_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'`
    - **"This Month Till Today":** (Dashboard Style)
      `task_start_date >= DATE_TRUNC('month', CURRENT_DATE) AND task_start_date < CURRENT_DATE + INTERVAL '1 day'`
-   - **For leave_request/plant_visitor/request:** Use `from_date` and `to_date` as the date range columns.
+   - **For leave_request/request:** Use `from_date` and `to_date` as the date range columns.
    - **For subscription:** Use `start_date` and `end_date` for date range.
-   - **For all_loans/request_forclosure/collect_noc:** Use `loan_start_date` and `loan_end_date`.
+    - **For all_loans/request_forclosure/collect_noc:** Use `loan_start_date` and `loan_end_date`.
+    - **For visitors:** Use `date_of_visit` as the date column.
 
 3. **PERFORMANCE REPORTS:**
    - Must include BOTH `checklist` and `delegation` tables (UNION ALL).
@@ -717,7 +739,6 @@ resume intake for HR (`resume_request`).
 5. **ADMIN/HR TABLE STATES:**
    - **Leave Pending:** `LOWER(request_status) = 'pending'`
    - **Leave Approved:** `LOWER(request_status) = 'approved'`
-   - **Visit Pending:** `LOWER(request_status) = 'pending'` in plant_visitor
    - **Interview Pending:** `interviewer_actual IS NULL AND interviewer_planned IS NOT NULL` in resume_request
    - **Candidate Joined:** `LOWER(joined_status) = 'yes'` in resume_request
 
@@ -730,8 +751,11 @@ resume intake for HR (`resume_request`).
    - **Renewed:** `LOWER(renewal_status) = 'renewed'` in subscription_renewals
    - **Active Loan:** `loan_end_date >= CURRENT_DATE` in all_loans
    - **NOC Collected:** `collect_noc = true` in collect_noc
-   - **NOC Pending:** `collect_noc = false OR collect_noc IS NULL` in collect_noc
-   - **Document Active:** `is_deleted = false OR is_deleted IS NULL` in documents
+    - **NOC Pending:** `collect_noc = false OR collect_noc IS NULL` in collect_noc
+    - **Visitor Inside:** `LOWER(status) = 'in'` in visitors
+    - **Visitor Left:** `LOWER(status) = 'out'` in visitors  
+    - **Visit Approved:** `LOWER(approval_status) = 'approved'` in visitors
+    - **Document Active:** `is_deleted = false OR is_deleted IS NULL` in documents
    - **Document Needs Renewal:** `need_renewal = 'yes'` in documents
 
 7. **SUBSCRIPTION JOIN RULES:**

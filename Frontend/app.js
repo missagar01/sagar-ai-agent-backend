@@ -9,8 +9,8 @@
  * - Query caching visualization
  * - Request cancellation
  */
-const API_BASE_URL = window.location.protocol === 'file:' 
-  ? 'http://localhost:8000' 
+const API_BASE_URL = window.location.protocol === 'file:'
+  ? 'http://localhost:8000'
   : '/api';
 
 // ============================================================================
@@ -91,10 +91,10 @@ function setupLoginForm() {
 
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const login = document.getElementById('loginInput').value.trim();
     const password = document.getElementById('loginPassword').value;
-    
+
     if (!login || !password) return;
 
     // Show loading state
@@ -115,7 +115,7 @@ function setupLoginForm() {
       if (response.ok && data.success) {
         localStorage.setItem('auth_token', data.token);
         localStorage.setItem('auth_user', JSON.stringify(data.user));
-        
+
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('appContainer').style.display = 'flex';
         initApp();
@@ -278,7 +278,7 @@ function startTypingAnimation() {
   if (typingTimeoutId) {
     clearTimeout(typingTimeoutId);
   }
-  
+
   const text = "Ask Anything....";
   let i = 0;
   typingElement.textContent = "";
@@ -286,8 +286,8 @@ function startTypingAnimation() {
   function type() {
     const currentTypingElement = document.getElementById("typingText");
     if (!currentTypingElement) {
-        typingAnimationActive = false;
-        return;
+      typingAnimationActive = false;
+      return;
     }
 
     if (i < text.length) {
@@ -302,7 +302,7 @@ function startTypingAnimation() {
       }, 2000);
     }
   }
-  
+
   typingAnimationActive = true;
   type();
 }
@@ -618,8 +618,8 @@ async function sendMessage() {
       const threshold = 150;
       const isNearBottom =
         chatDisplay.scrollHeight -
-          chatDisplay.scrollTop -
-          chatDisplay.clientHeight <
+        chatDisplay.scrollTop -
+        chatDisplay.clientHeight <
         threshold;
 
       for (const line of lines) {
@@ -666,28 +666,28 @@ async function sendMessage() {
               // Render markdown incrementally
               // CLEANUP: Silently hide (Note: ...) technical sections at the end
               let displayContent = fullText;
-              
+
               // Hide internal logging messages
-              if (displayContent.includes("Validation failed") || 
-                  displayContent.includes("LLM 1:") || 
-                  displayContent.includes("LLM 2:") ||
-                  displayContent.includes("Generating query") || 
-                  displayContent.includes("Storing schema context") ||
-                  displayContent.includes("❌")) {
-                  // We just don't parse these specific segments at all to keep UI clean
-                  displayContent = ""; 
+              if (displayContent.includes("Validation failed") ||
+                displayContent.includes("LLM 1:") ||
+                displayContent.includes("LLM 2:") ||
+                displayContent.includes("Generating query") ||
+                displayContent.includes("Storing schema context") ||
+                displayContent.includes("❌")) {
+                // We just don't parse these specific segments at all to keep UI clean
+                displayContent = "";
               }
 
               const noteRegex = /\n*\s*\(Note:[\s\S]*$/i;
               if (noteRegex.test(displayContent)) {
-                  displayContent = displayContent.replace(noteRegex, "").trim();
+                displayContent = displayContent.replace(noteRegex, "").trim();
               }
-              
+
               const techNoteRegex = /\n*\s*Technical note:[\s\S]*$/i;
               if (techNoteRegex.test(displayContent)) {
-                  displayContent = displayContent.replace(techNoteRegex, "").trim();
+                displayContent = displayContent.replace(techNoteRegex, "").trim();
               }
-              
+
               if (displayContent) {
                 try {
                   let rendered = marked.parse(displayContent);
@@ -701,9 +701,9 @@ async function sendMessage() {
                   contentDiv.innerText = displayContent;
                 }
               } else if (!statusDiv.style.display || statusDiv.style.display === "none") {
-                  // If we hid the content and the status div is also hidden, we should show the thinking state
-                  statusDiv.style.display = "flex";
-                  statusDiv.innerHTML = `
+                // If we hid the content and the status div is also hidden, we should show the thinking state
+                statusDiv.style.display = "flex";
+                statusDiv.innerHTML = `
                                 <div class="status-dot active"></div>
                                 <span>Thinking...</span>
                             `;
@@ -765,8 +765,8 @@ async function sendMessage() {
     const threshold = 150;
     const isNearBottom =
       chatDisplay.scrollHeight -
-        chatDisplay.scrollTop -
-        chatDisplay.clientHeight <
+      chatDisplay.scrollTop -
+      chatDisplay.clientHeight <
       threshold;
     if (isNearBottom) chatDisplay.scrollTop = chatDisplay.scrollHeight;
   }
@@ -831,14 +831,14 @@ function addMessage(text, type, animate = true) {
     let cleanedText = text;
     const noteRegex = /\n*\s*\(Note:[\s\S]*$/i;
     if (noteRegex.test(text)) {
-        cleanedText = text.replace(noteRegex, "").trim();
+      cleanedText = text.replace(noteRegex, "").trim();
     }
-    
+
     const techNoteRegex = /\n*\s*Technical note:[\s\S]*$/i;
     if (techNoteRegex.test(cleanedText)) {
-        cleanedText = cleanedText.replace(techNoteRegex, "").trim();
+      cleanedText = cleanedText.replace(techNoteRegex, "").trim();
     }
-    
+
     try {
       let renderedHtml = marked.parse(cleanedText);
       renderedHtml = renderedHtml.replace(
